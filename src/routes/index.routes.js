@@ -1,8 +1,12 @@
 const { Router } = require('express');
 const router = Router();
 
-const { home } = require('../controllers/home.controller');
-
-router.get('/', home);
+router.get('/', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'API del TFG funcionando',
+    version: '1.0.0'
+  });
+});
 
 module.exports = router;
