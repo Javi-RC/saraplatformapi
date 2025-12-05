@@ -12,7 +12,9 @@ class ResponseHandler {
       'INVALID_EMAIL_FORMAT': { status: 400, message: 'Formato de email inválido' },
       'PASSWORD_TOO_SHORT': { status: 400, message: 'La contraseña debe tener al menos 6 caracteres' },
       'MISSING_CREDENTIALS': { status: 400, message: 'Email y contraseña son requeridos' },
-      'MISSING_EMAIL_OR_NAME': { status: 400, message: 'Email y nombre son requeridos' }
+      'MISSING_EMAIL_OR_NAME': { status: 400, message: 'Email y nombre son requeridos' },
+      'ERROR_PROCESSING_CV': { status: 500, message: 'Error al procesar el CV. Verifica la configuración de Gemini API.' },
+      'CV_NOT_FOUND': { status: 404, message: 'CV no encontrado' }
     };
 
     const errorInfo = errorMap[error.message] || { status: 500, message: 'Error interno del servidor' };

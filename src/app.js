@@ -15,10 +15,12 @@ app.use(express.urlencoded({ extended: true }));
 const indexRoutes = require('./routes/index.routes');
 const authRoutes = require('./routes/auth.routes');
 const protectedRoutes = require('./routes/protected.routes');
+const cvRoutes = require('./routes/cv.routes');
 
 app.use('/', indexRoutes);
 app.use('/auth', authRoutes);
 app.use('/api', protectedRoutes);
+app.use('/api/cv', cvRoutes);
 
 // Ruta de salud
 app.get('/health', (req, res) => {
