@@ -52,7 +52,21 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
   lastLogin: Date,
-  avatar: String
+  avatar: String,
+  notificationPreferences: {
+    email: {
+      type: Boolean,
+      default: true
+    },
+    inApp: {
+      type: Boolean,
+      default: true
+    },
+    push: {
+      type: Boolean,
+      default: false
+    }
+  }
 });
 
 // Use a partial index so only documents with both oauthProvider and oauthId
