@@ -14,7 +14,12 @@ class ResponseHandler {
       'MISSING_CREDENTIALS': { status: 400, message: 'Email y contraseña son requeridos' },
       'MISSING_EMAIL_OR_NAME': { status: 400, message: 'Email y nombre son requeridos' },
       'ERROR_PROCESSING_CV': { status: 500, message: 'Error al procesar el CV. Verifica la configuración de Gemini API.' },
-      'CV_NOT_FOUND': { status: 404, message: 'CV no encontrado' }
+      'CV_NOT_FOUND': { status: 404, message: 'CV no encontrado' },
+      // BFI-44 Errors
+      'INVALID_RESPONSE_COUNT': { status: 400, message: 'Deben existir exactamente 44 respuestas' },
+      'BFI44_INVALID_RESPONSES_FORMAT': { status: 400, message: 'Formato de respuestas inválido' },
+      'BFI44_INVALID_RESPONSE_COUNT': { status: 400, message: 'Deben existir exactamente 44 respuestas' },
+      'BFI44_RESPONSE_NOT_FOUND': { status: 404, message: 'Respuesta BFI-44 no encontrada' }
     };
 
     const errorInfo = errorMap[error.message] || { status: 500, message: 'Error interno del servidor' };

@@ -83,6 +83,39 @@ class Validators {
 
     next();
   }
+
+  /**
+   * Validar respuestas del BFI-44
+   * @param {Object} responses - Objeto con las respuestas del cuestionario
+   * @throws {Error} Si las respuestas no son válidas
+   */
+  validateBFI44Responses(responses) {
+    if (!responses || typeof responses !== 'object') {
+      throw new Error('BFI44_INVALID_RESPONSES_FORMAT');
+    }
+
+    // Verificar que existan exactamente 44 respuestas
+    const responseKeys = Object.keys(responses);
+    if (responseKeys.length !== 44) {
+      throw new Error('BFI44_INVALID_RESPONSE_COUNT');
+    }
+
+    // Validar cada respuesta
+    for (let i = 1; i <= 44; i++) {
+      const key = i.toString();
+      const value = responses[key];
+
+      if (value === undefined || value === null) {
+        throw new Error(`BFI44_MISSING_QUESTION_${i}`);
+      }
+
+      if (!Number.isInteger(value) || value < 1 || value > 5) {
+        throw new Error(`BFI44_INVALID_VALUE_QUESTION_${i}`);
+      }
+    }
+
+    return true;
+  }
 }
 
 module.exports = new Validators();
