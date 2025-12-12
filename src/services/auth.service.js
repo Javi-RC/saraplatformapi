@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const { generateToken } = require('../utils/jwt');
 const emailService = require('./email.service');
 const authNotificationHelper = require('./authNotificationHelper');
+const bfi44NotificationHelper = require('./bfi44NotificationHelper');
+const BFI44Response = require('../models/bfi44.model');
 
 class AuthService {
   async register(userData) {
@@ -113,6 +115,16 @@ class AuthService {
     authNotificationHelper.notifyAccountConfirmed(user._id, user.name).catch(err => {
       console.error('Error enviando notificación de cuenta confirmada:', err);
     });
+
+    // Si es empleado y no ha completado el test BFI-44, notificar
+    if (user.role === 'employee') {
+      const hasProfile = await BFI44Response.hasProfile(user._id);
+      if (!hasProfile) {
+        bfi44NotificationHelper.notifyTestPending(user._id, user.name).catch(err => {
+          console.error('Error enviando notificación de test BFI-44:', err);
+        });
+      }
+    }
 
     return user;
   }

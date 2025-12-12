@@ -1,6 +1,8 @@
 const Organization = require('../models/organization.model');
 const User = require('../models/user.model');
 const organizationNotificationHelper = require('./organizationNotificationHelper');
+const bfi44NotificationHelper = require('./bfi44NotificationHelper');
+const BFI44Response = require('../models/bfi44.model');
 
 /**
  * Servicio de Gestión de Organizaciones
@@ -167,6 +169,14 @@ class OrganizationService {
     organizationNotificationHelper.notifyEmployeeAdded(organization, user, employeeData).catch(err => {
       console.error('Error enviando notificación de empleado agregado:', err);
     });
+
+    // Notificar sobre el test BFI-44 si no lo ha completado
+    const hasProfile = await BFI44Response.hasProfile(user._id);
+    if (!hasProfile) {
+      bfi44NotificationHelper.notifyTestPending(user._id, user.name).catch(err => {
+        console.error('Error enviando notificación de test BFI-44:', err);
+      });
+    }
 
     return organization;
   }
