@@ -1,6 +1,9 @@
 const aiExtractorService = require('../services/aiExtractor.service');
+const cvService = require('../services/cv.service');
 const responseHandler = require('../utils/responseHandler');
 const pdfParse = require('pdf-parse');
+const cvNotificationHelper = require('../services/cvNotificationHelper');
+const User = require('../models/user.model');
 
 /**
  * Controlador de CVs
@@ -39,6 +42,15 @@ class CVController {
       if (!textContent || textContent.trim().length === 0) {
         return responseHandler.error(res, 'No se pudo extraer texto del archivo', 400);
       }
+
+      // Obtener información del usuario para notificaciones
+      const user = await User.findById(userId);
+      const userName = user?.name || 'Usuario';
+
+      // Enviar notificación de CV subido (antes de procesar)
+      cvNotificationHelper.notifyCVUploaded(userId, userName, null, file.originalname).catch(err => {
+        console.error('Error enviando notificación de CV subido:', err);
+      });
 
       // Procesar CV con IA
       const cv = await aiExtractorService.processCV(userId, textContent, file.originalname);
@@ -200,6 +212,194 @@ class CVController {
 
     } catch (error) {
       return responseHandler.handleError(error, res);
+    }
+  }
+
+  /**
+   * Envía el CV a una organización
+   * POST /api/cv/submit-to-organization
+   */
+  async submitToOrganization(req, res) {
+    try {
+      const userId = req.user.id;
+      const { organizationId } = req.body;
+
+      if (!organizationId) {
+        return responseHandler.error(res, 'Se requiere el ID de la organización', 400);
+      }
+
+      const cv = await cvService.submitCVToOrganization(userId, organizationId);
+
+      return responseHandler.success(res, {
+        message: 'CV enviado exitosamente a la organización',
+        cv
+      }, 201);
+
+    } catch (error) {
+      console.error('Error enviando CV a organización:', error);
+      
+      const errorMessages = {
+        'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
+        'ORGANIZATION_NOT_ACTIVE': 'La organización no está activa',
+        'CV_NOT_FOUND': 'No tienes un CV registrado',
+        'CV_ALREADY_SUBMITTED': 'Ya has enviado tu CV a esta organización',
+        'USER_NOT_FOUND': 'Usuario no encontrado'
+      };
+
+      const statusCodes = {
+        'ORGANIZATION_NOT_FOUND': 404,
+        'ORGANIZATION_NOT_ACTIVE': 403,
+        'CV_NOT_FOUND': 404,
+        'CV_ALREADY_SUBMITTED': 409,
+        'USER_NOT_FOUND': 404
+      };
+
+      const message = errorMessages[error.message] || 'Error al enviar CV';
+      const statusCode = statusCodes[error.message] || 400;
+
+      return responseHandler.error(res, message, statusCode);
+    }
+  }
+
+  /**
+   * Obtiene los CVs enviados a una organización (solo admins)
+   * GET /api/organizations/:id/cvs
+   */
+  async getOrganizationCVs(req, res) {
+    try {
+      const { id: organizationId } = req.params;
+      const adminId = req.user.id;
+      const filters = {
+        status: req.query.status,
+        page: req.query.page,
+        limit: req.query.limit
+      };
+
+      const result = await cvService.getOrganizationCVs(organizationId, adminId, filters);
+
+      return responseHandler.success(res, result);
+
+    } catch (error) {
+      console.error('Error obteniendo CVs de organización:', error);
+      
+      const errorMessages = {
+        'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
+        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver estos CVs'
+      };
+
+      const statusCodes = {
+        'ORGANIZATION_NOT_FOUND': 404,
+        'UNAUTHORIZED_ACCESS': 403
+      };
+
+      const message = errorMessages[error.message] || 'Error al obtener CVs';
+      const statusCode = statusCodes[error.message] || 400;
+
+      return responseHandler.error(res, message, statusCode);
+    }
+  }
+
+  /**
+   * Obtiene un CV específico de la organización
+   * GET /api/organizations/:id/cvs/:cvId
+   */
+  async getOrganizationCV(req, res) {
+    try {
+      const { id: organizationId, cvId } = req.params;
+      const adminId = req.user.id;
+
+      const cv = await cvService.getOrganizationCV(cvId, organizationId, adminId);
+
+      return responseHandler.success(res, { cv });
+
+    } catch (error) {
+      console.error('Error obteniendo CV de organización:', error);
+      
+      const errorMessages = {
+        'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
+        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver este CV',
+        'CV_NOT_FOUND': 'CV no encontrado',
+        'CV_NOT_BELONGS_TO_ORGANIZATION': 'Este CV no pertenece a esta organización'
+      };
+
+      const statusCodes = {
+        'ORGANIZATION_NOT_FOUND': 404,
+        'UNAUTHORIZED_ACCESS': 403,
+        'CV_NOT_FOUND': 404,
+        'CV_NOT_BELONGS_TO_ORGANIZATION': 403
+      };
+
+      const message = errorMessages[error.message] || 'Error al obtener CV';
+      const statusCode = statusCodes[error.message] || 400;
+
+      return responseHandler.error(res, message, statusCode);
+    }
+  }
+
+  /**
+   * Actualiza el estado de un CV en la organización
+   * PATCH /api/organizations/:id/cvs/:cvId/status
+   */
+  async updateCVStatus(req, res) {
+    try {
+      const { id: organizationId, cvId } = req.params;
+      const adminId = req.user.id;
+      const { status, notes, position, department } = req.body;
+
+      if (!status) {
+        return responseHandler.error(res, 'Se requiere el nuevo estado', 400);
+      }
+
+      const validStatuses = ['pending', 'reviewed', 'accepted', 'rejected'];
+      if (!validStatuses.includes(status)) {
+        return responseHandler.error(
+          res,
+          `Estado inválido. Debe ser uno de: ${validStatuses.join(', ')}`,
+          400
+        );
+      }
+
+      // Datos adicionales del empleado cuando se acepta el CV
+      const employeeData = {
+        position: position || '',
+        department: department || ''
+      };
+
+      const cv = await cvService.updateCVStatus(
+        cvId,
+        organizationId,
+        adminId,
+        status,
+        notes,
+        employeeData
+      );
+
+      return responseHandler.success(res, {
+        message: 'Estado del CV actualizado exitosamente',
+        cv
+      });
+
+    } catch (error) {
+      console.error('Error actualizando estado de CV:', error);
+      
+      const errorMessages = {
+        'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
+        'UNAUTHORIZED_ACCESS': 'No tienes permisos para actualizar este CV',
+        'CV_NOT_FOUND': 'CV no encontrado',
+        'CV_NOT_BELONGS_TO_ORGANIZATION': 'Este CV no pertenece a esta organización'
+      };
+
+      const statusCodes = {
+        'ORGANIZATION_NOT_FOUND': 404,
+        'UNAUTHORIZED_ACCESS': 403,
+        'CV_NOT_FOUND': 404,
+        'CV_NOT_BELONGS_TO_ORGANIZATION': 403
+      };
+
+      const message = errorMessages[error.message] || 'Error al actualizar estado';
+      const statusCode = statusCodes[error.message] || 400;
+
+      return responseHandler.error(res, message, statusCode);
     }
   }
 }

@@ -132,26 +132,84 @@ const dictionaries = {
     'India', 'Australia', 'New Zealand'
   ],
 
-  // Palabras clave para experiencia laboral
+  // Palabras clave para experiencia laboral en ingeniería de software
   experienceKeywords: [
-    'responsable', 'encargado', 'desarrollador', 'developer', 'engineer',
-    'ingeniero', 'analista', 'analyst', 'consultor', 'consultant',
-    'manager', 'jefe', 'director', 'líder', 'lead', 'senior', 'junior',
-    'arquitecto', 'architect', 'diseñador', 'designer', 'coordinador',
-    'specialist', 'especialista', 'administrador', 'administrator'
+    'desarrollador', 'developer', 'engineer', 'ingeniero',
+    'software engineer', 'frontend developer', 'backend developer',
+    'full stack', 'fullstack', 'devops', 'sre', 'site reliability',
+    'tech lead', 'team lead', 'engineering manager', 'scrum master',
+    'product owner', 'qa', 'tester', 'automation engineer',
+    'data engineer', 'data scientist', 'ml engineer', 'security engineer',
+    'cloud architect', 'solutions architect', 'principal engineer',
+    'staff engineer', 'senior', 'junior', 'mid-level', 'remoto', 'remote',
+    'híbrido', 'hybrid', 'presencial', 'on-site'
   ],
 
-  // Palabras clave para títulos académicos
+  // Palabras clave para títulos académicos en tech
   degreeKeywords: [
-    'grado', 'licenciatura', 'ingeniería', 'máster', 'master', 'mba',
-    'doctorado', 'phd', 'bachillerato', 'técnico', 'certificado',
-    'diplomatura', 'degree', 'bachelor', 'master\'s', 'doctorate'
+    'grado', 'licenciatura', 'ingeniería informática', 'ingeniería software',
+    'computer science', 'sistemas', 'telecomunicaciones', 'máster', 'master',
+    'mba', 'doctorado', 'phd', 'bootcamp', 'técnico', 'certificado',
+    'diplomatura', 'fp', 'formación profesional', 'degree', 'bachelor',
+    'master\'s', 'doctorate', 'computer engineering', 'software engineering',
+    'data science', 'cybersecurity'
   ],
 
-  // Palabras clave para certificaciones
+  // Palabras clave para certificaciones tech
   certificationKeywords: [
     'certified', 'certificado', 'certification', 'certificación',
-    'professional', 'profesional', 'associate', 'expert', 'specialist'
+    'professional', 'profesional', 'associate', 'expert', 'specialist',
+    'aws', 'azure', 'gcp', 'kubernetes', 'ckad', 'cka', 'cks',
+    'oracle', 'cisco', 'comptia', 'pmp', 'csm', 'psm', 'safe',
+    'terraform', 'docker', 'jenkins', 'scrum', 'agile'
+  ],
+
+  // Departamentos comunes en empresas tech
+  departments: [
+    'Ingeniería de Software',
+    'Frontend',
+    'Backend',
+    'Full Stack',
+    'DevOps',
+    'SRE',
+    'QA y Testing',
+    'Arquitectura',
+    'Data Engineering',
+    'Data Science',
+    'Machine Learning',
+    'Ciberseguridad',
+    'Cloud Infrastructure',
+    'Product Management',
+    'UX/UI Design',
+    'Mobile Development'
+  ],
+
+  // Modalidades de trabajo
+  workModes: [
+    'remoto',
+    'remote',
+    'híbrido',
+    'hybrid',
+    'presencial',
+    'on-site',
+    'flexible',
+    'distributed',
+    'distribuido'
+  ],
+
+  // Habilidades blandas para trabajo remoto
+  remoteSoftSkills: [
+    'comunicación asíncrona',
+    'autogestión',
+    'trabajo remoto',
+    'colaboración distribuida',
+    'autonomía',
+    'comunicación escrita',
+    'gestión del tiempo',
+    'adaptabilidad',
+    'proactividad',
+    'resolución de problemas',
+    'trabajo en equipo distribuido'
   ]
 };
 

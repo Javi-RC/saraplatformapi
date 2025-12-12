@@ -6,12 +6,22 @@ const { NotificationTypes, NotificationChannels, NotificationPriority } = requir
  */
 class AuthNotificationHelper {
   /**
+   * Extrae el ID de un objeto o retorna el string directamente
+   */
+  _extractId(obj) {
+    if (!obj) return null;
+    if (typeof obj === 'string') return obj;
+    if (obj._id) return obj._id.toString();
+    return obj.toString();
+  }
+
+  /**
    * Notifica al usuario que su cuenta ha sido creada
    */
   async notifyAccountCreated(userId, userName) {
     try {
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.EMAIL_CONFIRMATION,
         title: '¡Bienvenido!',
         message: `Hola ${userName}, tu cuenta ha sido creada exitosamente. Por favor, confirma tu email para comenzar.`,
@@ -32,7 +42,7 @@ class AuthNotificationHelper {
   async notifyAccountConfirmed(userId, userName) {
     try {
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.EMAIL_CONFIRMATION,
         title: 'Cuenta Confirmada',
         message: `¡Felicidades ${userName}! Tu cuenta ha sido confirmada exitosamente. Ya puedes acceder a todas las funcionalidades.`,
@@ -61,11 +71,11 @@ class AuthNotificationHelper {
       };
 
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.ROLE_CHANGED,
         title: 'Rol Actualizado',
         message: `Hola ${userName}, tu rol ha sido actualizado de ${roleNames[oldRole]} a ${roleNames[newRole]}.`,
-        channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
+        channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         metadata: {
           event: 'role_changed',
@@ -86,7 +96,7 @@ class AuthNotificationHelper {
       const changesList = Object.keys(changes).join(', ');
       
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.ACCOUNT_UPDATED,
         title: 'Cuenta Actualizada',
         message: `Hola ${userName}, tu perfil ha sido actualizado. Campos modificados: ${changesList}`,
@@ -110,11 +120,11 @@ class AuthNotificationHelper {
   async notifySuspiciousLogin(userId, userName, loginDetails) {
     try {
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.ACCOUNT_UPDATED,
         title: '⚠️ Inicio de Sesión Detectado',
         message: `Se ha detectado un inicio de sesión en tu cuenta desde ${loginDetails.location || 'ubicación desconocida'}. Si fuiste tú, puedes ignorar este mensaje.`,
-        channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
+        channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.URGENT,
         actionUrl: '/security',
         actionText: 'Revisar Seguridad',

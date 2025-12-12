@@ -49,6 +49,8 @@ exports.authMiddleware = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const decoded = exports.verifyToken(token);
     req.user = decoded;
+    // Alias de compatibilidad: muchos controladores usan req.user.id
+    req.user.id = decoded.userId;
     
     next();
   } catch (error) {

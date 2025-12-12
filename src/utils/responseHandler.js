@@ -32,6 +32,13 @@ class ResponseHandler {
     });
   }
 
+  error(res, message, statusCode = 400) {
+    return res.status(statusCode).json({
+      success: false,
+      error: message
+    });
+  }
+
   redirect(res, url) {
     return res.redirect(url);
   }

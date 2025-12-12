@@ -6,19 +6,29 @@ const { NotificationTypes, NotificationChannels, NotificationPriority } = requir
  */
 class CVNotificationHelper {
   /**
+   * Extrae el ID de un objeto o retorna el string directamente
+   */
+  _extractId(obj) {
+    if (!obj) return null;
+    if (typeof obj === 'string') return obj;
+    if (obj._id) return obj._id.toString();
+    return obj.toString();
+  }
+
+  /**
    * Notifica al usuario que su CV ha sido subido
    */
   async notifyCVUploaded(userId, userName, cvId, cvFileName) {
     try {
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.CV_UPLOADED,
         title: 'CV Subido',
         message: `Hola ${userName}, tu CV "${cvFileName}" ha sido subido exitosamente y está siendo procesado.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         metadata: {
-          cvId,
+          cvId: this._extractId(cvId),
           fileName: cvFileName,
           event: 'cv_uploaded'
         }
@@ -33,17 +43,18 @@ class CVNotificationHelper {
    */
   async notifyCVProcessed(userId, userName, cvId) {
     try {
+      const cvIdStr = this._extractId(cvId);
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.CV_PROCESSED,
         title: 'CV Procesado',
         message: `¡Buenas noticias ${userName}! Tu CV ha sido procesado y analizado exitosamente.`,
-        channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
+        channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
-        actionUrl: `/cv/${cvId}`,
+        actionUrl: `/cv/${cvIdStr}`,
         actionText: 'Ver CV',
         metadata: {
-          cvId,
+          cvId: cvIdStr,
           event: 'cv_processed'
         }
       });
@@ -57,18 +68,20 @@ class CVNotificationHelper {
    */
   async notifyCVAnalysisReady(userId, userName, cvId, analysisId, summary) {
     try {
+      const cvIdStr = this._extractId(cvId);
+      const analysisIdStr = this._extractId(analysisId);
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.CV_ANALYSIS_READY,
         title: 'Análisis de CV Completo',
         message: `${userName}, el análisis detallado de tu CV está listo. ${summary || 'Revisa los resultados para mejorar tu perfil profesional.'}`,
-        channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
+        channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
-        actionUrl: `/cv/${cvId}/analysis/${analysisId}`,
+        actionUrl: `/cv/${cvIdStr}/analysis/${analysisIdStr}`,
         actionText: 'Ver Análisis',
         metadata: {
-          cvId,
-          analysisId,
+          cvId: cvIdStr,
+          analysisId: analysisIdStr,
           event: 'cv_analysis_ready'
         }
       });
@@ -83,16 +96,16 @@ class CVNotificationHelper {
   async notifyCVAnalysisFailed(userId, userName, cvId, errorMessage) {
     try {
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.CV_ANALYSIS_FAILED,
         title: 'Error al Procesar CV',
         message: `${userName}, hubo un problema al procesar tu CV. Por favor, verifica el archivo e intenta nuevamente. ${errorMessage ? `Error: ${errorMessage}` : ''}`,
-        channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
+        channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         actionUrl: '/cv/upload',
         actionText: 'Subir Nuevo CV',
         metadata: {
-          cvId,
+          cvId: this._extractId(cvId),
           error: errorMessage,
           event: 'cv_analysis_failed'
         }
@@ -108,18 +121,19 @@ class CVNotificationHelper {
   async notifyCVRecommendations(userId, userName, cvId, recommendations) {
     try {
       const recommendationCount = recommendations?.length || 0;
+      const cvIdStr = this._extractId(cvId);
       
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.CV_ANALYSIS_READY,
         title: 'Recomendaciones para tu CV',
         message: `${userName}, tenemos ${recommendationCount} recomendaciones para mejorar tu CV y destacar más en las búsquedas.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
-        actionUrl: `/cv/${cvId}/recommendations`,
+        actionUrl: `/cv/${cvIdStr}/recommendations`,
         actionText: 'Ver Recomendaciones',
         metadata: {
-          cvId,
+          cvId: cvIdStr,
           recommendationCount,
           event: 'cv_recommendations'
         }
@@ -135,7 +149,7 @@ class CVNotificationHelper {
   async notifyCVDeleted(userId, userName, cvFileName) {
     try {
       await notificationService.create({
-        recipientId: userId,
+        recipientId: this._extractId(userId),
         type: NotificationTypes.CV_PROCESSED,
         title: 'CV Eliminado',
         message: `${userName}, tu CV "${cvFileName}" ha sido eliminado del sistema.`,
