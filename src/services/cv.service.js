@@ -1,6 +1,10 @@
 const CV = require('../models/cv.model');
+const Organization = require('../models/organization.model');
+const User = require('../models/user.model');
 const cvUtils = require('../utils/cvUtils');
 const dictionaries = require('../utils/dictionaries');
+const organizationNotificationHelper = require('./organizationNotificationHelper');
+const cvNotificationHelper = require('./cvNotificationHelper');
 
 // Importar todos los extractores
 const contactExtractor = require('./cvExtractors/contactExtractor');
@@ -73,6 +77,15 @@ class CVService {
       // Guardar en base de datos
       const cv = await this._saveOrUpdateCV(userId, cvData);
 
+      // Obtener información del usuario para las notificaciones
+      const user = await User.findById(userId);
+      const userName = user?.name || 'Usuario';
+
+      // Enviar notificación In-App de CV procesado
+      cvNotificationHelper.notifyCVProcessed(userId, userName, cv._id).catch(err => {
+        console.error('Error enviando notificación de CV procesado:', err);
+      });
+
       return cv;
     } catch (error) {
       console.error('Error procesando CV:', error);
@@ -89,6 +102,298 @@ class CVService {
       throw new Error('CV_NOT_FOUND');
     }
     return cv;
+  }
+
+  /**
+   * Envía un CV a una organización
+   * @param {string} userId - ID del usuario
+   * @param {string} organizationId - ID de la organización
+   * @returns {Object} - CV actualizado
+   */
+  async submitCVToOrganization(userId, organizationId) {
+    try {
+      // Verificar que la organización existe y está activa
+      const organization = await Organization.findById(organizationId)
+        .populate('admin', 'name email avatar')
+        .populate('additionalAdmins', 'name email avatar');
+
+      if (!organization) {
+        throw new Error('ORGANIZATION_NOT_FOUND');
+      }
+
+      if (organization.status !== 'active') {
+        throw new Error('ORGANIZATION_NOT_ACTIVE');
+      }
+
+      // Verificar que el usuario tiene un CV
+      let cv = await CV.findOne({ userId });
+      if (!cv) {
+        throw new Error('CV_NOT_FOUND');
+      }
+
+      // Verificar si ya envió el CV a esta organización
+      if (cv.organization && cv.organization.toString() === organizationId) {
+        throw new Error('CV_ALREADY_SUBMITTED');
+      }
+
+      // Obtener información del usuario
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('USER_NOT_FOUND');
+      }
+
+      // Actualizar el CV con la información de la organización
+      cv.organization = organizationId;
+      cv.organizationStatus = 'pending';
+      cv.submittedToOrganizationAt = new Date();
+      await cv.save();
+
+      // Notificar a los administradores de la organización
+      await organizationNotificationHelper.notifyCVSubmitted(organization, user, cv);
+
+      return cv;
+    } catch (error) {
+      console.error('Error enviando CV a organización:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene los CVs enviados a una organización
+   * @param {string} organizationId - ID de la organización
+   * @param {string} adminId - ID del administrador que solicita
+   * @param {Object} filters - Filtros opcionales
+   * @returns {Array} - Lista de CVs
+   */
+  async getOrganizationCVs(organizationId, adminId, filters = {}) {
+    try {
+      // Verificar que la organización existe
+      const organization = await Organization.findById(organizationId);
+      if (!organization) {
+        throw new Error('ORGANIZATION_NOT_FOUND');
+      }
+
+      // Verificar que el usuario es administrador
+      if (!organization.isAdmin(adminId)) {
+        throw new Error('UNAUTHORIZED_ACCESS');
+      }
+
+      // Construir query
+      const query = { organization: organizationId };
+
+      // Aplicar filtros
+      if (filters.status) {
+        query.organizationStatus = filters.status;
+      }
+
+      // Opciones de paginación
+      const page = parseInt(filters.page) || 1;
+      const limit = parseInt(filters.limit) || 20;
+      const skip = (page - 1) * limit;
+
+      // Obtener CVs con información del usuario
+      const cvs = await CV.find(query)
+        .populate('userId', 'name email avatar')
+        .sort({ submittedToOrganizationAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      const total = await CV.countDocuments(query);
+
+      return {
+        cvs,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      };
+    } catch (error) {
+      console.error('Error obteniendo CVs de organización:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Actualiza el estado de un CV en una organización
+   * @param {string} cvId - ID del CV
+   * @param {string} organizationId - ID de la organización
+   * @param {string} adminId - ID del administrador
+   * @param {string} newStatus - Nuevo estado
+   * @param {string} notes - Notas del administrador
+   * @param {Object} employeeData - Datos adicionales del empleado (posición, departamento)
+   * @returns {Object} - CV actualizado
+   */
+  async updateCVStatus(cvId, organizationId, adminId, newStatus, notes = '', employeeData = {}) {
+    try {
+      // Verificar que la organización existe
+      const organization = await Organization.findById(organizationId);
+      if (!organization) {
+        throw new Error('ORGANIZATION_NOT_FOUND');
+      }
+
+      // Verificar que el usuario es administrador
+      if (!organization.isAdmin(adminId)) {
+        throw new Error('UNAUTHORIZED_ACCESS');
+      }
+
+      // Buscar el CV
+      const cv = await CV.findById(cvId);
+      if (!cv) {
+        throw new Error('CV_NOT_FOUND');
+      }
+
+      // Verificar que el CV pertenece a esta organización
+      if (!cv.organization || cv.organization.toString() !== organizationId) {
+        throw new Error('CV_NOT_BELONGS_TO_ORGANIZATION');
+      }
+
+      const oldStatus = cv.organizationStatus;
+
+      // Actualizar estado y notas
+      cv.organizationStatus = newStatus;
+      if (notes) {
+        cv.organizationNotes = notes;
+      }
+      await cv.save();
+
+      // Si el CV es aceptado, agregar al usuario como empleado de la organización
+      if (newStatus === 'accepted' && oldStatus !== 'accepted') {
+        await this._addUserAsEmployee(cv.userId, organization, employeeData);
+      }
+
+      // Si el CV es rechazado y el usuario era empleado, removerlo
+      if (newStatus === 'rejected' && oldStatus === 'accepted') {
+        await this._removeUserAsEmployee(cv.userId, organization);
+      }
+
+      // Notificar al usuario
+      await organizationNotificationHelper.notifyCVStatusChanged(
+        cv,
+        organization,
+        oldStatus,
+        newStatus
+      );
+
+      return cv;
+    } catch (error) {
+      console.error('Error actualizando estado de CV:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Añade un usuario como empleado de una organización cuando su CV es aceptado
+   * @param {string} userId - ID del usuario
+   * @param {Object} organization - Organización
+   * @param {Object} employeeData - Datos del empleado (posición, departamento)
+   * @private
+   */
+  async _addUserAsEmployee(userId, organization, employeeData = {}) {
+    try {
+      // Verificar si el usuario ya es empleado
+      const existingEmployee = organization.employees.find(
+        emp => emp.user.toString() === userId.toString()
+      );
+
+      if (existingEmployee) {
+        // Si ya existe pero no está activo, activarlo
+        if (existingEmployee.status !== 'active') {
+          existingEmployee.status = 'active';
+          if (employeeData.position) existingEmployee.position = employeeData.position;
+          if (employeeData.department) existingEmployee.department = employeeData.department;
+          await organization.save();
+        }
+        return;
+      }
+
+      // Agregar como nuevo empleado con estado activo (ya fue aprobado por el admin)
+      organization.employees.push({
+        user: userId,
+        position: employeeData.position || '',
+        department: employeeData.department || '',
+        joinedAt: new Date(),
+        status: 'active'
+      });
+
+      organization.lastActivityAt = Date.now();
+      await organization.save();
+
+      // Actualizar el rol del usuario a employee si es necesario
+      const user = await User.findById(userId);
+      if (user && user.role === 'unassigned') {
+        user.role = 'employee';
+        await user.save();
+      }
+
+      console.log(`Usuario ${userId} añadido como empleado a la organización ${organization._id}`);
+    } catch (error) {
+      console.error('Error añadiendo usuario como empleado:', error);
+      // No lanzar error para no interrumpir el flujo principal
+    }
+  }
+
+  /**
+   * Remueve un usuario como empleado de una organización cuando su CV es rechazado
+   * @param {string} userId - ID del usuario
+   * @param {Object} organization - Organización
+   * @private
+   */
+  async _removeUserAsEmployee(userId, organization) {
+    try {
+      const employeeIndex = organization.employees.findIndex(
+        emp => emp.user.toString() === userId.toString()
+      );
+
+      if (employeeIndex !== -1) {
+        organization.employees.splice(employeeIndex, 1);
+        organization.lastActivityAt = Date.now();
+        await organization.save();
+        console.log(`Usuario ${userId} removido como empleado de la organización ${organization._id}`);
+      }
+    } catch (error) {
+      console.error('Error removiendo usuario como empleado:', error);
+      // No lanzar error para no interrumpir el flujo principal
+    }
+  }
+
+  /**
+   * Obtiene un CV específico de una organización
+   * @param {string} cvId - ID del CV
+   * @param {string} organizationId - ID de la organización
+   * @param {string} adminId - ID del administrador
+   * @returns {Object} - CV con detalles completos
+   */
+  async getOrganizationCV(cvId, organizationId, adminId) {
+    try {
+      // Verificar que la organización existe
+      const organization = await Organization.findById(organizationId);
+      if (!organization) {
+        throw new Error('ORGANIZATION_NOT_FOUND');
+      }
+
+      // Verificar que el usuario es administrador
+      if (!organization.isAdmin(adminId)) {
+        throw new Error('UNAUTHORIZED_ACCESS');
+      }
+
+      // Buscar el CV
+      const cv = await CV.findById(cvId).populate('userId', 'name email avatar');
+      if (!cv) {
+        throw new Error('CV_NOT_FOUND');
+      }
+
+      // Verificar que el CV pertenece a esta organización
+      if (!cv.organization || cv.organization.toString() !== organizationId) {
+        throw new Error('CV_NOT_BELONGS_TO_ORGANIZATION');
+      }
+
+      return cv;
+    } catch (error) {
+      console.error('Error obteniendo CV de organización:', error);
+      throw error;
+    }
   }
 
   /**

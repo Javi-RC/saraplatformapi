@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { generateToken } = require('../utils/jwt');
 const emailService = require('./email.service');
+const authNotificationHelper = require('./authNotificationHelper');
 
 class AuthService {
   async register(userData) {
@@ -40,6 +41,11 @@ class AuthService {
     } catch (error) {
       console.error('Error enviando email:', error);
     }
+
+    // Enviar notificación In-App de bienvenida (asíncrono, no bloquea)
+    authNotificationHelper.notifyAccountCreated(newUser._id, name).catch(err => {
+      console.error('Error enviando notificación de cuenta creada:', err);
+    });
 
     return {
       user: {
@@ -102,6 +108,11 @@ class AuthService {
     user.confirmationTokenExpiry = undefined;
     user.lastLogin = new Date();
     await user.save();
+
+    // Enviar notificación In-App de cuenta confirmada
+    authNotificationHelper.notifyAccountConfirmed(user._id, user.name).catch(err => {
+      console.error('Error enviando notificación de cuenta confirmada:', err);
+    });
 
     return user;
   }

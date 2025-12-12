@@ -17,12 +17,14 @@ const authRoutes = require('./routes/auth.routes');
 const protectedRoutes = require('./routes/protected.routes');
 const cvRoutes = require('./routes/cv.routes');
 const notificationRoutes = require('./routes/notification.routes');
+const organizationRoutes = require('./routes/organization.routes');
 
 app.use('/', indexRoutes);
 app.use('/auth', authRoutes);
 app.use('/api', protectedRoutes);
 app.use('/api/cv', cvRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/organizations', organizationRoutes);
 
 // Ruta de salud
 app.get('/health', (req, res) => {

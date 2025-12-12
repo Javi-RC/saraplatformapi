@@ -1,4 +1,6 @@
 const CV = require('../models/cv.model');
+const User = require('../models/user.model');
+const cvNotificationHelper = require('./cvNotificationHelper');
 
 /**
  * Servicio de extracción de CVs usando IA
@@ -130,9 +132,34 @@ class AIExtractorService {
       // Guardar en base de datos
       const cv = await this._saveOrUpdateCV(userId, cvData);
 
+      // Obtener información del usuario para las notificaciones
+      const user = await User.findById(userId);
+      const userName = user?.name || 'Usuario';
+
+      // Enviar notificación In-App de CV procesado exitosamente
+      cvNotificationHelper.notifyCVProcessed(userId, userName, cv._id).catch(err => {
+        console.error('Error enviando notificación de CV procesado:', err);
+      });
+
       return cv;
     } catch (error) {
       console.error('Error procesando CV con IA:', error);
+      
+      // Intentar enviar notificación de fallo
+      try {
+        const user = await User.findById(userId);
+        if (user) {
+          cvNotificationHelper.notifyCVAnalysisFailed(
+            userId, 
+            user.name || 'Usuario', 
+            null, 
+            'Error al procesar el CV con IA'
+          ).catch(err => console.error('Error enviando notificación de fallo:', err));
+        }
+      } catch (notifyError) {
+        console.error('Error al notificar fallo de CV:', notifyError);
+      }
+      
       throw new Error('ERROR_PROCESSING_CV');
     }
   }
@@ -308,7 +335,7 @@ FORMATO DE SALIDA REQUERIDO (JSON):
         "name": "string (REQUERIDO)",
         "normalizedName": "string en minúsculas",
         "level": "básico|intermedio|avanzado|experto o vacío",
-        "category": "lenguaje|framework|herramienta|base_datos|cloud|otro"
+        "category": "lenguaje|framework|herramienta|base_datos|cloud|runtime|devops|testing|mobile|frontend|backend|seguridad|ia_ml|otro"
       }
     ],
     "soft": ["string"]
@@ -472,7 +499,16 @@ Devuelve ÚNICAMENTE el JSON válido, sin explicaciones adicionales.`;
     }
 
     if (cvData.skills?.technical && cvData.skills.technical.length > 0) {
-      cvData.skills.technical = cvData.skills.technical.filter(skill => skill.name);
+      // Categorías válidas según el modelo CV
+      const validCategories = ['lenguaje', 'framework', 'herramienta', 'base_datos', 'cloud', 'runtime', 'devops', 'testing', 'mobile', 'frontend', 'backend', 'seguridad', 'ia_ml', 'otro'];
+      
+      cvData.skills.technical = cvData.skills.technical
+        .filter(skill => skill.name)
+        .map(skill => ({
+          ...skill,
+          // Sanitizar categoría: si no es válida, usar 'otro'
+          category: validCategories.includes(skill.category) ? skill.category : 'otro'
+        }));
       if (cvData.skills.technical.length === 0) delete cvData.skills.technical;
     }
 

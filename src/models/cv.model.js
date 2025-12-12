@@ -7,6 +7,32 @@ const cvSchema = new mongoose.Schema({
     required: true
   },
   
+  // Organización a la que se envía el CV (opcional)
+  organization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    index: true
+  },
+  
+  // Estado del CV en relación a la organización
+  organizationStatus: {
+    type: String,
+    enum: ['pending', 'reviewed', 'accepted', 'rejected'],
+    default: 'pending'
+  },
+  
+  // Fecha de envío a la organización
+  submittedToOrganizationAt: {
+    type: Date
+  },
+  
+  // Notas del administrador de la organización
+  organizationNotes: {
+    type: String,
+    trim: true,
+    maxlength: 2000
+  },
+  
   // 1. Información de contacto
   contact: {
     email: {
@@ -116,7 +142,7 @@ const cvSchema = new mongoose.Schema({
       },
       category: {
         type: String,
-        enum: ['lenguaje', 'framework', 'herramienta', 'base_datos', 'cloud', 'otro'],
+        enum: ['lenguaje', 'framework', 'herramienta', 'base_datos', 'cloud', 'runtime', 'devops', 'testing', 'mobile', 'frontend', 'backend', 'seguridad', 'ia_ml', 'otro'],
         default: 'otro'
       }
     }],
@@ -209,9 +235,11 @@ const cvSchema = new mongoose.Schema({
 
 // Índices para búsquedas
 cvSchema.index({ 'userId': 1 });
+cvSchema.index({ 'organization': 1, 'organizationStatus': 1 });
 cvSchema.index({ 'skills.technical.normalizedName': 1 });
 cvSchema.index({ 'experience.technologies': 1 });
 cvSchema.index({ 'languages.language': 1 });
+cvSchema.index({ 'submittedToOrganizationAt': -1 });
 
 // Middleware para actualizar lastUpdated
 cvSchema.pre('save', function(next) {

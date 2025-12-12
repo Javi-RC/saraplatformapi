@@ -17,6 +17,16 @@ const NotificationTypes = {
   CV_PROCESSED: 'cv_processed',
   CV_ANALYSIS_READY: 'cv_analysis_ready',
   CV_ANALYSIS_FAILED: 'cv_analysis_failed',
+  CV_SUBMITTED_TO_ORG: 'cv_submitted_to_org',
+  CV_REVIEWED: 'cv_reviewed',
+  CV_STATUS_CHANGED: 'cv_status_changed',
+  
+  // Notificaciones de organización
+  ORG_EMPLOYEE_ADDED: 'org_employee_added',
+  ORG_EMPLOYEE_REMOVED: 'org_employee_removed',
+  ORG_EMPLOYEE_STATUS_CHANGED: 'org_employee_status_changed',
+  ORG_ADMIN_ADDED: 'org_admin_added',
+  ORG_SETTINGS_UPDATED: 'org_settings_updated',
   
   // Notificaciones administrativas
   ADMIN_ANNOUNCEMENT: 'admin_announcement',

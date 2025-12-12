@@ -39,6 +39,12 @@ const userSchema = new mongoose.Schema({
     enum: ['employee', 'org_admin', 'unassigned'], // Nuevo estado
     default: 'unassigned'
   },
+  // Organización a la que pertenece (si es empleado)
+  organization: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Organization',
+    index: true
+  },
   isConfirmed: {
     type: Boolean,
     default: function() {

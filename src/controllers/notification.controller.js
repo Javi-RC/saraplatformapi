@@ -13,7 +13,7 @@ class NotificationController {
    */
   async getNotifications(req, res) {
     try {
-      const userId = req.user.id;
+      const userId = req.user.userId;
       const {
         page = 1,
         limit = 20,
@@ -54,7 +54,7 @@ class NotificationController {
    */
   async getUnreadCount(req, res) {
     try {
-      const userId = req.user.id;
+      const userId = req.user.userId;
       const count = await notificationService.getUnreadCount(userId);
       
       return res.status(200).json({
@@ -77,7 +77,7 @@ class NotificationController {
    */
   async getStats(req, res) {
     try {
-      const userId = req.user.id;
+      const userId = req.user.userId;
       const stats = await notificationService.getUserStats(userId);
       
       return res.status(200).json({
@@ -101,7 +101,7 @@ class NotificationController {
   async markAsRead(req, res) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const userId = req.user.userId;
 
       const notification = await notificationService.markAsRead(id, userId);
       
@@ -132,7 +132,7 @@ class NotificationController {
   async markMultipleAsRead(req, res) {
     try {
       const { notificationIds } = req.body;
-      const userId = req.user.id;
+      const userId = req.user.userId;
 
       if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
         return res.status(400).json({
@@ -163,7 +163,7 @@ class NotificationController {
    */
   async markAllAsRead(req, res) {
     try {
-      const userId = req.user.id;
+      const userId = req.user.userId;
       const count = await notificationService.markAllAsRead(userId);
       
       return res.status(200).json({
@@ -187,7 +187,7 @@ class NotificationController {
   async archive(req, res) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const userId = req.user.userId;
 
       const notification = await notificationService.archive(id, userId);
       
@@ -218,7 +218,7 @@ class NotificationController {
   async delete(req, res) {
     try {
       const { id } = req.params;
-      const userId = req.user.id;
+      const userId = req.user.userId;
 
       const deleted = await notificationService.delete(id, userId);
       
@@ -289,7 +289,7 @@ class NotificationController {
         actionUrl,
         actionText,
         expiresAt,
-        senderId: req.user.id
+        senderId: req.user.userId
       });
 
       return res.status(201).json({
@@ -356,7 +356,7 @@ class NotificationController {
           priority,
           actionUrl,
           actionText,
-          senderId: req.user.id
+          senderId: req.user.userId
         }
       );
 
@@ -409,7 +409,7 @@ class NotificationController {
         priority,
         actionUrl,
         actionText,
-        senderId: req.user.id
+        senderId: req.user.userId
       });
 
       return res.status(201).json({
@@ -460,7 +460,7 @@ class NotificationController {
         priority,
         actionUrl,
         actionText,
-        senderId: req.user.id
+        senderId: req.user.userId
       });
 
       return res.status(201).json({

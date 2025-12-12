@@ -50,6 +50,13 @@ router.post('/upload', authenticate, upload.single('cv'), cvController.uploadCV)
 router.get('/my-cv', authenticate, cvController.getMyCV);
 
 /**
+ * @route   POST /api/cv/submit-to-organization
+ * @desc    Envía el CV a una organización
+ * @access  Private
+ */
+router.post('/submit-to-organization', authenticate, cvController.submitToOrganization);
+
+/**
  * @route   GET /api/cv/stats
  * @desc    Obtiene estadísticas del CV del usuario
  * @access  Private
