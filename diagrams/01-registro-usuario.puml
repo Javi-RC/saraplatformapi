@@ -75,7 +75,8 @@ else #LightGreen Validación Cliente OK
         DB --> SVC: user | null
         deactivate DB
         
-        alt #Pink Email duplicado
+        alt #Pink Email ya verificado
+            note right of SVC: Usuario existe\ny isConfirmed=true
             SVC --> CTRL: throw USER_ALREADY_EXISTS
             deactivate SVC
             CTRL --> AR: HTTP 409
@@ -84,13 +85,93 @@ else #LightGreen Validación Cliente OK
             deactivate AR
             AC --> UI: reject(error)
             deactivate AC
-            UI --> U: "Email ya registrado"
+            UI --> U: "Email ya registrado y verificado"
+        else #Orange Email existe pero NO verificado
+            note right of SVC: Usuario existe pero\nisConfirmed=false
+            SVC -> SVC: Verificar verificationTokenExpiry
+            
+            alt #LightCoral Token expirado (>24h)
+                note right of SVC: Permitir re-registro:\neliminar usuario anterior
+                SVC -> DB: deleteOne({ _id })
+                activate DB
+                DB --> SVC: OK
+                deactivate DB
+                
+                note right of SVC: Continúa con\nregistro normal
+                SVC -> SVC: bcrypt.hash(password, 12)
+                SVC -> SVC: crypto.randomBytes(32)
+                
+                SVC -> DB: User.save()
+                activate DB
+                DB --> SVC: newUser
+                deactivate DB
+                
+                SVC ->> EMAIL: sendConfirmationEmail()
+                activate EMAIL
+                note right of EMAIL: Envía nuevo link\ncon token (expira 24h)
+                EMAIL --> SVC: OK
+                deactivate EMAIL
+                
+                SVC --> CTRL: { user, message }
+                deactivate SVC
+                
+                CTRL --> AR: HTTP 201 { success, user }
+                AR --> AC: 201 Created
+                deactivate CTRL
+                deactivate AR
+                AC --> UI: resolve(data)
+                deactivate AC
+                
+                UI --> U: "Cuenta creada.\nRevisa tu email"
+            else #LightYellow Token válido (<24h)
+                SVC -> SVC: Verificar registrationAttempts
+                
+                alt #Pink Límite alcanzado (≥3)
+                    note right of SVC: Demasiados intentos
+                    SVC --> CTRL: throw TOO_MANY_ATTEMPTS
+                    deactivate SVC
+                    CTRL --> AR: HTTP 429
+                    AR --> AC: 429 Too Many Requests
+                    deactivate CTRL
+                    deactivate AR
+                    AC --> UI: reject(error)
+                    deactivate AC
+                    UI --> U: "Demasiados intentos.\nEspera 24h"
+                else #LightGreen Intentos disponibles (<3)
+                    note right of SVC: Reenviar email\ny aumentar contador
+                    SVC -> SVC: Nuevo token + incrementar attempts
+                    
+                    SVC -> DB: save() + update
+                    activate DB
+                    DB --> SVC: OK
+                    deactivate DB
+                    
+                    SVC ->> EMAIL: sendConfirmationEmail()
+                    activate EMAIL
+                    EMAIL --> SVC: OK
+                    deactivate EMAIL
+                    
+                    SVC --> CTRL: { user, message }
+                    deactivate SVC
+                    
+                    CTRL --> AR: HTTP 200 { success }
+                    AR --> AC: 200 OK
+                    deactivate CTRL
+                    deactivate AR
+                    AC --> UI: resolve(data)
+                    deactivate AC
+                    
+                    UI --> U: "Email reenviado.\nRevisa tu bandeja"
+                end
+            end
         else #LightGreen Email disponible
+            note right of SVC: Usuario NO existe:\nregistro normal
             SVC -> SVC: bcrypt.hash(password, 12)
             SVC -> SVC: crypto.randomBytes(32)
             
             SVC -> DB: User.save()
             activate DB
+            note right of DB: Incluye:\nverificationTokenExpiry\nregistrationAttempts=0
             DB --> SVC: newUser
             deactivate DB
             
@@ -157,6 +238,23 @@ deactivate AC
 UI --> U: "Email reenviado"
 
 deactivate UI
+
+' ============================================
+' LIMPIEZA AUTOMÁTICA
+' ============================================
+== Limpieza Automática (Background) ==
+
+note over DB #LightCyan
+  **Sistema de Limpieza:**
+  • Índice TTL MongoDB: elimina usuarios no verificados tras 48h
+  • Tarea programada: se ejecuta cada 6 horas
+  • Limpieza inicial: al arrancar servidor
+  
+  **Protección contra suplantación:**
+  • Usuarios no verificados expiran en 24-48h
+  • Máximo 3 intentos de verificación
+  • Email legítimo se libera automáticamente
+end note
 
 note over U, EMAIL #FFFFCC
   **Continúa en:** 02-confirmacion-cuenta.puml

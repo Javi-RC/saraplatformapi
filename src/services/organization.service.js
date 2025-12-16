@@ -462,6 +462,7 @@ class OrganizationService {
       activeEmployees: organization.employees.filter(e => e.status === 'active').length,
       pendingEmployees: organization.employees.filter(e => e.status === 'pending').length,
       inactiveEmployees: organization.employees.filter(e => e.status === 'inactive').length,
+      projectManagers: organization.employees.filter(e => e.status === 'active' && e.isProjectManager).length,
       totalAdmins: 1 + organization.additionalAdmins.length,
       departments: [...new Set(organization.employees.map(e => e.department).filter(Boolean))],
       isFullyConfigured: organization.isFullyConfigured,
@@ -471,6 +472,81 @@ class OrganizationService {
     };
 
     return stats;
+  }
+
+  /**
+   * Asigna o remueve el rol de jefe de proyecto a un empleado
+   * @param {string} organizationId - ID de la organización
+   * @param {string} employeeId - ID del empleado
+   * @param {boolean} isProjectManager - True para asignar, false para remover
+   * @param {string} adminId - ID del administrador que realiza la acción
+   * @returns {Promise<Object>} Organización actualizada
+   */
+  async setProjectManagerRole(organizationId, employeeId, isProjectManager, adminId) {
+    const organization = await Organization.findById(organizationId);
+
+    if (!organization) {
+      throw new Error('Organización no encontrada');
+    }
+
+    // Verificar permisos - solo administradores pueden asignar jefes de proyecto
+    if (!organization.isAdmin(adminId)) {
+      throw new Error('No tienes permisos para asignar jefes de proyecto');
+    }
+
+    // Verificar que el empleado pertenece a la organización
+    if (!organization.isEmployee(employeeId)) {
+      throw new Error('El empleado no pertenece a esta organización');
+    }
+
+    // Asignar/remover el rol
+    await organization.setProjectManagerRole(employeeId, isProjectManager);
+
+    // Poblar los datos
+    await organization.populate('admin', 'name email avatar');
+    await organization.populate('additionalAdmins', 'name email avatar');
+    await organization.populate('employees.user', 'name email avatar');
+
+    // Enviar notificación al empleado
+    try {
+      const employee = await User.findById(employeeId);
+      if (employee) {
+        await organizationNotificationHelper.notifyProjectManagerRoleChanged(
+          organization,
+          employee,
+          isProjectManager
+        );
+      }
+    } catch (notificationError) {
+      console.error('Error enviando notificación de cambio de rol:', notificationError);
+    }
+
+    return organization;
+  }
+
+  /**
+   * Obtiene todos los jefes de proyecto de una organización
+   * @param {string} organizationId - ID de la organización
+   * @returns {Promise<Array>} Lista de jefes de proyecto
+   */
+  async getProjectManagers(organizationId) {
+    const organization = await Organization.findById(organizationId)
+      .populate('employees.user', 'name email avatar');
+
+    if (!organization) {
+      throw new Error('Organización no encontrada');
+    }
+
+    const projectManagers = organization.employees
+      .filter(emp => emp.status === 'active' && emp.isProjectManager)
+      .map(emp => ({
+        user: emp.user,
+        position: emp.position,
+        department: emp.department,
+        joinedAt: emp.joinedAt
+      }));
+
+    return projectManagers;
   }
 }
 

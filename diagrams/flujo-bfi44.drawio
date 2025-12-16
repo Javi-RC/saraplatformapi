@@ -1,0 +1,203 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="BFI-44 Flow" id="bfi44-flow">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Flujo Completo del Test BFI-44 (Big Five Inventory)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="800" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Start -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="100" y="100" width="40" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- User Request -->
+        <mxCell id="user-request" value="Usuario solicita&#xa;realizar test BFI-44" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="60" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="start" target="user-request">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Frontend Request -->
+        <mxCell id="frontend-request" value="GET /api/bfi44/questionnaire&#xa;Solicita cuestionario completo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="240" y="170" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-request" target="frontend-request">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Service: Get Questions -->
+        <mxCell id="get-questions" value="BFI44Service.getQuestionnaire()&#xa;&#xa;Retorna:&#xa;- 44 preguntas con IDs&#xa;- Escala Likert (1-5)&#xa;- Instrucciones" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="150" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="frontend-request" target="get-questions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Questions Display -->
+        <mxCell id="questions-display" value="Frontend muestra 44 preguntas:&#xa;&#xa;&quot;Soy alguien que...&quot;&#xa;1. Es hablador/a&#xa;2. Tiende a criticar a los demás&#xa;3. Hace las cosas a fondo&#xa;...&#xa;44. Es sofisticado/a en arte, música o literatura&#xa;&#xa;Escala: 1 (Muy en desacuerdo) - 5 (Muy de acuerdo)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;" vertex="1" parent="1">
+          <mxGeometry x="780" y="120" width="340" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="get-questions" target="questions-display">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- User Answers -->
+        <mxCell id="user-answers" value="Usuario responde las 44 preguntas&#xa;(selecciona valores 1-5)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="850" y="320" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="questions-display" target="user-answers">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Submit Answers -->
+        <mxCell id="submit" value="POST /api/bfi44/submit&#xa;Envía respuestas:&#xa;{ responses: { 1: 4, 2: 2, ... } }" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="600" y="310" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-answers" target="submit">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Validation -->
+        <mxCell id="validation-box" value="Validación de Respuestas" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="340" y="430" width="520" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="validation-1" value="✓ Verificar exactamente 44 respuestas" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="validation-box">
+          <mxGeometry x="20" y="40" width="230" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="validation-2" value="✓ Validar IDs 1-44" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="validation-box">
+          <mxGeometry x="20" y="60" width="230" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="validation-3" value="✓ Verificar valores en rango 1-5" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="validation-box">
+          <mxGeometry x="20" y="80" width="230" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="validation-4" value="✓ Validar que usuario existe y está autenticado" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="validation-box">
+          <mxGeometry x="270" y="40" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="validation-5" value="✓ Verificar que no haya duplicados" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="validation-box">
+          <mxGeometry x="270" y="60" width="240" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="submit" target="validation-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Calculation Process -->
+        <mxCell id="calc-box" value="Cálculo de Dimensiones (BFI44Service.calculateScores)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="100" y="600" width="1000" height="240" as="geometry" />
+        </mxCell>
+        
+        <!-- Extraversion -->
+        <mxCell id="calc-extra" value="EXTRAVERSION&#xa;Ítems: 1, 6, 11, 16, 21, 26, 31, 36&#xa;Invertidos: 6, 21, 31&#xa;&#xa;Cálculo:&#xa;- Invertir respuestas (6-valor)&#xa;- Sumar todos los ítems&#xa;- Dividir entre 8" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;" vertex="1" parent="calc-box">
+          <mxGeometry x="20" y="45" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Agreeableness -->
+        <mxCell id="calc-agree" value="AGREEABLENESS&#xa;Ítems: 2, 7, 12, 17, 22, 27, 32, 37, 42&#xa;Invertidos: 2, 12, 27, 37&#xa;&#xa;Cálculo:&#xa;- Invertir respuestas&#xa;- Sumar todos los ítems&#xa;- Dividir entre 9" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;" vertex="1" parent="calc-box">
+          <mxGeometry x="210" y="45" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Conscientiousness -->
+        <mxCell id="calc-consc" value="CONSCIENTIOUSNESS&#xa;Ítems: 3, 8, 13, 18, 23, 28, 33, 38, 43&#xa;Invertidos: 8, 18, 23, 43&#xa;&#xa;Cálculo:&#xa;- Invertir respuestas&#xa;- Sumar todos los ítems&#xa;- Dividir entre 9" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;" vertex="1" parent="calc-box">
+          <mxGeometry x="400" y="45" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Neuroticism -->
+        <mxCell id="calc-neuro" value="NEUROTICISM&#xa;Ítems: 4, 9, 14, 19, 24, 29, 34, 39&#xa;Invertidos: 9, 24, 34&#xa;&#xa;Cálculo:&#xa;- Invertir respuestas&#xa;- Sumar todos los ítems&#xa;- Dividir entre 8" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;" vertex="1" parent="calc-box">
+          <mxGeometry x="590" y="45" width="180" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Openness -->
+        <mxCell id="calc-open" value="OPENNESS&#xa;Ítems: 5, 10, 15, 20, 25, 30, 35, 40, 41, 44&#xa;Invertidos: 35, 41&#xa;&#xa;Cálculo:&#xa;- Invertir respuestas&#xa;- Sumar todos los ítems&#xa;- Dividir entre 10" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;" vertex="1" parent="calc-box">
+          <mxGeometry x="780" y="45" width="200" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- Results Example -->
+        <mxCell id="results-example" value="Resultados (media entre 1-5):&#xa;{ Extraversion: 3.75, Agreeableness: 4.22, Conscientiousness: 3.89, Neuroticism: 2.63, Openness: 4.10 }" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1" vertex="1" parent="calc-box">
+          <mxGeometry x="20" y="185" width="960" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="validation-box" target="calc-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Save to DB -->
+        <mxCell id="save-db" value="Guardar en MongoDB:&#xa;BFI44Response.create({&#xa;  userId,&#xa;  responses: Map,&#xa;  results: {Extraversion, ...},&#xa;  completedAt: Date.now()&#xa;})" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="480" y="890" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="calc-box" target="save-db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Notification -->
+        <mxCell id="notification" value="bfi44NotificationHelper&#xa;Envía notificación:&#xa;'Test BFI-44 completado exitosamente'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="480" y="1050" width="240" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="save-db" target="notification">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Response to Frontend -->
+        <mxCell id="response" value="Respuesta HTTP 200 OK:&#xa;{&#xa;  bfi44ResponseId,&#xa;  results: {&#xa;    Extraversion: 3.75,&#xa;    Agreeableness: 4.22,&#xa;    Conscientiousness: 3.89,&#xa;    Neuroticism: 2.63,&#xa;    Openness: 4.10&#xa;  },&#xa;  completedAt&#xa;}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="450" y="1170" width="300" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="notification" target="response">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Frontend Display Results -->
+        <mxCell id="display-results" value="Frontend muestra resultados:&#xa;&#xa;Gráfico de radar con 5 dimensiones&#xa;Interpretación de cada puntuación&#xa;Comparación con medias poblacionales" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="450" y="1380" width="300" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="response" target="display-results">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- End -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="580" y="1510" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="display-results" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Info Box -->
+        <mxCell id="info-box" value="Información sobre BFI-44" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1580" width="1000" height="140" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="info-1" value="✓ Test psicométrico estándar para medir los 5 grandes rasgos de personalidad" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="20" y="35" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="info-2" value="✓ 44 preguntas distribuidas en 5 dimensiones (8-10 ítems por dimensión)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="20" y="55" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="info-3" value="✓ Ítems invertidos (reverse-scored) para evitar sesgos de respuesta" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="20" y="75" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="info-4" value="✓ Escala Likert 1-5: Permite gradación en la intensidad de las respuestas" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="20" y="95" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="info-5" value="✓ Cálculo automatizado: Suma de ítems invertidos + directos dividido por número de ítems" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="500" y="35" width="480" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="info-6" value="✓ Resultados entre 1-5: Mayor puntuación = mayor presencia del rasgo" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="500" y="55" width="480" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="info-7" value="✓ Validación estricta: Exactamente 44 respuestas, valores 1-5, sin duplicados" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="500" y="75" width="480" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="info-8" value="✓ Sistema de notificaciones: Usuario recibe confirmación tras completar el test" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="info-box">
+          <mxGeometry x="500" y="95" width="480" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

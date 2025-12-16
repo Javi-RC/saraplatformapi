@@ -13,8 +13,56 @@ class AuthService {
 
     // Verificar si usuario existe
     const existingUser = await User.findOne({ email: email.toLowerCase() });
+    
     if (existingUser) {
-      throw new Error('USER_ALREADY_EXISTS');
+      // Si el usuario ya está verificado, no permitir re-registro
+      if (existingUser.isConfirmed) {
+        throw new Error('USER_ALREADY_EXISTS');
+      }
+      
+      // Usuario existe pero no está verificado
+      // Verificar si el token de verificación expiró
+      if (existingUser.verificationTokenExpiry && existingUser.verificationTokenExpiry < Date.now()) {
+        // Token expirado: permitir re-registro eliminando el usuario anterior
+        await User.deleteOne({ _id: existingUser._id });
+        console.log(`Usuario no verificado eliminado para re-registro: ${email}`);
+      } else {
+        // Token aún válido: verificar límite de intentos
+        if (existingUser.registrationAttempts >= 3) {
+          const error = new Error('TOO_MANY_ATTEMPTS');
+          error.statusCode = 429;
+          throw error;
+        }
+        
+        // Permitir reenvío de email de verificación
+        const confirmationToken = crypto.randomBytes(32).toString('hex');
+        const confirmationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        
+        existingUser.confirmationToken = confirmationToken;
+        existingUser.confirmationTokenExpiry = confirmationTokenExpiry;
+        existingUser.verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        existingUser.registrationAttempts = (existingUser.registrationAttempts || 0) + 1;
+        await existingUser.save();
+        
+        // Reenviar email
+        const backendUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 3000}`;
+        const confirmLink = `${backendUrl}/auth/confirm?token=${confirmationToken}`;
+        
+        try {
+          await emailService.sendConfirmationEmail(email, name, confirmLink);
+        } catch (error) {
+          console.error('Error reenviando email:', error);
+        }
+        
+        return {
+          user: {
+            id: existingUser._id,
+            email: existingUser.email,
+            name: existingUser.name
+          },
+          message: 'Email de verificación reenviado. Revisa tu bandeja de entrada.'
+        };
+      }
     }
 
     // Crear usuario
@@ -28,6 +76,8 @@ class AuthService {
       passwordHash,
       confirmationToken,
       confirmationTokenExpiry,
+      verificationTokenExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      registrationAttempts: 0,
       isConfirmed: false,
       role: role
     });
@@ -143,6 +193,8 @@ class AuthService {
     // Actualizar usuario
     user.confirmationToken = confirmationToken;
     user.confirmationTokenExpiry = confirmationTokenExpiry;
+    user.verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    user.registrationAttempts = (user.registrationAttempts || 0) + 1;
     await user.save();
 
     // Enviar email

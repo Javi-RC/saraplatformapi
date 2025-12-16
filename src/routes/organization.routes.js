@@ -121,6 +121,19 @@ router.delete('/:id/employees/:userId', authenticate, organizationController.rem
  */
 router.patch('/:id/employees/:userId/status', authenticate, organizationController.updateEmployeeStatus);
 
+/**
+ * Asignar o remover rol de jefe de proyecto a un empleado
+ * PATCH /api/organizations/:id/employees/:employeeId/project-manager
+ * Body: { isProjectManager: boolean }
+ */
+router.patch('/:id/employees/:employeeId/project-manager', authenticate, organizationController.setProjectManagerRole);
+
+/**
+ * Obtener todos los jefes de proyecto de la organización
+ * GET /api/organizations/:id/project-managers
+ */
+router.get('/:id/project-managers', authenticate, organizationController.getProjectManagers);
+
 // ============================================
 // RUTAS DE GESTIÓN DE ADMINISTRADORES
 // ============================================
@@ -155,5 +168,22 @@ router.get('/:id/cvs/:cvId', authenticate, require('../controllers/cv.controller
  * Body: { status: 'pending' | 'reviewed' | 'accepted' | 'rejected', notes }
  */
 router.patch('/:id/cvs/:cvId/status', authenticate, require('../controllers/cv.controller').updateCVStatus);
+
+// ============================================
+// RUTAS DE GESTIÓN DE PROYECTOS
+// ============================================
+
+/**
+ * Obtener proyectos de la organización
+ * GET /api/organizations/:id/projects
+ * Query params: status, projectManager
+ */
+router.get('/:id/projects', authenticate, organizationController.getOrganizationProjects);
+
+/**
+ * Obtener estadísticas de proyectos de la organización
+ * GET /api/organizations/:id/projects/statistics
+ */
+router.get('/:id/projects/statistics', authenticate, organizationController.getProjectStatistics);
 
 module.exports = router;

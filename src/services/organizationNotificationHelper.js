@@ -289,6 +289,41 @@ class OrganizationNotificationHelper {
   }
 
   /**
+   * Notifica cuando se asigna o remueve el rol de jefe de proyecto
+   * @param {Object} organization - Organización
+   * @param {Object} employee - Empleado afectado
+   * @param {boolean} isProjectManager - True si se asignó, false si se removió
+   */
+  async notifyProjectManagerRoleChanged(organization, employee, isProjectManager) {
+    try {
+      const employeeId = this._extractId(employee);
+
+      await notificationService.create({
+        recipientId: employeeId,
+        type: NotificationTypes.ROLE_CHANGED,
+        title: isProjectManager ? 'Asignado como jefe de proyecto' : 'Rol de jefe de proyecto removido',
+        message: isProjectManager 
+          ? `Has sido asignado como jefe de proyecto en ${organization.name}. Ahora puedes crear y gestionar proyectos.`
+          : `Tu rol de jefe de proyecto ha sido removido en ${organization.name}.`,
+        channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
+        priority: NotificationPriority.HIGH,
+        metadata: {
+          organizationId: this._extractId(organization),
+          organizationName: organization.name,
+          isProjectManager,
+          changedAt: new Date()
+        },
+        actionUrl: `/organizations/${this._extractId(organization)}`,
+        actionText: 'Ver organización'
+      });
+
+      console.log(`Notificación de cambio de rol de jefe de proyecto enviada a ${employee.name || employee.email}`);
+    } catch (error) {
+      console.error('Error al notificar cambio de rol de jefe de proyecto:', error);
+    }
+  }
+
+  /**
    * Notifica a todos los administradores de la organización
    * @param {Object} organization - Organización
    * @param {string} title - Título de la notificación

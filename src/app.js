@@ -19,6 +19,7 @@ const cvRoutes = require('./routes/cv.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const organizationRoutes = require('./routes/organization.routes');
 const bfi44Routes = require('./routes/bfi44.routes');
+const projectRoutes = require('./routes/project.routes');
 
 app.use('/', indexRoutes);
 app.use('/auth', authRoutes);
@@ -27,6 +28,7 @@ app.use('/api/cv', cvRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/bfi-44', bfi44Routes);
+app.use('/api/projects', projectRoutes);
 
 // Ruta de salud
 app.get('/health', (req, res) => {

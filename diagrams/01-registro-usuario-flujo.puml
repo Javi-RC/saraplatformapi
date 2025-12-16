@@ -1,0 +1,85 @@
+@startuml 01_Registro_Usuario_Flujo
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 10
+skinparam arrowColor #333333
+
+title Diagrama de Flujo: Registro de Usuario con Protección Anti-Suplantación\n(TFG - Sistema de Gestión de CVs)
+
+start
+
+:Usuario accede a /register;
+:Completa formulario (3 pasos);
+
+if (Validación Cliente OK?) then (no)
+  :Mostrar error inline;
+  stop
+else (sí)
+  :Enviar POST /auth/register;
+  
+  if (Validación Backend OK?) then (no)
+    #Pink:Retornar 400 Bad Request;
+    :Mostrar error;
+    stop
+  else (sí)
+    :Buscar usuario por email;
+    
+    if (Usuario existe?) then (no)
+      #LightGreen:**NUEVO USUARIO**;
+      :Hash password (bcrypt);
+      :Generar token confirmación;
+      :Crear usuario con:
+      • isConfirmed = false
+      • verificationTokenExpiry = +24h
+      • registrationAttempts = 0;
+      :Guardar en BD;
+      :Enviar email verificación;
+      #LightGreen:Retornar 201 Created;
+      :Mostrar "Cuenta creada.\nRevisa tu email";
+      stop
+    else (sí)
+      if (Usuario verificado?\nisConfirmed = true) then (sí)
+        #Pink:**EMAIL YA REGISTRADO**;
+        #Pink:Retornar 409 Conflict;
+        :Mostrar "Email ya registrado\ny verificado";
+        stop
+      else (no)
+        #Orange:**USUARIO NO VERIFICADO**;
+        if (Token expirado?\n> 24 horas) then (sí)
+          #LightCoral:**RE-REGISTRO PERMITIDO**;
+          :Eliminar usuario anterior;
+          :Hash nuevo password;
+          :Generar nuevo token;
+          :Crear usuario nuevo con:
+          • verificationTokenExpiry = +24h
+          • registrationAttempts = 0;
+          :Guardar en BD;
+          :Enviar email verificación;
+          #LightGreen:Retornar 201 Created;
+          :Mostrar "Cuenta creada.\nRevisa tu email";
+          stop
+        else (no)
+          #LightYellow:**TOKEN VÁLIDO (< 24h)**;
+          if (Intentos ≥ 3?) then (sí)
+            #Pink:**LÍMITE ALCANZADO**;
+            #Pink:Retornar 429 Too Many;
+            :Mostrar "Demasiados intentos.\nEspera 24h";
+            stop
+          else (no)
+            #LightGreen:**REENVÍO PERMITIDO**;
+            :Generar nuevo token;
+            :Incrementar registrationAttempts;
+            :Actualizar verificationTokenExpiry = +24h;
+            :Guardar cambios;
+            :Reenviar email verificación;
+            :Retornar 200 OK;
+            :Mostrar "Email reenviado.\nRevisa tu bandeja";
+            stop
+          endif
+        endif
+      endif
+    endif
+  endif
+endif
+
+@enduml

@@ -53,6 +53,14 @@ const userSchema = new mongoose.Schema({
   },
   confirmationToken: String,
   confirmationTokenExpiry: Date,
+  verificationTokenExpiry: {
+    type: Date,
+    default: () => Date.now() + 24 * 60 * 60 * 1000 // 24 horas
+  },
+  registrationAttempts: {
+    type: Number,
+    default: 0
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -86,6 +94,15 @@ userSchema.index(
       oauthProvider: { $type: 'string' },
       oauthId: { $type: 'string' }
     }
+  }
+);
+
+// Índice TTL para eliminar usuarios no verificados después de 48 horas
+userSchema.index(
+  { createdAt: 1 },
+  { 
+    expireAfterSeconds: 172800, // 48 horas
+    partialFilterExpression: { isConfirmed: false }
   }
 );
 

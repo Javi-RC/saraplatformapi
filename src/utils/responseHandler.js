@@ -8,6 +8,7 @@ class ResponseHandler {
       'EMAIL_NOT_CONFIRMED': { status: 401, message: 'Confirma tu email antes de iniciar sesión' },
       'INVALID_OR_EXPIRED_TOKEN': { status: 400, message: 'Token inválido o expirado' },
       'USER_NOT_FOUND': { status: 404, message: 'Usuario no encontrado' },
+      'TOO_MANY_ATTEMPTS': { status: 429, message: 'Demasiados intentos de registro. Espera 24 horas o contacta con soporte.' },
       'MISSING_REQUIRED_FIELDS': { status: 400, message: 'Todos los campos son requeridos' },
       'INVALID_EMAIL_FORMAT': { status: 400, message: 'Formato de email inválido' },
       'PASSWORD_TOO_SHORT': { status: 400, message: 'La contraseña debe tener al menos 6 caracteres' },

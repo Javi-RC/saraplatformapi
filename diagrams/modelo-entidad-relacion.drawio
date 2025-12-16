@@ -1,0 +1,473 @@
+<mxfile host="65bd71144e">
+    <diagram name="Modelo Entidad-Relación" id="er-modelo">
+        <mxGraphModel dx="2465" dy="2140" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Modelo Entidad-Relación (ER)&#xa;TFG - Sistema de Gestión de CVs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="450" y="20" width="500" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-entity" value="USER" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="150" width="280" height="458" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-id" value="🔑 _id: ObjectId (PK)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="user-entity" vertex="1">
+                    <mxGeometry y="30" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-email" value="email: String (unique, lowercase)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="56" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-name" value="name: String (required)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="82" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-pass" value="passwordHash: String (select: false)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="108" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-oauth" value="oauthProvider: String (google/github)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="134" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-oauthid" value="oauthId: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="160" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-role" value="role: String (employee/org_admin/unassigned)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="186" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-org" value="🔗 organization: ObjectId (FK)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="user-entity" vertex="1">
+                    <mxGeometry y="212" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-confirmed" value="isConfirmed: Boolean (default: false)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="238" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-token" value="confirmationToken: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="264" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-tokenexp" value="confirmationTokenExpiry: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="290" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-verifexp" value="verificationTokenExpiry: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="316" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-attempts" value="registrationAttempts: Number" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="342" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-created" value="createdAt: Date (TTL index)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="368" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-lastlogin" value="lastLogin: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="394" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-avatar" value="avatar: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="420" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="user-notifprefs" value="notificationPreferences: Object" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="user-entity" vertex="1">
+                    <mxGeometry y="446" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-entity" value="ORGANIZATION" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="570" y="120" width="280" height="342" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-id" value="🔑 _id: ObjectId (PK)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="org-entity" vertex="1">
+                    <mxGeometry y="30" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-name" value="name: String (required, unique)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="56" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-desc" value="description: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="82" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-taxid" value="taxId: String (unique, sparse)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="108" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-contact" value="contact: Object (email, phone, website)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="134" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-address" value="address: Object (street, city, country)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="160" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-industry" value="industry: String (enum)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="186" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-size" value="size: String (1-10/11-50/...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="212" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-admin" value="🔗 admin: ObjectId (FK → User)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="org-entity" vertex="1">
+                    <mxGeometry y="238" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-addladmins" value="🔗 additionalAdmins: [ObjectId] (FK → User)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" parent="org-entity" vertex="1">
+                    <mxGeometry y="264" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-employees" value="employees: [Object] (user, position, status)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="290" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="org-created" value="createdAt: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="org-entity" vertex="1">
+                    <mxGeometry y="316" width="280" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-entity" value="PROJECT" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="1050" y="120" width="340" height="1010" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-id" value="🔑 _id: ObjectId (PK)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=10" parent="proj-entity" vertex="1">
+                    <mxGeometry y="30" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-name" value="projectName: String (required)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" parent="proj-entity" vertex="1">
+                    <mxGeometry y="50" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-desc" value="briefDescription: String (required)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" parent="proj-entity" vertex="1">
+                    <mxGeometry y="70" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-eststart" value="estimatedStartDate: Date (required)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="90" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-estend" value="estimatedEndDate: Date (required)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="110" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-actstart" value="actualStartDate: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="130" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-actend" value="actualEndDate: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="150" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-duration" value="expectedDuration: Object {value, unit}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="170" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-sync" value="requiresSynchronousCommunication: String (yes/no)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="190" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-rtc" value="realTimeCommunicationLevel: String (high/medium/low)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="210" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-meetings" value="weeklyMeetingsCount: Number (0-10+)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="230" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-meetdur" value="averageMeetingDuration: Object {value, unit}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="250" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-schedule" value="requiredAvailabilitySchedule: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="270" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-langs" value="requiredLanguages: [String]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="290" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-langprof" value="minimumLanguageProficiency: String (A1-C2)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="310" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-techs" value="mainTechnologies: [String]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" parent="proj-entity" vertex="1">
+                    <mxGeometry y="330" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-explevel" value="requiredExperienceLevel: String (junior/mid/senior)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="350" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-complex" value="systemComplexity: String (low/medium/high)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="370" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-infra" value="sharedInfrastructureDependency: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="390" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-tools" value="requiresSpecializedTools: Object {needed, desc}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="410" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-docs" value="documentationLevel: String (complete/partial/minimal)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="430" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-regions" value="teamRegions: [String]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="450" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-distexp" value="distributedWorkExperienceLevel: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="470" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-overlap" value="expectedTimeOverlap: Object {value, unit}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="490" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-culture" value="culturalDiversityLevel: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="510" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-roles" value="keyRoles: [Object] {roleName, responsibilities}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="530" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-deps" value="criticalDependencies: [String]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="550" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-hours" value="weeklyHoursPerMember: Number (1-80)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="570" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-afterhours" value="requiresAfterHoursAvailability: String (yes/no)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="590" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-highload" value="highLoadPeriods: [Object] {period, desc}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="610" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-mgmt" value="managementMethod: String (scrum/kanban/waterfall)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="630" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-followup" value="followUpFrequency: Object {standups, reviews, etc}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="650" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-commtools" value="communicationTools: [String] (Slack/Teams/etc)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="670" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-tasktools" value="taskManagementTools: [String] (Jira/Trello/etc)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="690" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-docstand" value="documentationStandardization: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="710" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-teams" value="involvedTeams: [Object] {teamName, depLevel}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="730" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-flow" value="informationFlow: String (unidirectional/bidirectional)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="750" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-exchanges" value="criticalExchanges: [String]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="770" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-onboard" value="hasOnboardingProcesses: String (yes/partial/no)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="790" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-cicd" value="hasVersionControlAndCICD: String (yes/partial/no)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="810" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-frag" value="internalToolsFragmentation: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="830" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-org" value="🔗 organization: ObjectId (FK → Organization)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="850" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-manager" value="🔗 projectManager: ObjectId (FK → User)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="870" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-assigned" value="assignedEmployees: [Object] {user, role}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="890" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-status" value="status: String (draft/active/paused/completed/...)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="910" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-createdat" value="createdAt: Date (immutable, auto-generated)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="930" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-updated" value="updatedAt: Date (auto-updated via timestamps)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="950" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-activity" value="lastActivityAt: Date (manually updated)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="970" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="proj-version" value="__v: Number (Mongoose version key)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontSize=10" vertex="1" parent="proj-entity">
+                    <mxGeometry y="990" width="340" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-entity" value="CV" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="700" width="300" height="420" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-id" value="🔑 _id: ObjectId (PK)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="cv-entity">
+                    <mxGeometry y="30" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-user" value="🔗 userId: ObjectId (FK → User)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="cv-entity">
+                    <mxGeometry y="56" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-org" value="🔗 organization: ObjectId (FK → Org)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="cv-entity">
+                    <mxGeometry y="82" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-orgstatus" value="organizationStatus: String (enum)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="108" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-submitted" value="submittedToOrganizationAt: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="134" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-orgnotes" value="organizationNotes: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="160" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-contact" value="contact: Object (email, phones, links)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="186" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-education" value="education: [Object] (AI extracted)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="212" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-experience" value="experience: [Object] (AI extracted)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="238" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-skills" value="skills: Object (technical, soft)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="264" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-languages" value="languages: [Object] (AI extracted)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="290" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-projects" value="projects: [Object] (AI extracted)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="316" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-certifications" value="certifications: [Object] (AI extracted)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="342" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-achievements" value="achievements: Object (publications, awards)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="368" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="cv-created" value="createdAt: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="cv-entity">
+                    <mxGeometry y="394" width="300" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-entity" value="BFI44RESPONSE" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+                    <mxGeometry x="480" y="1650" width="320" height="238" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-id" value="🔑 _id: ObjectId (PK)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="30" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-user" value="🔗 userId: ObjectId (FK → User, indexed)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="56" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-responses" value="responses: Map&lt;String, Number&gt; (44 items, 1-5)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="82" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-results" value="results: Object {" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="108" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-extra" value="  Extraversion: Number" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="134" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-agree" value="  Agreeableness: Number" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="160" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-consc" value="  Conscientiousness, Neuroticism, Openness }" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="186" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="bfi-completed" value="completedAt: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="bfi-entity">
+                    <mxGeometry y="212" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-entity" value="NOTIFICATION" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+                    <mxGeometry x="860" y="1650" width="320" height="446" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-id" value="🔑 _id: ObjectId (PK)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="notif-entity">
+                    <mxGeometry y="30" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-user" value="🔗 recipient: ObjectId (FK → User, indexed)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;fontStyle=1" vertex="1" parent="notif-entity">
+                    <mxGeometry y="56" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-type" value="type: String (enum - 30+ tipos)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="82" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-title" value="title: String (required)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="108" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-message" value="message: String (required)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="134" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-priority" value="priority: String (low/medium/high/urgent)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="160" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-status" value="status: String (pending/sent/delivered/read)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="186" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-channels" value="channels: [String] (in_app/email/push)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="212" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-delivstatus" value="deliveryStatus: Object (inApp, email, push)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="238" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-read" value="isRead: Boolean (default: false)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="264" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-readat" value="readAt: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="290" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-actionurl" value="actionUrl: String" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="316" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-related" value="relatedEntity: Object (entityType, entityId)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="342" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-metadata" value="metadata: Object (optional)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="368" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-expires" value="expiresAt: Date (TTL index)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="394" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="notif-created" value="createdAt: Date" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="notif-entity">
+                    <mxGeometry y="420" width="320" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="rel1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" edge="1" parent="1" source="user-org" target="org-admin">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="rel1-label" value="pertenece a" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10" connectable="0" vertex="1" parent="rel1">
+                    <mxGeometry x="-0.1" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" edge="1" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="850" y="253"/>
+                            <mxPoint x="960" y="253"/>
+                            <mxPoint x="960" y="628"/>
+                        </Array>
+                        <mxPoint x="850" y="221" as="sourcePoint"/>
+                        <mxPoint x="1050" y="778" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel2-label" value="tiene proyectos" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10" connectable="0" vertex="1" parent="rel2">
+                    <mxGeometry x="-0.1" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" edge="1" parent="1" source="user-lastlogin" target="proj-manager">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="820" y="557"/>
+                            <mxPoint x="820" y="1210"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel6-label" value="administra" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10" connectable="0" vertex="1" parent="rel6">
+                    <mxGeometry x="-0.1" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" edge="1" parent="1" source="user-role" target="cv-user">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="60" y="350"/>
+                            <mxPoint x="60" y="1670"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel3-label" value="sube" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10" connectable="0" vertex="1" parent="rel3">
+                    <mxGeometry x="-0.1" y="2" relative="1" as="geometry">
+                        <mxPoint x="-10" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endArrow=ERone;endFill=0;startArrow=ERone;startFill=0;" edge="1" parent="1" source="user-created" target="bfi-user">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="420" y="531"/>
+                            <mxPoint x="420" y="1670"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel4-label" value="completa" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10" connectable="0" vertex="1" parent="rel4">
+                    <mxGeometry x="-0.1" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;" edge="1" parent="1" source="user-attempts" target="notif-user">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="840" y="505"/>
+                            <mxPoint x="840" y="1670"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="rel5-label" value="recibe" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10" connectable="0" vertex="1" parent="rel5">
+                    <mxGeometry x="-0.1" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="legend" value="LEYENDA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;verticalAlign=top;fontSize=11;fontStyle=1;align=left;" vertex="1" parent="1">
+                    <mxGeometry x="1450" y="-10" width="160" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend1" value="🔑 = Primary Key (PK)" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="1460" y="15" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend2" value="🔗 = Foreign Key (FK)" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="1460" y="40" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend3" value="ObjectId = MongoDB ID" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="1460" y="65" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend4" value="[Object] = Array" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="1460" y="90" width="110" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

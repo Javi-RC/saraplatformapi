@@ -143,6 +143,10 @@ const organizationSchema = new mongoose.Schema({
       type: String,
       enum: ['active', 'inactive', 'pending'],
       default: 'pending'
+    },
+    isProjectManager: {
+      type: Boolean,
+      default: false
     }
   }],
   
@@ -220,12 +224,12 @@ organizationSchema.index({ createdAt: -1 });
 
 // Virtual: Total de empleados activos
 organizationSchema.virtual('activeEmployeesCount').get(function() {
-  return this.employees.filter(emp => emp.status === 'active').length;
+  return this.employees ? this.employees.filter(emp => emp.status === 'active').length : 0;
 });
 
 // Virtual: Total de empleados
 organizationSchema.virtual('totalEmployeesCount').get(function() {
-  return this.employees.length;
+  return this.employees ? this.employees.length : 0;
 });
 
 // Virtual: Verificar si la organización está completamente configurada
@@ -251,14 +255,15 @@ organizationSchema.methods.isAdmin = function(userId) {
   }
   
   // Verificar si está en additionalAdmins (también puede estar poblado)
-  return this.additionalAdmins.some(admin => {
+  return this.additionalAdmins ? this.additionalAdmins.some(admin => {
     const additionalAdminId = admin._id ? admin._id.toString() : admin.toString();
     return additionalAdminId === userIdStr;
-  });
+  }) : false;
 };
 
 // Método: Verificar si un usuario es empleado
 organizationSchema.methods.isEmployee = function(userId) {
+  if (!this.employees) return false;
   const userIdStr = userId.toString();
   return this.employees.some(emp => {
     // Manejar caso donde emp.user está poblado o no
@@ -267,8 +272,24 @@ organizationSchema.methods.isEmployee = function(userId) {
   });
 };
 
+// Método: Verificar si un usuario es jefe de proyecto
+organizationSchema.methods.isProjectManager = function(userId) {
+  if (!this.employees) return false;
+  const userIdStr = userId.toString();
+  const employee = this.employees.find(emp => {
+    const empUserId = emp.user._id ? emp.user._id.toString() : emp.user.toString();
+    return empUserId === userIdStr && emp.status === 'active';
+  });
+  return employee ? employee.isProjectManager : false;
+};
+
 // Método: Agregar empleado
 organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
+  // Inicializar employees si no existe
+  if (!this.employees) {
+    this.employees = [];
+  }
+  
   // Verificar si ya existe
   const existingEmployee = this.employees.find(
     emp => emp.user.toString() === userId.toString()
@@ -282,7 +303,8 @@ organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
     user: userId,
     position: employeeData.position,
     department: employeeData.department,
-    status: this.settings.requireApproval ? 'pending' : 'active'
+    status: this.settings.requireApproval ? 'pending' : 'active',
+    isProjectManager: employeeData.isProjectManager || false
   });
   
   this.lastActivityAt = Date.now();
@@ -291,6 +313,10 @@ organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
 
 // Método: Remover empleado
 organizationSchema.methods.removeEmployee = function(userId) {
+  if (!this.employees) {
+    throw new Error('Empleado no encontrado en la organización');
+  }
+  
   const index = this.employees.findIndex(
     emp => emp.user.toString() === userId.toString()
   );
@@ -306,6 +332,10 @@ organizationSchema.methods.removeEmployee = function(userId) {
 
 // Método: Actualizar estado de empleado
 organizationSchema.methods.updateEmployeeStatus = function(userId, newStatus) {
+  if (!this.employees) {
+    throw new Error('Empleado no encontrado en la organización');
+  }
+  
   const employee = this.employees.find(
     emp => emp.user.toString() === userId.toString()
   );
@@ -315,6 +345,29 @@ organizationSchema.methods.updateEmployeeStatus = function(userId, newStatus) {
   }
   
   employee.status = newStatus;
+  this.lastActivityAt = Date.now();
+  return this.save();
+};
+
+// Método: Asignar/desasignar rol de jefe de proyecto
+organizationSchema.methods.setProjectManagerRole = function(userId, isProjectManager) {
+  if (!this.employees) {
+    throw new Error('Empleado no encontrado en la organización');
+  }
+  
+  const employee = this.employees.find(
+    emp => emp.user.toString() === userId.toString()
+  );
+  
+  if (!employee) {
+    throw new Error('Empleado no encontrado en la organización');
+  }
+  
+  if (employee.status !== 'active') {
+    throw new Error('Solo se puede asignar el rol de jefe de proyecto a empleados activos');
+  }
+  
+  employee.isProjectManager = isProjectManager;
   this.lastActivityAt = Date.now();
   return this.save();
 };

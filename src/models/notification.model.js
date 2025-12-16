@@ -28,6 +28,16 @@ const NotificationTypes = {
   ORG_ADMIN_ADDED: 'org_admin_added',
   ORG_SETTINGS_UPDATED: 'org_settings_updated',
   
+  // Notificaciones de proyectos
+  PROJECT_CREATED: 'project_created',
+  PROJECT_UPDATED: 'project_updated',
+  PROJECT_DELETED: 'project_deleted',
+  PROJECT_ACTIVATED: 'project_activated',
+  PROJECT_COMPLETED: 'project_completed',
+  PROJECT_CANCELLED: 'project_cancelled',
+  ASSIGNED_TO_PROJECT: 'assigned_to_project',
+  REMOVED_FROM_PROJECT: 'removed_from_project',
+  
   // Notificaciones administrativas
   ADMIN_ANNOUNCEMENT: 'admin_announcement',
   SYSTEM_UPDATE: 'system_update',

@@ -453,6 +453,127 @@ class OrganizationController {
       });
     }
   }
+
+  /**
+   * Asigna o remueve el rol de jefe de proyecto a un empleado
+   * PATCH /api/organizations/:id/employees/:employeeId/project-manager
+   */
+  async setProjectManagerRole(req, res) {
+    try {
+      const { id, employeeId } = req.params;
+      const { isProjectManager } = req.body;
+      const adminId = req.user.id;
+
+      if (typeof isProjectManager !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          error: 'isProjectManager must be a boolean value'
+        });
+      }
+
+      const organization = await organizationService.setProjectManagerRole(
+        id,
+        employeeId,
+        isProjectManager,
+        adminId
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: isProjectManager 
+          ? 'Empleado asignado como jefe de proyecto exitosamente'
+          : 'Rol de jefe de proyecto removido exitosamente',
+        data: organization
+      });
+    } catch (error) {
+      console.error('Error al asignar rol de jefe de proyecto:', error);
+      
+      let statusCode = 400;
+      if (error.message.includes('no encontrada') || error.message.includes('no pertenece')) {
+        statusCode = 404;
+      } else if (error.message.includes('permisos')) {
+        statusCode = 403;
+      }
+
+      return res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Obtiene todos los jefes de proyecto de una organización
+   * GET /api/organizations/:id/project-managers
+   */
+  async getProjectManagers(req, res) {
+    try {
+      const { id } = req.params;
+
+      const projectManagers = await organizationService.getProjectManagers(id);
+
+      return res.status(200).json({
+        success: true,
+        count: projectManagers.length,
+        data: projectManagers
+      });
+    } catch (error) {
+      console.error('Error al obtener jefes de proyecto:', error);
+      const statusCode = error.message.includes('no encontrada') ? 404 : 400;
+      return res.status(statusCode).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Obtiene todos los proyectos de una organización
+   * GET /api/organizations/:id/projects
+   */
+  async getOrganizationProjects(req, res) {
+    try {
+      const { id } = req.params;
+      const filters = {
+        status: req.query.status,
+        projectManager: req.query.projectManager
+      };
+
+      // Importar el controlador de proyectos para reutilizar su lógica
+      const projectController = require('./project.controller');
+      req.params.organizationId = id;
+      
+      return await projectController.getOrganizationProjects(req, res);
+    } catch (error) {
+      console.error('Error al obtener proyectos de la organización:', error);
+      return res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Obtiene estadísticas de proyectos de una organización
+   * GET /api/organizations/:id/projects/statistics
+   */
+  async getProjectStatistics(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Importar el controlador de proyectos para reutilizar su lógica
+      const projectController = require('./project.controller');
+      req.params.organizationId = id;
+      
+      return await projectController.getProjectStatistics(req, res);
+    } catch (error) {
+      console.error('Error al obtener estadísticas de proyectos:', error);
+      return res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
 }
 
 module.exports = new OrganizationController();

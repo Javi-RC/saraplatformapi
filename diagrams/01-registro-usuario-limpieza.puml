@@ -1,0 +1,64 @@
+@startuml 01_Registro_Usuario_Sistema_Limpieza
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam defaultFontSize 10
+
+title Sistema de Limpieza Automática de Usuarios No Verificados\n(Background Process)
+
+|MongoDB TTL Index|
+start
+:Esperar hasta que\ncreatedAt + 48h = now;
+#LightCoral:Eliminar usuario\nautomáticamente;
+note right
+  **Índice TTL:**
+  • expireAfterSeconds: 172800 (48h)
+  • Solo usuarios con isConfirmed = false
+  • Proceso automático de MongoDB
+end note
+stop
+
+|Servidor Backend|
+start
+:Servidor arranca;
+:Ejecutar cleanupUnverifiedUsers();
+repeat
+  :Esperar 6 horas;
+  :Buscar usuarios:
+  • isConfirmed = false
+  • createdAt < (now - 48h);
+  
+  if (¿Usuarios encontrados?) then (sí)
+    #Orange:Eliminar usuarios;
+    :Log: "X usuarios eliminados";
+  else (no)
+    :Log: "Sin usuarios para limpiar";
+  endif
+repeat while (Servidor activo?)
+stop
+
+|Protección Anti-Suplantación|
+start
+floating note left #LightCyan
+  **Cómo funciona la protección:**
+  
+  1. **Ataque de suplantación:**
+     Atacante registra victima@mail.com
+     pero no puede verificar (no tiene acceso)
+  
+  2. **Token expira en 24h:**
+     Sistema marca usuario para limpieza
+  
+  3. **Limpieza en 48h:**
+     Usuario no verificado se elimina
+  
+  4. **Email liberado:**
+     Víctima real puede registrarse
+  
+  **Límites de seguridad:**
+  • Máximo 3 reenvíos en 24h
+  • Token expira automáticamente
+  • Email se libera en 24-48h
+end note
+stop
+
+@enduml

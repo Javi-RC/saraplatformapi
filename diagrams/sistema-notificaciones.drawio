@@ -1,0 +1,195 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Notification System" id="notification-system">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Arquitectura del Sistema de Notificaciones (Factory Pattern)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="970" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Trigger Sources -->
+        <mxCell id="triggers-box" value="Fuentes de Eventos (Notification Helpers)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="990" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="helper-1" value="authNotificationHelper&#xa;- Registro exitoso&#xa;- Confirmación email&#xa;- Cambio contraseña" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;" vertex="1" parent="triggers-box">
+          <mxGeometry x="20" y="40" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="helper-2" value="cvNotificationHelper&#xa;- CV procesado&#xa;- Error extracción&#xa;- CV compartido" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;" vertex="1" parent="triggers-box">
+          <mxGeometry x="210" y="40" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="helper-3" value="bfi44NotificationHelper&#xa;- Test completado&#xa;- Resultados disponibles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;" vertex="1" parent="triggers-box">
+          <mxGeometry x="400" y="40" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="helper-4" value="organizationNotificationHelper&#xa;- Invitación recibida&#xa;- Rol actualizado&#xa;- Miembro eliminado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;" vertex="1" parent="triggers-box">
+          <mxGeometry x="590" y="40" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="helper-5" value="projectNotificationHelper&#xa;- Añadido a proyecto&#xa;- Eliminado de proyecto&#xa;- Proyecto actualizado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;align=left;" vertex="1" parent="triggers-box">
+          <mxGeometry x="780" y="40" width="190" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Notification Service -->
+        <mxCell id="service-box" value="NotificationService (Orquestador Principal)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="300" y="250" width="550" height="180" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="service-create" value="create(notificationData)&#xa;1. Validar usuario receptor&#xa;2. Crear notificación en MongoDB&#xa;3. Llamar a sendThroughChannels()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontStyle=1" vertex="1" parent="service-box">
+          <mxGeometry x="30" y="45" width="240" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="service-send" value="sendThroughChannels(notification, recipient, channels)&#xa;1. Iterar sobre canales [IN_APP, EMAIL, PUSH]&#xa;2. Obtener canal del Factory&#xa;3. Verificar canSend()&#xa;4. Enviar y actualizar status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;align=left;fontStyle=1" vertex="1" parent="service-box">
+          <mxGeometry x="280" y="45" width="250" height="110" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows from helpers to service -->
+        <mxCell id="arrow-h1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="helper-1" target="service-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-h2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.35;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="helper-2" target="service-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-h3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="helper-3" target="service-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-h4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.65;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="helper-4" target="service-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-h5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="helper-5" target="service-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Factory Pattern -->
+        <mxCell id="factory-box" value="NotificationChannelFactory (Patrón Factory)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="300" y="480" width="550" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="factory-method" value="getChannel(channelType)&#xa;Crea o retorna instancia de canal" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="factory-box">
+          <mxGeometry x="180" y="45" width="200" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="factory-deps" value="Dependencias inyectadas:&#xa;- emailService" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="factory-box">
+          <mxGeometry x="20" y="45" width="150" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrow from service to factory -->
+        <mxCell id="arrow-sf" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="service-send" target="factory-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Channels -->
+        <mxCell id="channels-container" value="Canales de Notificación (Strategy Pattern)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="80" y="650" width="990" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- InAppChannel -->
+        <mxCell id="channel-inapp-box" value="InAppChannel" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;startSize=25;" vertex="1" parent="channels-container">
+          <mxGeometry x="20" y="40" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="channel-inapp-1" value="canSend(): true (siempre)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="channel-inapp-box">
+          <mxGeometry x="10" y="30" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="channel-inapp-2" value="send(): Actualiza status en MongoDB" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="channel-inapp-box">
+          <mxGeometry x="10" y="45" width="280" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- EmailChannel -->
+        <mxCell id="channel-email-box" value="EmailChannel" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;startSize=25;" vertex="1" parent="channels-container">
+          <mxGeometry x="340" y="40" width="300" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="channel-email-1" value="canSend(): Verifica recipient.email" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="channel-email-box">
+          <mxGeometry x="10" y="30" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="channel-email-2" value="send(): emailService.sendNotificationEmail()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="channel-email-box">
+          <mxGeometry x="10" y="45" width="280" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- PushChannel -->
+        <mxCell id="channel-push-box" value="PushChannel" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;startSize=25;" vertex="1" parent="channels-container">
+          <mxGeometry x="660" y="40" width="310" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="channel-push-1" value="canSend(): Verifica recipient.pushTokens" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="channel-push-box">
+          <mxGeometry x="10" y="30" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="channel-push-2" value="send(): Integración con FCM/APNs (futuro)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="channel-push-box">
+          <mxGeometry x="10" y="45" width="290" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows from factory to channels -->
+        <mxCell id="arrow-fc1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="factory-box" target="channel-inapp-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-fc2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="factory-box" target="channel-email-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-fc3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.8;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="factory-box" target="channel-push-box">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Labels for arrows -->
+        <mxCell id="label-fc1" value="IN_APP" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="180" y="610" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="label-fc2" value="EMAIL" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="540" y="610" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="label-fc3" value="PUSH" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="785" y="610" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- External Services -->
+        <mxCell id="external-services" value="Servicios Externos" style="swimlane;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="80" y="800" width="990" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="external-1" value="MongoDB&#xa;(Almacenamiento de notificaciones in-app)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="external-services">
+          <mxGeometry x="40" y="40" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="external-2" value="Brevo API (SMTP)&#xa;(Envío de correos electrónicos)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="external-services">
+          <mxGeometry x="330" y="40" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="external-3" value="FCM/APNs (Futuro)&#xa;(Push notifications móviles)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="external-services">
+          <mxGeometry x="620" y="40" width="330" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows from channels to external services -->
+        <mxCell id="arrow-ext1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="channel-inapp-box" target="external-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-ext2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="channel-email-box" target="external-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-ext3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="channel-push-box" target="external-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Design Patterns Info -->
+        <mxCell id="patterns-box" value="Patrones de Diseño Aplicados" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="80" y="920" width="990" height="100" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pattern-1" value="✓ Factory Pattern: NotificationChannelFactory crea instancias de canales dinámicamente" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="patterns-box">
+          <mxGeometry x="20" y="35" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="pattern-2" value="✓ Strategy Pattern: Cada canal implementa la misma interfaz (canSend, send)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="patterns-box">
+          <mxGeometry x="20" y="55" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="pattern-3" value="✓ Dependency Injection: EmailService se inyecta en EmailChannel vía Factory" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="patterns-box">
+          <mxGeometry x="20" y="75" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="pattern-4" value="✓ Single Responsibility: Cada helper maneja eventos de un dominio específico" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="patterns-box">
+          <mxGeometry x="510" y="35" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="pattern-5" value="✓ Open/Closed: Fácil añadir nuevos canales sin modificar código existente" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="patterns-box">
+          <mxGeometry x="510" y="55" width="460" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="pattern-6" value="✓ Fail-Safe: Si un canal falla, otros canales siguen enviando (resilience)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="patterns-box">
+          <mxGeometry x="510" y="75" width="460" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

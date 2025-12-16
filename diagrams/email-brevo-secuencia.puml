@@ -1,0 +1,300 @@
+@startuml Envio_Email_Brevo_API
+!theme plain
+skinparam backgroundColor #FEFEFE
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 200
+skinparam noteFontSize 9
+skinparam participantFontSize 10
+
+title Diagrama de Secuencia: Envío de Email de Confirmación con Brevo API\n(TFG - Sistema de Gestión de CVs)
+
+' ============================================
+' PARTICIPANTES
+' ============================================
+participant "<<Backend>>\nauth.service" as SVC #LightYellow
+participant "<<Backend>>\nemail.service" as EMAIL #LightYellow
+participant "<<External API>>\nBrevo API\napi.brevo.com" as BREVO #LightPink
+participant "<<External>>\nSMTP Server\nBrevo" as SMTP #LightPink
+participant "<<External>>\nEmail Provider\n(Gmail, Outlook, etc.)" as PROVIDER #LightCyan
+actor "Usuario\n(Bandeja de entrada)" as USER #LightBlue
+
+' ============================================
+' FLUJO PRINCIPAL
+' ============================================
+
+== Fase 1: Preparación del Email ==
+
+SVC -> SVC: Usuario registrado exitosamente
+activate SVC
+
+note right of SVC
+  Contexto previo:
+  • Usuario guardado en MongoDB
+  • confirmationToken generado (32 bytes hex)
+  • confirmationTokenExpiry = now + 24h
+end note
+
+SVC -> SVC: Construir confirmLink
+note right of SVC
+  confirmLink = 
+  ${BACKEND_URL}/auth/confirm?token=${confirmationToken}
+  
+  Ejemplo:
+  http://localhost:3000/auth/confirm?token=abc123...
+end note
+
+SVC -> EMAIL: sendConfirmationEmail(email, name, confirmLink)
+activate EMAIL
+
+note over EMAIL #LightCyan
+  **email.service.js**
+  Método: sendConfirmationEmail()
+end note
+
+== Fase 2: Construcción del Payload ==
+
+EMAIL -> EMAIL: getConfirmationEmailTemplate(name, confirmLink)
+activate EMAIL
+note right of EMAIL
+  **HTML Template**:
+  • Header con logo/título
+  • Saludo personalizado: "¡Hola {name}!"
+  • Botón principal: "Confirmar Mi Cuenta"
+  • Link alternativo (texto plano)
+  • Advertencia: "Expira en 24 horas"
+  • Estilos inline CSS
+end note
+EMAIL --> EMAIL: htmlContent (string)
+deactivate EMAIL
+
+EMAIL -> EMAIL: Construir payload JSON
+note right of EMAIL
+  **Payload Brevo API**:
+  {
+    "sender": {
+      "name": "Tu Aplicación",
+      "email": "noreply@tudominio.com"
+    },
+    "to": [{ 
+      "email": "usuario@ejemplo.com",
+      "name": "Juan Pérez" 
+    }],
+    "subject": "Confirma tu cuenta - Tu Aplicación",
+    "htmlContent": "<div>...</div>"
+  }
+end note
+
+== Fase 3: Envío a Brevo API ==
+
+EMAIL -> BREVO: POST /v3/smtp/email\nHeaders:\n• api-key: ${BREVO_API_KEY}\n• Content-Type: application/json
+activate BREVO
+
+note over BREVO #LightPink
+  **Brevo API Endpoint**
+  https://api.brevo.com/v3/smtp/email
+  
+  **Autenticación**:
+  Header: api-key (desde .env)
+end note
+
+BREVO -> BREVO: Validar API Key
+BREVO -> BREVO: Validar formato payload
+
+alt #Pink Error de validación
+    note right of BREVO
+      Errores comunes:
+      • API Key inválida (401)
+      • Email sender no verificado (400)
+      • Formato payload incorrecto (400)
+      • Límite de rate excedido (429)
+    end note
+    
+    BREVO --> EMAIL: HTTP 4xx/5xx\n{ "code": "...", "message": "..." }
+    deactivate BREVO
+    
+    EMAIL -> EMAIL: Capturar error
+    note right of EMAIL
+      throw new Error(
+        `Brevo API error: ${status} - ${errorText}`
+      )
+    end note
+    
+    EMAIL --> SVC: throw Error
+    deactivate EMAIL
+    
+    note over SVC #Pink
+      En auth.service.js el error se captura
+      con try/catch y se logea:
+      console.error('Error enviando email:', error)
+      
+      **El registro NO se aborta**
+      Usuario queda creado pero sin email enviado
+    end note
+    
+    SVC --> SVC: Continuar (no bloquea registro)
+    deactivate SVC
+    
+else #LightGreen Validación exitosa
+
+    BREVO -> BREVO: Crear messageId único
+
+== Fase 4: Procesamiento en Brevo ==
+
+    BREVO -> BREVO: Encolar email para envío
+    
+    note right of BREVO
+      Brevo procesa el email:
+      • Aplica template HTML
+      • Añade headers de tracking
+      • Prepara para SMTP delivery
+    end note
+    
+    BREVO --> EMAIL: HTTP 201 Created\n{ "messageId": "abc-123-def-456" }
+    deactivate BREVO
+    
+    note right of EMAIL
+      Response exitoso:
+      {
+        "messageId": "<unique-id@smtp-relay.brevo.com>"
+      }
+    end note
+    
+    EMAIL --> SVC: return { messageId }
+    deactivate EMAIL
+    
+    note over SVC #LightGreen
+      Email encolado exitosamente
+      Continuar con respuesta al usuario
+    end note
+    
+    SVC --> SVC: return { user, message }
+    deactivate SVC
+
+== Fase 5: Entrega del Email (Asíncrono) ==
+
+    note over BREVO, SMTP #FFFFCC
+      **Proceso Asíncrono**
+      (Ocurre después del response HTTP 201)
+    end note
+    
+    activate BREVO
+    BREVO -> SMTP: Conectar SMTP\n(autenticado)
+    activate SMTP
+    
+    SMTP -> SMTP: Resolver MX records\ndel dominio destino
+    
+    note right of SMTP
+      Ejemplo para usuario@gmail.com:
+      • Buscar MX de gmail.com
+      • Encontrar: gmail-smtp-in.l.google.com
+    end note
+    
+    SMTP -> PROVIDER: SMTP EHLO + STARTTLS
+    activate PROVIDER
+    PROVIDER --> SMTP: 250 OK
+    
+    SMTP -> PROVIDER: MAIL FROM:<noreply@tudominio.com>
+    PROVIDER --> SMTP: 250 OK
+    
+    SMTP -> PROVIDER: RCPT TO:<usuario@ejemplo.com>
+    PROVIDER --> SMTP: 250 OK
+    
+    SMTP -> PROVIDER: DATA\n(Headers + HTML Body)
+    
+    note right of SMTP
+      **Email Headers**:
+      • From: Tu Aplicación <noreply@tudominio.com>
+      • To: Juan Pérez <usuario@ejemplo.com>
+      • Subject: Confirma tu cuenta...
+      • Content-Type: text/html; charset=UTF-8
+      • Message-ID: ...
+      • Date: ...
+    end note
+    
+    alt #Pink Error en entrega
+        PROVIDER --> SMTP: 5xx Error\n(Buzón lleno, no existe, etc.)
+        SMTP -> SMTP: Registrar bounce
+        SMTP --> BREVO: Notificar fallo
+        deactivate SMTP
+        deactivate PROVIDER
+        
+        note over BREVO #Pink
+          Brevo webhook puede notificar:
+          • hard_bounce
+          • soft_bounce
+          • invalid_email
+          
+          (No implementado en este sistema)
+        end note
+        deactivate BREVO
+        
+    else #LightGreen Entrega exitosa
+        PROVIDER --> SMTP: 250 OK\nMessage accepted
+        deactivate PROVIDER
+        
+        SMTP --> BREVO: Entrega confirmada
+        deactivate SMTP
+        
+        note over BREVO #LightGreen
+          Email entregado exitosamente
+          Brevo actualiza estadísticas
+        end note
+        deactivate BREVO
+
+== Fase 6: Recepción del Usuario ==
+
+        activate PROVIDER
+        PROVIDER -> PROVIDER: Procesar email
+        
+        note right of PROVIDER
+          Proveedor de email:
+          • Verificar spam/phishing
+          • Aplicar filtros del usuario
+          • Almacenar en buzón
+        end note
+        
+        PROVIDER -> USER: Email disponible\nen bandeja de entrada
+        activate USER
+        deactivate PROVIDER
+        
+        note over USER #LightCyan
+          Usuario recibe email con:
+          • Asunto: "Confirma tu cuenta - Tu Aplicación"
+          • Botón: "Confirmar Mi Cuenta"
+          • Link: http://localhost:3000/auth/confirm?token=...
+          • Expiración: 24 horas
+        end note
+
+== Fase 7: Acción del Usuario ==
+
+        USER -> USER: Abre email
+        USER -> USER: Click en botón/link
+        
+        note right of USER
+          Al hacer click, el navegador
+          hace GET al backend:
+          
+          GET /auth/confirm?token={confirmationToken}
+          
+          **Ver diagrama:** 02-confirmacion-cuenta.puml
+        end note
+        
+        deactivate USER
+    end
+end
+
+note over SVC, USER #FFFFCC
+  **Tiempos aproximados**:
+  • Fase 1-3 (API Request): <1 segundo
+  • Fase 4 (Brevo procesa): 1-5 segundos
+  • Fase 5 (Entrega SMTP): 5-30 segundos
+  • Total hasta bandeja: <1 minuto (típico)
+  
+  **Configuración necesaria**:
+  • BREVO_API_KEY en .env
+  • EMAIL_SENDER_EMAIL verificado en Brevo
+  • BACKEND_URL configurado correctamente
+end note
+
+@enduml

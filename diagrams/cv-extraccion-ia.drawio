@@ -1,0 +1,244 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="CV Extraction Flow" id="cv-extraction-ia">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Sistema de Extracción de CV con IA (Gemini API)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="800" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- User Upload -->
+        <mxCell id="user-start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="80" y="100" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="user-label" value="Usuario sube CV.pdf" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="160" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-start" target="user-label">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Frontend Processing -->
+        <mxCell id="frontend-box" value="Frontend (React)" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="200" y="100" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-1" value="Validación formato PDF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="frontend-box">
+          <mxGeometry x="30" y="45" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="user-label" target="frontend-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Backend Controller -->
+        <mxCell id="controller-box" value="Controller" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="480" y="100" width="260" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="controller-1" value="POST /api/cv/upload&#xa;Recibe multipart/form-data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="controller-box">
+          <mxGeometry x="30" y="45" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="frontend-1" target="controller-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- PDF Parsing -->
+        <mxCell id="parse-box" value="Multer + PDFParse" style="swimlane;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="790" y="100" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="parse-1" value="Extracción texto plano&#xa;del PDF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="parse-box">
+          <mxGeometry x="30" y="45" width="180" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="controller-1" target="parse-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- AI Service Decision -->
+        <mxCell id="ai-service-box" value="AIExtractorService" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="200" y="270" width="830" height="380" as="geometry" />
+        </mxCell>
+        
+        <!-- Model Selection -->
+        <mxCell id="ai-model-select" value="Selección de modelo Gemini" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1" vertex="1" parent="ai-service-box">
+          <mxGeometry x="50" y="50" width="150" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Model Options -->
+        <mxCell id="model-1" value="gemini-2.0-flash&#xa;(Principal: 15 RPM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="ai-service-box">
+          <mxGeometry x="270" y="40" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="model-2" value="gemini-2.0-flash-lite&#xa;(Fallback: 30 RPM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="ai-service-box">
+          <mxGeometry x="270" y="90" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="model-3" value="gemini-2.5-pro&#xa;(Preciso: 2 RPM)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="ai-service-box">
+          <mxGeometry x="270" y="140" width="130" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="ai-service-box" source="ai-model-select" target="model-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="ai-service-box" source="ai-model-select" target="model-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="ai-service-box" source="ai-model-select" target="model-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- API Call -->
+        <mxCell id="api-call" value="Llamada API REST&#xa;generateContent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="ai-service-box">
+          <mxGeometry x="450" y="75" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="ai-service-box" source="model-1" target="api-call">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Prompt Engineering -->
+        <mxCell id="prompt" value="Prompt estructurado:&#xa;- Extraer contacto&#xa;- Educación (títulos, fechas)&#xa;- Experiencia (empresa, rol, logros)&#xa;- Skills técnicas/blandas&#xa;- Idiomas con niveles&#xa;- Certificaciones&#xa;- Proyectos&#xa;- Logros destacados" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;verticalAlign=top;" vertex="1" parent="ai-service-box">
+          <mxGeometry x="640" y="40" width="160" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="ai-service-box" source="api-call" target="prompt">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Error Handling -->
+        <mxCell id="error-check" value="¿Respuesta exitosa?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="ai-service-box">
+          <mxGeometry x="470" y="170" width="110" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="ai-service-box" source="api-call" target="error-check">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="retry" value="Cambiar a siguiente modelo&#xa;(cooldown 60s)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="ai-service-box">
+          <mxGeometry x="270" y="190" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow11" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="ai-service-box" source="error-check" target="retry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="ai-service-box" source="retry" target="ai-model-select">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- JSON Parsing -->
+        <mxCell id="json-parse" value="Parsear respuesta JSON" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="ai-service-box">
+          <mxGeometry x="450" y="280" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow13" value="SÍ" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="ai-service-box" source="error-check" target="json-parse">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-down" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="parse-1" target="ai-model-select">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="910" y="250" as="sourcePoint" />
+            <mxPoint x="275" y="320" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="910" y="250" />
+              <mxPoint x="275" y="250" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- CV Service Processing -->
+        <mxCell id="cv-service-box" value="CVService - Procesamiento Estructurado" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="950" height="300" as="geometry" />
+        </mxCell>
+        
+        <!-- Extractors -->
+        <mxCell id="extractor-1" value="contactExtractor&#xa;(email, teléfono, ubicación)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="30" y="50" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="extractor-2" value="educationExtractor&#xa;(títulos, instituciones, fechas)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="230" y="50" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="extractor-3" value="experienceExtractor&#xa;(empresa, rol, logros)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="430" y="50" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="extractor-4" value="skillsExtractor&#xa;(técnicas, blandas)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="630" y="50" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="extractor-5" value="languagesExtractor&#xa;(idioma, nivel)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="790" y="50" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="extractor-6" value="certificationsExtractor&#xa;(certificados, emisor)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="30" y="120" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="extractor-7" value="projectsExtractor&#xa;(nombre, tecnologías)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="230" y="120" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="extractor-8" value="achievementsExtractor&#xa;(logros destacados)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="430" y="120" width="180" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Validation -->
+        <mxCell id="validation" value="Validación y limpieza de campos:&#xa;- Eliminar arrays vacíos&#xa;- Validar campos obligatorios&#xa;- Normalizar formatos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;align=left;" vertex="1" parent="cv-service-box">
+          <mxGeometry x="630" y="120" width="300" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- DB Save -->
+        <mxCell id="db-save" value="Guardar/Actualizar en MongoDB:&#xa;CV.findOneAndUpdate()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="cv-service-box">
+          <mxGeometry x="330" y="220" width="290" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows to extractors -->
+        <mxCell id="arrow-extract-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="json-parse" target="extractor-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-extract-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="json-parse" target="extractor-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-extract-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="json-parse" target="extractor-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-extract-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="json-parse" target="extractor-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-extract-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="json-parse" target="extractor-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Notification -->
+        <mxCell id="notification" value="cvNotificationHelper&#xa;Envía notificación:&#xa;'CV procesado exitosamente'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="410" y="1050" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-notif" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="db-save" target="notification">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Response -->
+        <mxCell id="response" value="Respuesta al Frontend:&#xa;HTTP 200 OK&#xa;{ cvId, status: 'processed', ... }" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="410" y="1160" width="290" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-response" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="notification" target="response">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- End -->
+        <mxCell id="end-circle" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="535" y="1260" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow-end" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="response" target="end-circle">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-box" value="Leyenda" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontStyle=1;startSize=30;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1330" width="950" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-1" value="Gemini API: Sistema de IA gratuito de Google para extracción estructurada" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="legend-box">
+          <mxGeometry x="20" y="40" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-2" value="Fallback automático: Cambia entre 5 modelos si hay errores de rate limit" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="legend-box">
+          <mxGeometry x="20" y="60" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-3" value="Extractores especializados: 8 módulos independientes para cada sección del CV" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="legend-box">
+          <mxGeometry x="490" y="40" width="450" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-4" value="Validación robusta: Limpia campos vacíos y valida datos obligatorios antes de guardar" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="legend-box">
+          <mxGeometry x="490" y="60" width="450" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
