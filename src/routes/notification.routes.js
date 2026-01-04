@@ -11,7 +11,7 @@ const isAdmin = (req, res, next) => {
   if (req.user.role !== 'org_admin') {
     return res.status(403).json({
       success: false,
-      error: 'Acceso denegado. Se requieren permisos de administrador.'
+      error: 'Access denied. Administrator permissions are required.'
     });
   }
   next();

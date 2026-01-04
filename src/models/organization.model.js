@@ -173,6 +173,126 @@ const organizationSchema = new mongoose.Schema({
       description: 'Procesar automáticamente CVs con IA'
     }
   },
+
+  // ============================================
+  // Remote Work and Support Configuration
+  // ============================================
+  remoteWorkConfiguration: {
+    hasRemoteWorkPolicy: {
+      type: Boolean,
+      default: false
+    },
+    policyDocument: {
+      type: String,
+      trim: true
+    },
+    providesTechSupport: {
+      type: Boolean,
+      default: false
+    },
+    remoteWorkTools: [{
+      type: String,
+      trim: true
+    }],
+    vpnAccess: {
+      type: Boolean,
+      default: false
+    },
+    equipmentProvision: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  // ============================================
+  // Process Maturity and Development Practices
+  // ============================================
+  developmentPractices: {
+    hasOnboarding: {
+      type: Boolean,
+      default: false
+    },
+    onboardingDuration: {
+      type: Number,
+      min: 0
+    },
+    hasVersionControl: {
+      type: Boolean,
+      default: false
+    },
+    versionControlSystems: [{
+      type: String,
+      trim: true
+    }],
+    hasCICD: {
+      type: Boolean,
+      default: false
+    },
+    cicdTools: [{
+      type: String,
+      trim: true
+    }],
+    codeReviewProcess: {
+      type: Boolean,
+      default: false
+    },
+    testingCoverage: {
+      type: String,
+      enum: ['none', 'low', 'medium', 'high'],
+      default: 'none'
+    }
+  },
+
+  // ============================================
+  // Knowledge Management
+  // ============================================
+  knowledgeManagement: {
+    hasKnowledgeBase: {
+      type: Boolean,
+      default: false
+    },
+    knowledgeBaseTools: [{
+      type: String,
+      trim: true
+    }],
+    documentationStandards: {
+      type: Boolean,
+      default: false
+    },
+    hasTemplates: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  // ============================================
+  // Organizational Maturity
+  // ============================================
+  maturityLevel: {
+    overall: {
+      type: String,
+      enum: ['initial', 'managed', 'defined', 'quantitatively_managed', 'optimizing'],
+      default: 'initial'
+    },
+    processMaturity: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 1
+    },
+    technicalMaturity: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 1
+    },
+    culturalMaturity: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 1
+    }
+  },
   
   // Estado de la organización
   status: {

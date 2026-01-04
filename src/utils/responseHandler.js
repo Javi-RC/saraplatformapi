@@ -3,27 +3,27 @@ class ResponseHandler {
     console.error('Controller Error:', error);
 
     const errorMap = {
-      'USER_ALREADY_EXISTS': { status: 409, message: 'Este email ya está registrado' },
-      'INVALID_CREDENTIALS': { status: 401, message: 'Credenciales inválidas' },
-      'EMAIL_NOT_CONFIRMED': { status: 401, message: 'Confirma tu email antes de iniciar sesión' },
-      'INVALID_OR_EXPIRED_TOKEN': { status: 400, message: 'Token inválido o expirado' },
-      'USER_NOT_FOUND': { status: 404, message: 'Usuario no encontrado' },
-      'TOO_MANY_ATTEMPTS': { status: 429, message: 'Demasiados intentos de registro. Espera 24 horas o contacta con soporte.' },
-      'MISSING_REQUIRED_FIELDS': { status: 400, message: 'Todos los campos son requeridos' },
-      'INVALID_EMAIL_FORMAT': { status: 400, message: 'Formato de email inválido' },
-      'PASSWORD_TOO_SHORT': { status: 400, message: 'La contraseña debe tener al menos 6 caracteres' },
-      'MISSING_CREDENTIALS': { status: 400, message: 'Email y contraseña son requeridos' },
-      'MISSING_EMAIL_OR_NAME': { status: 400, message: 'Email y nombre son requeridos' },
-      'ERROR_PROCESSING_CV': { status: 500, message: 'Error al procesar el CV. Verifica la configuración de Gemini API.' },
-      'CV_NOT_FOUND': { status: 404, message: 'CV no encontrado' },
+      'USER_ALREADY_EXISTS': { status: 409, message: 'This email is already registered' },
+      'INVALID_CREDENTIALS': { status: 401, message: 'Invalid credentials' },
+      'EMAIL_NOT_CONFIRMED': { status: 401, message: 'Please confirm your email before signing in' },
+      'INVALID_OR_EXPIRED_TOKEN': { status: 400, message: 'Invalid or expired token' },
+      'USER_NOT_FOUND': { status: 404, message: 'User not found' },
+      'TOO_MANY_ATTEMPTS': { status: 429, message: 'Too many registration attempts. Please wait 24 hours or contact support.' },
+      'MISSING_REQUIRED_FIELDS': { status: 400, message: 'All fields are required' },
+      'INVALID_EMAIL_FORMAT': { status: 400, message: 'Invalid email format' },
+      'PASSWORD_TOO_SHORT': { status: 400, message: 'Password must be at least 6 characters long' },
+      'MISSING_CREDENTIALS': { status: 400, message: 'Email and password are required' },
+      'MISSING_EMAIL_OR_NAME': { status: 400, message: 'Email and name are required' },
+      'ERROR_PROCESSING_CV': { status: 500, message: 'Error processing the CV. Check the Gemini API configuration.' },
+      'CV_NOT_FOUND': { status: 404, message: 'CV not found' },
       // BFI-44 Errors
-      'INVALID_RESPONSE_COUNT': { status: 400, message: 'Deben existir exactamente 44 respuestas' },
-      'BFI44_INVALID_RESPONSES_FORMAT': { status: 400, message: 'Formato de respuestas inválido' },
-      'BFI44_INVALID_RESPONSE_COUNT': { status: 400, message: 'Deben existir exactamente 44 respuestas' },
-      'BFI44_RESPONSE_NOT_FOUND': { status: 404, message: 'Respuesta BFI-44 no encontrada' }
+      'INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
+      'BFI44_INVALID_RESPONSES_FORMAT': { status: 400, message: 'Invalid responses format' },
+      'BFI44_INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
+      'BFI44_RESPONSE_NOT_FOUND': { status: 404, message: 'BFI-44 response not found' }
     };
 
-    const errorInfo = errorMap[error.message] || { status: 500, message: 'Error interno del servidor' };
+    const errorInfo = errorMap[error.message] || { status: 500, message: 'Internal server error' };
     
     return res.status(errorInfo.status).json({
       success: false,

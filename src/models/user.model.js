@@ -67,6 +67,39 @@ const userSchema = new mongoose.Schema({
   },
   lastLogin: Date,
   avatar: String,
+  
+  // ============================================
+  // Location and Timezone Information
+  // ============================================
+  country: {
+    type: String,
+    trim: true
+  },
+  
+  timezone: {
+    type: String,
+    trim: true
+  },
+  
+  flexibleSchedule: {
+    type: Boolean,
+    default: false
+  },
+  
+  preferredWorkingHours: {
+    start: {
+      type: String,
+      trim: true
+    },
+    end: {
+      type: String,
+      trim: true
+    }
+  },
+  
+  // ============================================
+  // Notification Preferences
+  // ============================================
   notificationPreferences: {
     email: {
       type: Boolean,
@@ -79,6 +112,45 @@ const userSchema = new mongoose.Schema({
     push: {
       type: Boolean,
       default: false
+    }
+  },
+
+  // ============================================
+  // Privacy and Consent for CV Processing with AI
+  // ============================================
+  cvProcessingConsent: {
+    // Si el usuario ha aceptado el procesamiento con IA de terceros
+    accepted: {
+      type: Boolean,
+      default: false
+    },
+    // Fecha y hora de aceptación
+    acceptedAt: {
+      type: Date
+    },
+    // Versión de los términos aceptados
+    version: {
+      type: String,
+      default: '1.0'
+    },
+    // IP desde la que se aceptó (opcional, para trazabilidad)
+    ipAddress: {
+      type: String
+    },
+    // Detalles adicionales sobre qué se consintió
+    details: {
+      aiProcessing: {
+        type: Boolean,
+        default: false
+      },
+      thirdPartySharing: {
+        type: Boolean,
+        default: false
+      },
+      dataRetention: {
+        type: Boolean,
+        default: false
+      }
     }
   }
 });
@@ -109,6 +181,12 @@ userSchema.index(
 // Método para verificar si el perfil está completo
 userSchema.methods.isProfileComplete = function() {
   return this.role !== 'unassigned';
+};
+
+// Método para verificar si el usuario ha dado consentimiento para procesamiento de CVs con IA
+userSchema.methods.hasCVProcessingConsent = function() {
+  return this.cvProcessingConsent?.accepted === true && 
+         this.cvProcessingConsent?.details?.aiProcessing === true;
 };
 
 userSchema.methods.comparePassword = async function(candidatePassword) {

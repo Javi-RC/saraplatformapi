@@ -220,6 +220,81 @@ const cvSchema = new mongoose.Schema({
     }]
   },
 
+  // 9. Experiencia multicultural
+  crossCulturalExperience: {
+    hasExperience: {
+      type: Boolean,
+      default: false
+    },
+    countriesWorkedWith: [{
+      type: String,
+      trim: true
+    }],
+    multiculturalProjects: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    mediationSkills: {
+      type: Boolean,
+      default: false
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 1000
+    }
+  },
+
+  // 10. Experiencia en trabajo remoto
+  remoteWorkExperience: {
+    yearsRemote: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    distributedTeamsExperience: {
+      type: Boolean,
+      default: false
+    },
+    timezoneFlexibility: {
+      type: Boolean,
+      default: false
+    },
+    preferredTimezones: [{
+      type: String,
+      trim: true
+    }],
+    remoteWorkTools: [{
+      type: String,
+      trim: true
+    }]
+  },
+
+  // 11. Habilidades de comunicación y gestión del conocimiento
+  communicationSkills: {
+    knowledgeManagementTools: [{
+      type: String,
+      trim: true
+    }],
+    documentationExperience: {
+      type: Boolean,
+      default: false
+    },
+    asyncCommunicationTools: [{
+      type: String,
+      trim: true
+    }],
+    presentationSkills: {
+      type: Boolean,
+      default: false
+    },
+    technicalWriting: {
+      type: Boolean,
+      default: false
+    }
+  },
+
   // Metadata
   originalFileName: String,
   rawText: String,

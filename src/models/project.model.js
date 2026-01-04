@@ -343,6 +343,164 @@ const projectSchema = new mongoose.Schema({
     enum: ['low', 'medium', 'high'],
     default: 'medium'
   },
+
+  // ============================================
+  // 11. Work Model and Remote Work Configuration
+  // ============================================
+  workModel: {
+    type: {
+      type: String,
+      enum: ['remote', 'hybrid', 'on-site'],
+      default: 'on-site'
+    },
+    remotePercentage: {
+      type: Number,
+      min: 0,
+      max: 100
+    }
+  },
+
+  // ============================================
+  // 12. Knowledge Management
+  // ============================================
+  hasKnowledgeManagementTools: {
+    type: Boolean,
+    default: false
+  },
+
+  knowledgeManagementSystem: {
+    type: String,
+    trim: true
+  },
+
+  knowledgeManagementTools: [{
+    type: String,
+    trim: true
+  }],
+
+  documentationProcesses: {
+    hasStandardization: {
+      type: Boolean,
+      default: false
+    },
+    templates: {
+      type: Boolean,
+      default: false
+    },
+    reviewProcess: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  // ============================================
+  // 13. Role Clarity and Organization
+  // ============================================
+  hasOrganizationalChart: {
+    type: Boolean,
+    default: false
+  },
+
+  hasTaskTrackingTool: {
+    type: Boolean,
+    default: false
+  },
+
+  taskTrackingSystem: {
+    type: String,
+    trim: true
+  },
+
+  rolesAndResponsibilities: [{
+    roleName: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    responsibilities: [{
+      type: String,
+      trim: true
+    }],
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    clarityScore: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 3
+    }
+  }],
+
+  // ============================================
+  // 14. Standards and Compliance
+  // ============================================
+  hasStandardizedProcedures: {
+    type: Boolean,
+    default: false
+  },
+
+  requiresRegulatoryCompliance: {
+    type: Boolean,
+    default: false
+  },
+
+  complianceStandards: [{
+    type: String,
+    trim: true
+  }],
+
+  standardsDocumentation: {
+    type: String,
+    trim: true,
+    maxlength: [2000, 'Standards documentation cannot exceed 2000 characters']
+  },
+
+  // ============================================
+  // 15. Timezone Management and Scheduling
+  // ============================================
+  hasTimezoneSchedulingPolicy: {
+    type: Boolean,
+    default: false
+  },
+
+  coreHours: {
+    start: {
+      type: String,
+      trim: true
+    },
+    end: {
+      type: String,
+      trim: true
+    },
+    timezone: {
+      type: String,
+      trim: true
+    }
+  },
+
+  meetingRotationPolicy: {
+    type: Boolean,
+    default: false
+  },
+
+  timezoneConsiderations: {
+    type: String,
+    trim: true,
+    maxlength: [1000, 'Timezone considerations cannot exceed 1000 characters']
+  },
+
+  requiresOffHoursReporting: {
+    type: Boolean,
+    default: false
+  },
+
+  asyncCommunicationStrategy: {
+    type: String,
+    trim: true,
+    maxlength: [1000, 'Async strategy cannot exceed 1000 characters']
+  },
   
   // ============================================
   // Metadata and Relationships
@@ -406,6 +564,87 @@ const projectSchema = new mongoose.Schema({
   lastActivityAt: {
     type: Date,
     default: Date.now
+  },
+  
+  // ============================================
+  // Risk Prediction (CBR System)
+  // ============================================
+  riskPredictions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Risk'
+  }],
+  
+  riskPredictionMetadata: {
+    lastPredictionDate: Date,
+    caseBaseSize: Number,
+    systemPhase: {
+      type: Number,
+      min: 1,
+      max: 5
+    },
+    treeWeight: Number,
+    cbrWeight: Number,
+    similarCasesUsed: Number
+  },
+  
+  // ============================================
+  // Project Outcome (Post-Completion)
+  // ============================================
+  projectOutcome: {
+    actualDuration: {
+      value: Number,
+      unit: {
+        type: String,
+        enum: ['days', 'weeks', 'months']
+      }
+    },
+    actualBudget: Number,
+    finalQuality: {
+      type: Number,
+      min: 1,
+      max: 5
+    },
+    completionReason: {
+      type: String,
+      enum: ['successful', 'cancelled', 'partial_delivery']
+    },
+    actualRisks: [{
+      riskType: String,
+      severity: {
+        type: String,
+        enum: ['low', 'medium', 'high', 'critical']
+      },
+      description: String,
+      mitigationActions: [String],
+      impact: String
+    }],
+    teamFeedback: {
+      satisfactionLevel: {
+        type: Number,
+        min: 1,
+        max: 5
+      },
+      workloadLevel: {
+        type: Number,
+        min: 1,
+        max: 5
+      },
+      communicationQuality: {
+        type: Number,
+        min: 1,
+        max: 5
+      },
+      comments: String
+    },
+    lessonsLearned: [String],
+    successfulPractices: [String],
+    unsuccessfulPractices: [String],
+    recommendations: [String],
+    capturedAt: Date,
+    capturedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
   }
 }, {
   timestamps: true,

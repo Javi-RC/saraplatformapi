@@ -238,4 +238,50 @@ router.post(
  */
 router.delete('/:id/employees/:employeeId', authenticate, projectController.removeEmployee);
 
+// ============================================
+// TEAM SELECTION ROUTES (Manhattan Distance)
+// ============================================
+
+/**
+ * Suggest optimal team based on project requirements
+ * POST /api/projects/suggest-team
+ * Body: { organizationId, projectRequirements, teamSize }
+ */
+router.post(
+  '/suggest-team',
+  authenticate,
+  [
+    body('organizationId')
+      .notEmpty()
+      .withMessage('Organization ID is required')
+      .isMongoId()
+      .withMessage('Invalid organization ID'),
+    body('projectRequirements')
+      .notEmpty()
+      .withMessage('Project requirements are required'),
+    body('teamSize')
+      .optional()
+      .isInt({ min: 1, max: 20 })
+      .withMessage('Team size must be between 1 and 20')
+  ],
+  projectController.suggestTeam
+);
+
+/**
+ * Get team analysis for a specific project
+ * GET /api/projects/:id/team-analysis
+ * 
+ * Devuelve:
+ * - currentTeam: Análisis del equipo actual (si hay empleados asignados)
+ * - suggestions: Empleados sugeridos para completar el equipo
+ * - teamStatus: Estado del equipo (tamaño actual vs objetivo)
+ * 
+ * Permite al PM construir el equipo gradualmente, asignando uno por uno
+ */
+router.get(
+  '/:id/team-analysis',
+  authenticate,
+  projectController.getTeamAnalysis
+);
+
 module.exports = router;

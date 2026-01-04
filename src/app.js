@@ -20,6 +20,8 @@ const notificationRoutes = require('./routes/notification.routes');
 const organizationRoutes = require('./routes/organization.routes');
 const bfi44Routes = require('./routes/bfi44.routes');
 const projectRoutes = require('./routes/project.routes');
+const riskRoutes = require('./routes/risk.routes');
+const legalRoutes = require('./routes/legal.routes');
 
 app.use('/', indexRoutes);
 app.use('/auth', authRoutes);
@@ -29,6 +31,8 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/organizations', organizationRoutes);
 app.use('/api/bfi-44', bfi44Routes);
 app.use('/api/projects', projectRoutes);
+app.use('/api', riskRoutes);
+app.use('/api/legal', legalRoutes);
 
 // Ruta de salud
 app.get('/health', (req, res) => {
@@ -43,7 +47,7 @@ app.get('/health', (req, res) => {
 app.use('*', (req, res) => {
   res.status(404).json({ 
     success: false, 
-    error: 'Ruta no encontrada' 
+    error: 'Route not found' 
   });
 });
 
@@ -52,7 +56,7 @@ app.use((error, req, res, next) => {
   console.error('Error global:', error);
   res.status(500).json({ 
     success: false, 
-    error: 'Error interno del servidor' 
+    error: 'Internal server error' 
   });
 });
 

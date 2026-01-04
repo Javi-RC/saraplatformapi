@@ -43,9 +43,18 @@ class CVController {
         return responseHandler.error(res, 'No se pudo extraer texto del archivo', 400);
       }
 
-      // Obtener información del usuario para notificaciones
+      // Obtener información del usuario para validar consentimiento
       const user = await User.findById(userId);
       const userName = user?.name || 'Usuario';
+
+      // Verificar consentimiento para procesamiento con IA
+      if (!user.hasCVProcessingConsent()) {
+        return responseHandler.error(res, 
+          'Debes aceptar el consentimiento para el procesamiento de CVs con IA antes de subir tu CV. ' +
+          'Por favor, acepta los términos en tu perfil de privacidad.', 
+          403
+        );
+      }
 
       // Enviar notificación de CV subido (antes de procesar)
       cvNotificationHelper.notifyCVUploaded(userId, userName, null, file.originalname).catch(err => {

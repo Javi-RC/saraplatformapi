@@ -92,7 +92,7 @@ router.put('/profile', authMiddleware, async (req, res) => {
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: 'User not found' });
     }
 
     user.role = role;
@@ -100,12 +100,12 @@ router.put('/profile', authMiddleware, async (req, res) => {
 
     res.json({
       user: user.toJSON(),
-      message: 'Perfil actualizado correctamente'
+      message: 'Profile updated successfully'
     });
 
   } catch (error) {
     res.status(500).json({
-      error: 'Error al actualizar el perfil'
+      error: 'Error updating profile'
     });
   }
 });

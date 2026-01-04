@@ -2,6 +2,7 @@ const Project = require('../models/project.model');
 const Organization = require('../models/organization.model');
 const User = require('../models/user.model');
 const projectNotificationHelper = require('./projectNotificationHelper');
+const teamSelectionService = require('./teamSelection.service');
 
 /**
  * Project Service
@@ -49,9 +50,16 @@ class ProjectService {
 
     await project.save();
 
+    // NO asignar equipo automáticamente
+    // El PM debe solicitar recomendaciones usando:
+    // - GET /api/projects/:id/team-analysis (para ver sugerencia de equipo)
+    // - POST /api/projects/suggest-team (para ver opciones antes de crear)
+    // - POST /api/projects/:id/assign (para asignar manualmente cada empleado)
+
     // Populate relationships
     await project.populate('organization', 'name');
     await project.populate('projectManager', 'name email avatar');
+    await project.populate('assignedEmployees.user', 'name email avatar');
 
     // Send notification about project creation
     try {

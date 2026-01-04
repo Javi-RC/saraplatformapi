@@ -391,6 +391,86 @@ class ProjectNotificationHelper {
       console.error('Error notifying employee removal:', error);
     }
   }
-}
+  /**
+   * Notify when there are insufficient employees for a project
+   * @param {Object} project - Project with insufficient team
+   * @param {Object} organization - Organization owning the project
+   * @param {Object} projectManager - Project manager
+   * @param {Object} metadata - Team selection metadata
+   * @param {Object} summary - Team summary with warnings
+   */
+  async notifyInsufficientTeam(project, organization, projectManager, metadata, summary) {
+    try {
+      // Notify PM and organization administrators
+      const adminIds = [
+        this._extractId(organization.admin),
+        ...organization.additionalAdmins.map(admin => this._extractId(admin))
+      ].filter(id => id !== null);
+
+      const projectManagerId = this._extractId(projectManager);
+      const allRecipients = [...new Set([projectManagerId, ...adminIds])];
+
+      if (allRecipients.length === 0) {
+        console.log('No recipients for insufficient team notification');
+        return;
+      }
+
+      // Generar descripción detallada
+      const description = [
+        `El proyecto "${project.projectName}" requiere ${metadata.requestedSize} empleados pero solo hay ${metadata.selectedSize} disponibles.`,
+        `Faltan ${metadata.shortage} miembro(s) del equipo.`,
+        metadata.employeesWithAcceptedCV < metadata.allEmployeesInOrg 
+          ? `Hay ${metadata.allEmployeesInOrg - metadata.employeesWithAcceptedCV} empleado(s) en la organización sin CV aceptado.`
+          : null,
+        summary.skillsGaps && summary.skillsGaps.length > 0
+          ? `Tecnologías no cubiertas: ${summary.skillsGaps.join(', ')}`
+          : null
+      ].filter(Boolean).join(' ');
+
+      const recommendations = [
+        '• Considerar contratar nuevos empleados',
+        '• Reducir el alcance del proyecto',
+        '• Extender los plazos de entrega',
+        '• Revisar CVs pendientes de aprobación',
+        '• Evaluar disponibilidad de empleados en otros proyectos'
+      ].join('\n');
+
+      const notificationPromises = allRecipients.map(recipientId =>
+        notificationService.create({
+          recipientId: recipientId,
+          type: NotificationTypes.PROJECT_UPDATED, // O crear nuevo tipo PROJECT_INSUFFICIENT_TEAM
+          title: '⚠️ Equipo Insuficiente para Proyecto',
+          message: description,
+          channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
+          priority: metadata.shortage >= metadata.requestedSize * 0.5 
+            ? NotificationPriority.HIGH 
+            : NotificationPriority.MEDIUM,
+          metadata: {
+            projectId: this._extractId(project),
+            projectName: project.projectName,
+            organizationId: this._extractId(organization),
+            organizationName: organization.name,
+            requestedTeamSize: metadata.requestedSize,
+            actualTeamSize: metadata.selectedSize,
+            shortage: metadata.shortage,
+            availableEmployees: metadata.availableEmployees,
+            employeesWithAcceptedCV: metadata.employeesWithAcceptedCV,
+            allEmployeesInOrg: metadata.allEmployeesInOrg,
+            skillsGaps: summary.skillsGaps || [],
+            warnings: summary.warnings || [],
+            recommendations: recommendations,
+            averageScore: summary.averageScore
+          },
+          actionUrl: `/projects/${this._extractId(project)}`,
+          actionText: 'View project details'
+        })
+      );
+
+      await Promise.all(notificationPromises);
+      console.log(`Insufficient team notifications sent to ${allRecipients.length} recipients`);
+    } catch (error) {
+      console.error('Error notifying insufficient team:', error);
+    }
+  }}
 
 module.exports = new ProjectNotificationHelper();

@@ -87,12 +87,23 @@ class AIExtractorService {
 
   /**
    * Procesa un CV usando IA y guarda la información extraída
+   * Requiere que el usuario haya dado consentimiento previo
    */
   async processCV(userId, textContent, originalFileName) {
     try {
       // Validar que tenemos la API key
       if (!this.apiKey) {
         throw new Error('GEMINI_API_KEY no configurada en variables de entorno');
+      }
+
+      // Verificar consentimiento del usuario
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      if (!user.hasCVProcessingConsent()) {
+        throw new Error('CONSENT_REQUIRED: El usuario no ha dado consentimiento para el procesamiento de CVs con IA');
       }
 
       // Extraer información usando IA
@@ -132,11 +143,9 @@ class AIExtractorService {
       // Guardar en base de datos
       const cv = await this._saveOrUpdateCV(userId, cvData);
 
-      // Obtener información del usuario para las notificaciones
-      const user = await User.findById(userId);
-      const userName = user?.name || 'Usuario';
-
       // Enviar notificación In-App de CV procesado exitosamente
+      // Reutilizamos la variable 'user' que ya obtuvimos al inicio para validar consentimiento
+      const userName = user?.name || 'Usuario';
       cvNotificationHelper.notifyCVProcessed(userId, userName, cv._id).catch(err => {
         console.error('Error enviando notificación de CV procesado:', err);
       });
@@ -147,11 +156,11 @@ class AIExtractorService {
       
       // Intentar enviar notificación de fallo
       try {
-        const user = await User.findById(userId);
-        if (user) {
+        const userForNotification = await User.findById(userId);
+        if (userForNotification) {
           cvNotificationHelper.notifyCVAnalysisFailed(
             userId, 
-            user.name || 'Usuario', 
+            userForNotification.name || 'Usuario', 
             null, 
             'Error al procesar el CV con IA'
           ).catch(err => console.error('Error enviando notificación de fallo:', err));

@@ -43,14 +43,14 @@ class Validators {
     if (!name || !name.trim()) {
       return res.status(400).json({
         success: false,
-        error: 'El nombre de la organización es obligatorio'
+        error: 'Organization name is required'
       });
     }
 
     if (!contact || !contact.email) {
       return res.status(400).json({
         success: false,
-        error: 'El email de contacto es obligatorio'
+        error: 'Contact email is required'
       });
     }
 
@@ -58,7 +58,7 @@ class Validators {
     if (!emailRegex.test(contact.email)) {
       return res.status(400).json({
         success: false,
-        error: 'El email de contacto no es válido'
+        error: 'Contact email is not valid'
       });
     }
 
@@ -76,7 +76,7 @@ class Validators {
       if (!emailRegex.test(contact.email)) {
         return res.status(400).json({
           success: false,
-          error: 'El email de contacto no es válido'
+          error: 'Contact email is not valid'
         });
       }
     }
@@ -115,6 +115,122 @@ class Validators {
     }
 
     return true;
+  }
+
+  /**
+   * Middleware para validar actualización de perfil de usuario
+   */
+  validateProfileUpdate(req, res, next) {
+    const { 
+      name, 
+      country, 
+      timezone, 
+      flexibleSchedule, 
+      preferredWorkingHours,
+      notificationPreferences 
+    } = req.body;
+
+    // Validar nombre si se proporciona
+    if (name !== undefined) {
+      if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 50) {
+        return res.status(400).json({
+          success: false,
+          error: 'Name must be between 2 and 50 characters'
+        });
+      }
+    }
+
+    // Validar country si se proporciona
+    if (country !== undefined) {
+      if (typeof country !== 'string' || country.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Country must be a valid string'
+        });
+      }
+    }
+
+    // Validar timezone si se proporciona
+    if (timezone !== undefined) {
+      if (typeof timezone !== 'string' || timezone.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Timezone must be a valid string'
+        });
+      }
+    }
+
+    // Validar flexibleSchedule si se proporciona
+    if (flexibleSchedule !== undefined) {
+      if (typeof flexibleSchedule !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          error: 'flexibleSchedule must be a boolean'
+        });
+      }
+    }
+
+    // Validar preferredWorkingHours si se proporciona
+    if (preferredWorkingHours !== undefined) {
+      if (typeof preferredWorkingHours !== 'object' || preferredWorkingHours === null) {
+        return res.status(400).json({
+          success: false,
+          error: 'preferredWorkingHours must be an object'
+        });
+      }
+
+      const { start, end } = preferredWorkingHours;
+      const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+
+      if (start !== undefined && (typeof start !== 'string' || !timeRegex.test(start))) {
+        return res.status(400).json({
+          success: false,
+          error: 'Start time must be in HH:MM format (24h)'
+        });
+      }
+
+      if (end !== undefined && (typeof end !== 'string' || !timeRegex.test(end))) {
+        return res.status(400).json({
+          success: false,
+          error: 'End time must be in HH:MM format (24h)'
+        });
+      }
+    }
+
+    // Validar notificationPreferences si se proporciona
+    if (notificationPreferences !== undefined) {
+      if (typeof notificationPreferences !== 'object' || notificationPreferences === null) {
+        return res.status(400).json({
+          success: false,
+          error: 'notificationPreferences must be an object'
+        });
+      }
+
+      const { email, inApp, push } = notificationPreferences;
+
+      if (email !== undefined && typeof email !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          error: 'Email preference must be a boolean'
+        });
+      }
+
+      if (inApp !== undefined && typeof inApp !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          error: 'In-app notifications preference must be a boolean'
+        });
+      }
+
+      if (push !== undefined && typeof push !== 'boolean') {
+        return res.status(400).json({
+          success: false,
+          error: 'Push notifications preference must be a boolean'
+        });
+      }
+    }
+
+    next();
   }
 }
 

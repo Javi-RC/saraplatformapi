@@ -444,6 +444,183 @@ class ProjectController {
       });
     }
   }
-}
+  /**
+   * Get optimal team for a project based on Manhattan distance
+   * POST /api/projects/suggest-team
+   */
+  async suggestTeam(req, res) {
+    try {
+      const teamSelectionService = require('../services/teamSelection.service');
+      
+      const { projectRequirements, organizationId, teamSize = 5 } = req.body;
+
+      if (!projectRequirements || !organizationId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Project requirements and organization ID are required'
+        });
+      }
+
+      const { team, metadata } = await teamSelectionService.selectOptimalTeam(
+        projectRequirements,
+        organizationId,
+        teamSize
+      );
+
+      const summary = teamSelectionService.getTeamSummary(team, metadata);
+      const risks = teamSelectionService.generateTeamRisks(metadata, summary, projectRequirements);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          team,
+          summary,
+          metadata,
+          risks: risks.length > 0 ? risks : undefined
+        }
+      });
+    } catch (error) {
+      console.error('Error suggesting team:', error);
+      return res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Get team analysis for a specific project
+   * GET /api/projects/:id/team-analysis
+   * 
+   * Devuelve:
+   * - Análisis del equipo actual (si existe)
+   * - Sugerencias complementarias para completar el equipo
+   * - Permite construir el equipo gradualmente, uno por uno
+   */
+  async getTeamAnalysis(req, res) {
+    try {
+      const teamSelectionService = require('../services/teamSelection.service');
+      const Project = require('../models/project.model');
+      const CV = require('../models/cv.model');
+      
+      const { id } = req.params;
+
+      const project = await Project.findById(id)
+        .populate('assignedEmployees.user', 'name email avatar')
+        .populate('organization', 'name');
+
+      if (!project) {
+        return res.status(404).json({
+          success: false,
+          error: 'Project not found'
+        });
+      }
+
+      const organizationId = project.organization._id || project.organization;
+      const targetTeamSize = project.estimatedTeamSize || 5;
+      const currentTeamSize = project.assignedEmployees?.length || 0;
+      const remainingSlots = Math.max(0, targetTeamSize - currentTeamSize);
+
+      const response = {
+        success: true,
+        data: {
+          project: {
+            id: project._id,
+            name: project.projectName,
+            mainTechnologies: project.mainTechnologies,
+            requiredExperienceLevel: project.requiredExperienceLevel,
+            systemComplexity: project.systemComplexity,
+            estimatedTeamSize: targetTeamSize
+          },
+          teamStatus: {
+            currentSize: currentTeamSize,
+            targetSize: targetTeamSize,
+            remainingSlots,
+            isComplete: currentTeamSize >= targetTeamSize
+          }
+        }
+      };
+
+      // CASO 1: Hay equipo asignado - Analizar equipo actual
+      if (currentTeamSize > 0) {
+        const userIds = project.assignedEmployees.map(emp => emp.user._id);
+        const cvs = await CV.find({
+          userId: { $in: userIds },
+          organization: organizationId,
+          organizationStatus: 'accepted'
+        }).populate('userId', 'name email avatar');
+
+        // Analizar cada miembro actual
+        const teamMembers = await Promise.all(
+          cvs.map(async cv => {
+            const score = await teamSelectionService.calculateEmployeeScore(
+              cv,
+              (project.mainTechnologies || []).map(t => 
+                teamSelectionService.normalizeTechnology(t)
+              ),
+              project.requiredExperienceLevel || 'mid',
+              project.systemComplexity || 'medium',
+              project.weeklyHoursPerMember || 40
+            );
+            
+            return {
+              userId: cv.userId._id,
+              user: cv.userId,
+              score: score.total,
+              details: score.details,
+              matchedSkills: score.matchedSkills,
+              missingSkills: score.missingSkills
+            };
+          })
+        );
+
+        const currentTeamSummary = teamSelectionService.getTeamSummary(teamMembers);
+        
+        response.data.currentTeam = teamMembers;
+        response.data.currentTeamSummary = currentTeamSummary;
+      }
+
+      // CASO 2: Sugerir empleados complementarios (siempre, salvo que esté completo)
+      if (remainingSlots > 0) {
+        const currentUserIds = project.assignedEmployees?.map(emp => emp.user._id) || [];
+        
+        const { suggestions, metadata } = await teamSelectionService.selectComplementaryTeam(
+          project,
+          organizationId,
+          currentUserIds,
+          remainingSlots
+        );
+
+        const suggestionsSummary = teamSelectionService.getTeamSummary(suggestions, metadata);
+        const risks = teamSelectionService.generateTeamRisks(metadata, suggestionsSummary, project);
+
+        response.data.suggestions = suggestions;
+        response.data.suggestionsSummary = suggestionsSummary;
+        response.data.suggestionsMetadata = metadata;
+        
+        if (risks.length > 0) {
+          response.data.risks = risks;
+        }
+
+        // Mensaje contextual
+        if (currentTeamSize === 0) {
+          response.data.message = `Proyecto sin equipo. Sugerimos ${suggestions.length} empleado(s) para comenzar.`;
+        } else {
+          response.data.message = `Equipo actual: ${currentTeamSize}/${targetTeamSize}. Sugerimos ${suggestions.length} empleado(s) para completar el equipo.`;
+        }
+      } else {
+        // Equipo completo
+        response.data.message = 'El equipo está completo.';
+      }
+
+      return res.status(200).json(response);
+    } catch (error) {
+      console.error('Error analyzing team:', error);
+      return res.status(400).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }}
 
 module.exports = new ProjectController();

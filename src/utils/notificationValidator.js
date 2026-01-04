@@ -13,56 +13,56 @@ class NotificationValidator {
 
     // Validar recipientId
     if (!recipientId) {
-      errors.push('recipientId es requerido');
+      errors.push('recipientId is required');
     }
 
     // Validar type
     if (!type) {
-      errors.push('type es requerido');
+      errors.push('type is required');
     } else if (!Object.values(NotificationTypes).includes(type)) {
-      errors.push(`type debe ser uno de: ${Object.values(NotificationTypes).join(', ')}`);
+      errors.push(`type must be one of: ${Object.values(NotificationTypes).join(', ')}`);
     }
 
     // Validar title
     if (!title) {
-      errors.push('title es requerido');
+      errors.push('title is required');
     } else if (typeof title !== 'string' || title.trim().length === 0) {
-      errors.push('title debe ser un string no vacío');
+      errors.push('title must be a non-empty string');
     } else if (title.length > 200) {
-      errors.push('title no puede exceder 200 caracteres');
+      errors.push('title cannot exceed 200 characters');
     }
 
     // Validar message
     if (!message) {
-      errors.push('message es requerido');
+      errors.push('message is required');
     } else if (typeof message !== 'string' || message.trim().length === 0) {
-      errors.push('message debe ser un string no vacío');
+      errors.push('message must be a non-empty string');
     } else if (message.length > 1000) {
-      errors.push('message no puede exceder 1000 caracteres');
+      errors.push('message cannot exceed 1000 characters');
     }
 
     // Validar channels (opcional)
     if (channels) {
       if (!Array.isArray(channels)) {
-        errors.push('channels debe ser un array');
+        errors.push('channels must be an array');
       } else {
         const validChannels = Object.values(NotificationChannels);
         const invalidChannels = channels.filter(ch => !validChannels.includes(ch));
         if (invalidChannels.length > 0) {
-          errors.push(`Canales inválidos: ${invalidChannels.join(', ')}`);
+          errors.push(`Invalid channels: ${invalidChannels.join(', ')}`);
         }
       }
     }
 
     // Validar priority (opcional)
     if (priority && !Object.values(NotificationPriority).includes(priority)) {
-      errors.push(`priority debe ser uno de: ${Object.values(NotificationPriority).join(', ')}`);
+      errors.push(`priority must be one of: ${Object.values(NotificationPriority).join(', ')}`);
     }
 
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Errores de validación',
+        error: 'Validation errors',
         details: errors
       });
     }
@@ -79,34 +79,34 @@ class NotificationValidator {
 
     // Validar recipientIds
     if (!recipientIds) {
-      errors.push('recipientIds es requerido');
+      errors.push('recipientIds is required');
     } else if (!Array.isArray(recipientIds)) {
-      errors.push('recipientIds debe ser un array');
+      errors.push('recipientIds must be an array');
     } else if (recipientIds.length === 0) {
-      errors.push('recipientIds no puede estar vacío');
+      errors.push('recipientIds cannot be empty');
     } else if (recipientIds.length > 1000) {
-      errors.push('recipientIds no puede tener más de 1000 elementos');
+      errors.push('recipientIds cannot have more than 1000 items');
     }
 
     // Validar type, title, message (igual que create)
     if (!type) {
-      errors.push('type es requerido');
+      errors.push('type is required');
     } else if (!Object.values(NotificationTypes).includes(type)) {
-      errors.push(`type debe ser uno de: ${Object.values(NotificationTypes).join(', ')}`);
+      errors.push(`type must be one of: ${Object.values(NotificationTypes).join(', ')}`);
     }
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
-      errors.push('title es requerido y debe ser un string no vacío');
+      errors.push('title is required and must be a non-empty string');
     }
 
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      errors.push('message es requerido y debe ser un string no vacío');
+      errors.push('message is required and must be a non-empty string');
     }
 
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Errores de validación',
+        error: 'Validation errors',
         details: errors
       });
     }
@@ -123,27 +123,27 @@ class NotificationValidator {
     const validRoles = ['employee', 'org_admin', 'unassigned'];
 
     if (!role) {
-      errors.push('role es requerido');
+      errors.push('role is required');
     } else if (!validRoles.includes(role)) {
-      errors.push(`role debe ser uno de: ${validRoles.join(', ')}`);
+      errors.push(`role must be one of: ${validRoles.join(', ')}`);
     }
 
     if (!type || !Object.values(NotificationTypes).includes(type)) {
-      errors.push('type es requerido y debe ser válido');
+      errors.push('type is required and must be valid');
     }
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
-      errors.push('title es requerido y debe ser un string no vacío');
+      errors.push('title is required and must be a non-empty string');
     }
 
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      errors.push('message es requerido y debe ser un string no vacío');
+      errors.push('message is required and must be a non-empty string');
     }
 
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Errores de validación',
+        error: 'Validation errors',
         details: errors
       });
     }
@@ -160,31 +160,31 @@ class NotificationValidator {
 
     // Validar page
     if (page && (isNaN(page) || parseInt(page) < 1)) {
-      errors.push('page debe ser un número mayor a 0');
+      errors.push('page must be a number greater than 0');
     }
 
     // Validar limit
     if (limit) {
       const limitNum = parseInt(limit);
       if (isNaN(limit) || limitNum < 1 || limitNum > 100) {
-        errors.push('limit debe ser un número entre 1 y 100');
+        errors.push('limit must be a number between 1 and 100');
       }
     }
 
     // Validar status
     if (status && !['pending', 'sent', 'delivered', 'read', 'failed'].includes(status)) {
-      errors.push('status debe ser: pending, sent, delivered, read o failed');
+      errors.push('status must be: pending, sent, delivered, read or failed');
     }
 
     // Validar type
     if (type && !Object.values(NotificationTypes).includes(type)) {
-      errors.push(`type debe ser uno de los tipos válidos`);
+      errors.push('type must be a valid notification type');
     }
 
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Errores de validación',
+        error: 'Validation errors',
         details: errors
       });
     }

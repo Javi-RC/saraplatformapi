@@ -16,7 +16,7 @@ const upload = multer({
     if (file.mimetype === 'application/pdf' || file.mimetype === 'text/plain') {
       cb(null, true);
     } else {
-      cb(new Error('Formato de archivo no soportado. Use PDF o TXT'), false);
+      cb(new Error('Unsupported file format. Use PDF or TXT'), false);
     }
   }
 });
@@ -31,7 +31,7 @@ const isAdmin = (req, res, next) => {
   }
   return res.status(403).json({
     success: false,
-    error: 'Acceso denegado. Se requieren permisos de administrador.'
+    error: 'Access denied. Administrator permissions are required.'
   });
 };
 
@@ -104,12 +104,12 @@ router.use((error, req, res, next) => {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        error: 'El archivo es demasiado grande. Máximo 5MB.'
+        error: 'File is too large. Maximum size is 5MB.'
       });
     }
     return res.status(400).json({
       success: false,
-      error: `Error al subir archivo: ${error.message}`
+      error: `Error uploading file: ${error.message}`
     });
   } else if (error) {
     return res.status(400).json({
