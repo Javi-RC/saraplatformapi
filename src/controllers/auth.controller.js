@@ -6,8 +6,6 @@ exports.register = async (req, res) => {
   try {
     const { email, name, password, role } = req.body;
 
-
-    console.log(role);
     // Validar datos
     validators.validateRegistrationData(email, name, password);
 

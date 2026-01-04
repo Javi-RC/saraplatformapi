@@ -53,11 +53,8 @@ app.use('*', (req, res) => {
 
 // Manejo global de errores
 app.use((error, req, res, next) => {
-  console.error('Error global:', error);
-  res.status(500).json({ 
-    success: false, 
-    error: 'Internal server error' 
-  });
+  const responseHandler = require('./utils/responseHandler');
+  return responseHandler.handleError(error, res);
 });
 
 module.exports = app;

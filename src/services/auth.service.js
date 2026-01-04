@@ -6,6 +6,7 @@ const emailService = require('./email.service');
 const authNotificationHelper = require('./authNotificationHelper');
 const bfi44NotificationHelper = require('./bfi44NotificationHelper');
 const BFI44Response = require('../models/bfi44.model');
+const AppError = require('../utils/AppError');
 
 class AuthService {
   async register(userData) {
@@ -17,7 +18,7 @@ class AuthService {
     if (existingUser) {
       // Si el usuario ya está verificado, no permitir re-registro
       if (existingUser.isConfirmed) {
-        throw new Error('USER_ALREADY_EXISTS');
+        throw AppError.conflict('USER_ALREADY_EXISTS', 'This email is already registered');
       }
       
       // Usuario existe pero no está verificado
@@ -29,9 +30,7 @@ class AuthService {
       } else {
         // Token aún válido: verificar límite de intentos
         if (existingUser.registrationAttempts >= 3) {
-          const error = new Error('TOO_MANY_ATTEMPTS');
-          error.statusCode = 429;
-          throw error;
+          throw new AppError('TOO_MANY_ATTEMPTS', 429, 'Too many registration attempts. Please wait 24 hours or contact support.');
         }
         
         // Permitir reenvío de email de verificación
@@ -115,16 +114,16 @@ class AuthService {
     const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
     
     if (!user) {
-      throw new Error('INVALID_CREDENTIALS');
+      throw AppError.unauthorized('INVALID_CREDENTIALS', 'Invalid credentials');
     }
 
     if (!user.isConfirmed) {
-      throw new Error('EMAIL_NOT_CONFIRMED');
+      throw AppError.unauthorized('EMAIL_NOT_CONFIRMED', 'Please confirm your email before signing in');
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      throw new Error('INVALID_CREDENTIALS');
+      throw AppError.unauthorized('INVALID_CREDENTIALS', 'Invalid credentials');
     }
 
     // Actualizar último login
@@ -152,7 +151,7 @@ class AuthService {
     });
 
     if (!user) {
-      throw new Error('INVALID_OR_EXPIRED_TOKEN');
+      throw AppError.badRequest('INVALID_OR_EXPIRED_TOKEN', 'Invalid or expired token');
     }
 
     user.isConfirmed = true;
@@ -183,7 +182,7 @@ class AuthService {
     const user = await User.findOne({ email: email.toLowerCase() });
     
     if (!user) {
-      throw new Error('USER_NOT_FOUND');
+      throw AppError.notFound('USER_NOT_FOUND', 'User not found');
     }
 
     // Generar nuevo token

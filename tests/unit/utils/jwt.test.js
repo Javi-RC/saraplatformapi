@@ -72,7 +72,7 @@ describe('JWT Utils - Unit Tests', () => {
 
       // Act & Assert
       expect(() => verifyToken(expiredToken))
-        .toThrow('Token expirado');
+        .toThrow('Token expired');
     });
 
     it('debería lanzar error para token inválido', () => {
@@ -88,7 +88,7 @@ describe('JWT Utils - Unit Tests', () => {
 
       // Act & Assert
       expect(() => verifyToken(invalidToken))
-        .toThrow('Token inválido');
+        .toThrow('Invalid token');
     });
   });
 });

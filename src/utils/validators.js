@@ -1,3 +1,5 @@
+const AppError = require('./AppError');
+
 class Validators {
   validateEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -10,27 +12,27 @@ class Validators {
 
   validateRegistrationData(email, name, password) {
     if (!email || !name || !password) {
-      throw new Error('MISSING_REQUIRED_FIELDS');
+      throw AppError.badRequest('MISSING_REQUIRED_FIELDS', 'All fields are required');
     }
 
     if (!this.validateEmail(email)) {
-      throw new Error('INVALID_EMAIL_FORMAT');
+      throw AppError.badRequest('INVALID_EMAIL_FORMAT', 'Invalid email format');
     }
 
     if (!this.validatePassword(password)) {
-      throw new Error('PASSWORD_TOO_SHORT');
+      throw AppError.badRequest('PASSWORD_TOO_SHORT', 'Password must be at least 6 characters long');
     }
   }
 
   validateLoginData(email, password) {
     if (!email || !password) {
-      throw new Error('MISSING_CREDENTIALS');
+      throw AppError.badRequest('MISSING_CREDENTIALS', 'Email and password are required');
     }
   }
 
   validateConfirmationRequest(email, name) {
     if (!email || !name) {
-      throw new Error('MISSING_EMAIL_OR_NAME');
+      throw AppError.badRequest('MISSING_EMAIL_OR_NAME', 'Email and name are required');
     }
   }
 

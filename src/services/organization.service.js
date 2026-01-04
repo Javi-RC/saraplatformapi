@@ -294,7 +294,8 @@ class OrganizationService {
       throw new Error('No tienes permisos para ver los empleados de esta organización');
     }
 
-    let employees = organization.employees;
+    // Filter out employees with null user (deleted users)
+    let employees = organization.employees.filter(emp => emp.user != null);
 
     // Aplicar filtros
     if (filters.status) {

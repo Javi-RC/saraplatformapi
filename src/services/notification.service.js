@@ -8,6 +8,7 @@ const {
 const User = require('../models/user.model');
 const NotificationChannelFactory = require('./notificationChannels/NotificationChannelFactory');
 const emailService = require('./email.service');
+const AppError = require('../utils/AppError');
 
 /**
  * Servicio de Notificaciones
@@ -54,7 +55,7 @@ class NotificationService {
     // Validar que el receptor existe
     const recipient = await User.findById(recipientId);
     if (!recipient) {
-      throw new Error('Usuario receptor no encontrado');
+      throw AppError.notFound('USER_NOT_FOUND', 'Notification recipient not found');
     }
 
     // Crear la notificación en la base de datos
@@ -207,7 +208,7 @@ class NotificationService {
     });
 
     if (!notification) {
-      throw new Error('Notificación no encontrada');
+      throw AppError.notFound('NOTIFICATION_NOT_FOUND', 'Notification not found');
     }
 
     return await notification.markAsRead();
@@ -269,7 +270,7 @@ class NotificationService {
     });
 
     if (!notification) {
-      throw new Error('Notificación no encontrada');
+      throw AppError.notFound('NOTIFICATION_NOT_FOUND', 'Notification not found');
     }
 
     return await notification.archive();

@@ -688,6 +688,8 @@ projectSchema.virtual('isActive').get(function() {
  * Check if a user is the project manager
  */
 projectSchema.methods.isProjectManager = function(userId) {
+  if (!this.projectManager) return false;
+  
   const pmId = this.projectManager._id 
     ? this.projectManager._id.toString() 
     : this.projectManager.toString();
@@ -700,6 +702,8 @@ projectSchema.methods.isProjectManager = function(userId) {
 projectSchema.methods.isAssignedEmployee = function(userId) {
   const userIdStr = userId.toString();
   return this.assignedEmployees.some(emp => {
+    if (!emp.user) return false;
+    
     const empUserId = emp.user._id 
       ? emp.user._id.toString() 
       : emp.user.toString();
@@ -731,6 +735,8 @@ projectSchema.methods.assignEmployee = function(userId, assignedRole = '') {
  */
 projectSchema.methods.removeEmployee = function(userId) {
   const index = this.assignedEmployees.findIndex(emp => {
+    if (!emp.user) return false;
+    
     const empUserId = emp.user._id 
       ? emp.user._id.toString() 
       : emp.user.toString();

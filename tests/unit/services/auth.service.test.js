@@ -61,12 +61,15 @@ const mockSave = jest.fn().mockResolvedValue(true);
         password: 'password123'
       };
 
-      User.findOne.mockResolvedValue({ email: 'existing@example.com' });
+      User.findOne.mockResolvedValue({ 
+        email: 'existing@example.com',
+        isConfirmed: true 
+      });
 
       // Act & Assert
       await expect(authService.register(userData))
         .rejects
-        .toThrow('USER_ALREADY_EXISTS');
+        .toThrow(expect.objectContaining({ code: 'USER_ALREADY_EXISTS' }));
     });
   });
 
@@ -117,7 +120,7 @@ const mockSave = jest.fn().mockResolvedValue(true);
       // Act & Assert
       await expect(authService.login(credentials))
         .rejects
-        .toThrow('INVALID_CREDENTIALS');
+        .toThrow(expect.objectContaining({ code: 'INVALID_CREDENTIALS' }));
     });
   });
 });

@@ -1,6 +1,20 @@
+const AppError = require('./AppError');
+
 class ResponseHandler {
   handleError(error, res) {
     console.error('Controller Error:', error);
+
+    // Prefer structured application errors
+    if (error && (error.name === 'AppError' || error.code)) {
+      const status = Number(error.status || error.statusCode) || 500;
+      const code = error.code || error.message || 'INTERNAL_ERROR';
+      return res.status(status).json({
+        success: false,
+        error: error.message || code,
+        code,
+        ...(error.details ? { details: error.details } : {})
+      });
+    }
 
     const errorMap = {
       'USER_ALREADY_EXISTS': { status: 409, message: 'This email is already registered' },
@@ -20,10 +34,17 @@ class ResponseHandler {
       'INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
       'BFI44_INVALID_RESPONSES_FORMAT': { status: 400, message: 'Invalid responses format' },
       'BFI44_INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
-      'BFI44_RESPONSE_NOT_FOUND': { status: 404, message: 'BFI-44 response not found' }
+      'BFI44_RESPONSE_NOT_FOUND': { status: 404, message: 'BFI-44 response not found' },
+
+      // Common plain-text errors currently thrown by services
+      'Project not found': { status: 404, message: 'Project not found' },
+      'Organization not found': { status: 404, message: 'Organization not found' },
+      'Project manager not found': { status: 404, message: 'Project manager not found' },
+      'Notificación no encontrada': { status: 404, message: 'Notification not found' },
+      'Usuario receptor no encontrado': { status: 404, message: 'Notification recipient not found' }
     };
 
-    const errorInfo = errorMap[error.message] || { status: 500, message: 'Internal server error' };
+    const errorInfo = errorMap[error.message] || { status: Number(error.statusCode) || 500, message: 'Internal server error' };
     
     return res.status(errorInfo.status).json({
       success: false,

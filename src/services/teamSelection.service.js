@@ -45,7 +45,10 @@ class TeamSelectionService {
       organizationStatus: 'accepted'
     }).populate('userId', 'name email avatar');
 
-    if (cvs.length === 0) {
+    // Filter out CVs where userId populate failed (deleted users)
+    const validCvs = cvs.filter(cv => cv.userId != null);
+
+    if (validCvs.length === 0) {
       return [];
     }
 
@@ -56,7 +59,7 @@ class TeamSelectionService {
 
     // 4. Calcular score para cada empleado
     const scoredEmployees = await Promise.all(
-      cvs.map(async cv => {
+      validCvs.map(async cv => {
         const score = await this.calculateEmployeeScore(
           cv,
           normalizedRequiredTechs,
@@ -148,7 +151,11 @@ class TeamSelectionService {
       organizationStatus: 'accepted'
     }).populate('userId', 'name email avatar');
 
-    if (cvs.length === 0) {
+    // Filter out CVs where userId populate failed (deleted users)
+    const validCvs = cvs.filter(cv => cv.userId != null);
+
+    if (validCvs.length === 0) {
+      console.warn(`No valid CVs found for organization ${organizationId}. Total CVs: ${cvs.length}, Valid: ${validCvs.length}`);
       return {
         suggestions: [],
         metadata: {
@@ -156,7 +163,8 @@ class TeamSelectionService {
           availableEmployees: 0,
           selectedSize: 0,
           isComplete: false,
-          shortage: remainingSlots
+          shortage: remainingSlots,
+          currentTeamSize: currentTeamUserIds.length
         }
       };
     }
@@ -168,7 +176,7 @@ class TeamSelectionService {
 
     // 4. Calcular score para cada empleado disponible
     const scoredEmployees = await Promise.all(
-      cvs.map(async cv => {
+      validCvs.map(async cv => {
         const score = await this.calculateEmployeeScore(
           cv,
           normalizedRequiredTechs,
@@ -178,7 +186,7 @@ class TeamSelectionService {
         );
         
         return {
-          userId: cv.userId._id,
+          userId: cv.userId._id || cv.userId,
           user: cv.userId,
           cv: cv,
           score: score.total,
@@ -198,7 +206,7 @@ class TeamSelectionService {
     // 7. Metadata
     const metadata = {
       requestedSize: remainingSlots,
-      availableEmployees: cvs.length,
+      availableEmployees: validCvs.length,
       selectedSize: suggestions.length,
       isComplete: suggestions.length >= remainingSlots,
       shortage: Math.max(0, remainingSlots - suggestions.length),
@@ -221,6 +229,17 @@ class TeamSelectionService {
    * @returns {Object} Score y detalles
    */
   async calculateEmployeeScore(cv, requiredTechs, experienceLevel, complexity, weeklyHours) {
+    // Validate input
+    if (!cv || !cv.userId) {
+      console.error('Invalid CV or missing userId in calculateEmployeeScore');
+      return {
+        total: Infinity,
+        details: { error: 'Invalid CV data' },
+        matchedSkills: [],
+        missingSkills: requiredTechs || []
+      };
+    }
+
     let manhattanDistance = 0;
     const details = {};
     const matchedSkills = [];

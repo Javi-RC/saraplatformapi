@@ -3,6 +3,7 @@ const Organization = require('../models/organization.model');
 const User = require('../models/user.model');
 const projectNotificationHelper = require('./projectNotificationHelper');
 const teamSelectionService = require('./teamSelection.service');
+const AppError = require('../utils/AppError');
 
 /**
  * Project Service
@@ -24,18 +25,18 @@ class ProjectService {
     // Validate organization exists
     const organization = await Organization.findById(organizationId);
     if (!organization) {
-      throw new Error('Organization not found');
+      throw AppError.notFound('ORGANIZATION_NOT_FOUND', 'Organization not found');
     }
 
     // Validate user is a project manager in the organization
     if (!organization.isProjectManager(projectManagerId)) {
-      throw new Error('User is not authorized as a project manager in this organization');
+      throw AppError.forbidden('NOT_PROJECT_MANAGER', 'User is not authorized as a project manager in this organization');
     }
 
     // Validate project manager exists
     const projectManager = await User.findById(projectManagerId);
     if (!projectManager) {
-      throw new Error('Project manager not found');
+      throw AppError.notFound('PROJECT_MANAGER_NOT_FOUND', 'Project manager not found');
     }
 
     // Create project
@@ -89,7 +90,7 @@ class ProjectService {
     const project = await query;
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     return project;
@@ -106,13 +107,13 @@ class ProjectService {
     const project = await Project.findById(projectId);
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions: only project manager or organization admin
     const organization = await Organization.findById(project.organization);
     if (!project.isProjectManager(userId) && !organization.isAdmin(userId)) {
-      throw new Error('You do not have permission to update this project');
+      throw AppError.forbidden('NO_PERMISSION', 'You do not have permission to update this project');
     }
 
     // Fields that cannot be directly modified
@@ -150,13 +151,13 @@ class ProjectService {
     const project = await Project.findById(projectId);
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions: only organization admin can delete
     const organization = await Organization.findById(project.organization);
     if (!organization.isAdmin(userId)) {
-      throw new Error('Only organization administrators can delete projects');
+      throw AppError.forbidden('ADMIN_ONLY', 'Only organization administrators can delete projects');
     }
 
     // Send notification before deletion
@@ -246,17 +247,17 @@ class ProjectService {
       .populate('projectManager', 'name email avatar');
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions: project manager or organization admin
     if (!project.isProjectManager(requesterId) && !project.organization.isAdmin(requesterId)) {
-      throw new Error('You do not have permission to assign employees to this project');
+      throw AppError.forbidden('NO_PERMISSION', 'You do not have permission to assign employees to this project');
     }
 
     // Verify employee belongs to organization
     if (!project.organization.isEmployee(employeeId)) {
-      throw new Error('Employee does not belong to this organization');
+      throw AppError.badRequest('NOT_IN_ORGANIZATION', 'Employee does not belong to this organization');
     }
 
     // Assign employee
@@ -293,12 +294,12 @@ class ProjectService {
       .populate('projectManager', 'name email avatar');
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions
     if (!project.isProjectManager(requesterId) && !project.organization.isAdmin(requesterId)) {
-      throw new Error('You do not have permission to remove employees from this project');
+      throw AppError.forbidden('NO_PERMISSION', 'You do not have permission to remove employees from this project');
     }
 
     // Send notification before removal
@@ -333,16 +334,16 @@ class ProjectService {
       .populate('projectManager', 'name email avatar');
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions
     if (!project.isProjectManager(userId) && !project.organization.isAdmin(userId)) {
-      throw new Error('You do not have permission to activate this project');
+      throw AppError.forbidden('NO_PERMISSION', 'You do not have permission to activate this project');
     }
 
     if (project.status !== 'draft') {
-      throw new Error('Only draft projects can be activated');
+      throw AppError.badRequest('INVALID_STATUS', 'Only draft projects can be activated');
     }
 
     await project.activate();
@@ -371,16 +372,16 @@ class ProjectService {
       .populate('projectManager', 'name email avatar');
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions
     if (!project.isProjectManager(userId) && !project.organization.isAdmin(userId)) {
-      throw new Error('You do not have permission to complete this project');
+      throw AppError.forbidden('NO_PERMISSION', 'You do not have permission to complete this project');
     }
 
     if (project.status !== 'active') {
-      throw new Error('Only active projects can be completed');
+      throw AppError.badRequest('INVALID_STATUS', 'Only active projects can be completed');
     }
 
     await project.complete();
@@ -409,16 +410,16 @@ class ProjectService {
       .populate('projectManager', 'name email avatar');
 
     if (!project) {
-      throw new Error('Project not found');
+      throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Only organization admin can cancel
     if (!project.organization.isAdmin(userId)) {
-      throw new Error('Only organization administrators can cancel projects');
+      throw AppError.forbidden('ADMIN_ONLY', 'Only organization administrators can cancel projects');
     }
 
     if (project.status === 'completed' || project.status === 'cancelled') {
-      throw new Error('Cannot cancel a project that is already completed or cancelled');
+      throw AppError.badRequest('INVALID_STATUS', 'Cannot cancel a project that is already completed or cancelled');
     }
 
     await project.cancel();

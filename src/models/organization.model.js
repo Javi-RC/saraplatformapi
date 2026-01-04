@@ -386,6 +386,9 @@ organizationSchema.methods.isEmployee = function(userId) {
   if (!this.employees) return false;
   const userIdStr = userId.toString();
   return this.employees.some(emp => {
+    // Skip if emp.user is null (deleted user)
+    if (!emp.user) return false;
+    
     // Manejar caso donde emp.user está poblado o no
     const empUserId = emp.user._id ? emp.user._id.toString() : emp.user.toString();
     return empUserId === userIdStr && emp.status === 'active';
@@ -397,6 +400,9 @@ organizationSchema.methods.isProjectManager = function(userId) {
   if (!this.employees) return false;
   const userIdStr = userId.toString();
   const employee = this.employees.find(emp => {
+    // Skip if emp.user is null (deleted user)
+    if (!emp.user) return false;
+    
     const empUserId = emp.user._id ? emp.user._id.toString() : emp.user.toString();
     return empUserId === userIdStr && emp.status === 'active';
   });
@@ -412,7 +418,7 @@ organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
   
   // Verificar si ya existe
   const existingEmployee = this.employees.find(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (existingEmployee) {
@@ -438,7 +444,7 @@ organizationSchema.methods.removeEmployee = function(userId) {
   }
   
   const index = this.employees.findIndex(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (index === -1) {
@@ -457,7 +463,7 @@ organizationSchema.methods.updateEmployeeStatus = function(userId, newStatus) {
   }
   
   const employee = this.employees.find(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (!employee) {
@@ -476,7 +482,7 @@ organizationSchema.methods.setProjectManagerRole = function(userId, isProjectMan
   }
   
   const employee = this.employees.find(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (!employee) {

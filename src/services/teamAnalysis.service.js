@@ -45,8 +45,10 @@ async function getTeamAnalysis(projectId) {
       throw new Error('Project not found');
     }
     
-    // Get team member IDs
-    const teamMemberIds = project.assignedEmployees.map(emp => emp.user._id || emp.user);
+    // Get team member IDs (filter out null users)
+    const teamMemberIds = project.assignedEmployees
+      .filter(emp => emp.user != null)
+      .map(emp => emp.user._id || emp.user);
     
     // Fetch CVs for all team members
     const cvs = await CV.find({ 
@@ -370,19 +372,23 @@ function analyzeTeamPersonality(bfi44Results) {
 function analyzeTeamWorkload(project, otherProjects) {
   const memberWorkload = new Map();
   
-  // Initialize with current project
-  project.assignedEmployees.forEach(emp => {
-    const userId = (emp.user._id || emp.user).toString();
-    memberWorkload.set(userId, {
-      projects: 1,
-      totalHours: project.weeklyHoursPerMember || 40,
-      projectNames: [project.projectName]
+  // Initialize with current project (filter out null users)
+  project.assignedEmployees
+    .filter(emp => emp.user != null)
+    .forEach(emp => {
+      const userId = (emp.user._id || emp.user).toString();
+      memberWorkload.set(userId, {
+        projects: 1,
+        totalHours: project.weeklyHoursPerMember || 40,
+        projectNames: [project.projectName]
+      });
     });
-  });
   
   // Add workload from other active projects
   otherProjects.forEach(otherProject => {
-    otherProject.assignedEmployees.forEach(emp => {
+    otherProject.assignedEmployees
+      .filter(emp => emp.user != null)
+      .forEach(emp => {
       const userId = (emp.user._id || emp.user).toString();
       
       if (memberWorkload.has(userId)) {

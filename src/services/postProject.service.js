@@ -180,7 +180,8 @@ function calculateDerivedMetrics(project, outcomeData) {
  */
 function canUpdateOutcome(project, userId) {
   // Project manager can always update
-  if (project.projectManager._id.toString() === userId.toString()) {
+  if (project.projectManager && project.projectManager._id && 
+      project.projectManager._id.toString() === userId.toString()) {
     return true;
   }
   

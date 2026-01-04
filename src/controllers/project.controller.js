@@ -516,6 +516,14 @@ class ProjectController {
         });
       }
 
+      // Ensure organization is populated
+      if (!project.organization) {
+        return res.status(400).json({
+          success: false,
+          error: 'Project organization not found'
+        });
+      }
+
       const organizationId = project.organization._id || project.organization;
       const targetTeamSize = project.estimatedTeamSize || 5;
       const currentTeamSize = project.assignedEmployees?.length || 0;
@@ -543,16 +551,21 @@ class ProjectController {
 
       // CASO 1: Hay equipo asignado - Analizar equipo actual
       if (currentTeamSize > 0) {
-        const userIds = project.assignedEmployees.map(emp => emp.user._id);
+        const userIds = project.assignedEmployees
+          .filter(emp => emp.user != null)
+          .map(emp => emp.user._id);
         const cvs = await CV.find({
           userId: { $in: userIds },
           organization: organizationId,
           organizationStatus: 'accepted'
         }).populate('userId', 'name email avatar');
 
+        // Filter out CVs where userId populate failed (deleted users)
+        const validCvs = cvs.filter(cv => cv.userId != null);
+
         // Analizar cada miembro actual
         const teamMembers = await Promise.all(
-          cvs.map(async cv => {
+          validCvs.map(async cv => {
             const score = await teamSelectionService.calculateEmployeeScore(
               cv,
               (project.mainTechnologies || []).map(t => 
@@ -582,7 +595,9 @@ class ProjectController {
 
       // CASO 2: Sugerir empleados complementarios (siempre, salvo que esté completo)
       if (remainingSlots > 0) {
-        const currentUserIds = project.assignedEmployees?.map(emp => emp.user._id) || [];
+        const currentUserIds = project.assignedEmployees
+          ?.filter(emp => emp.user != null)
+          .map(emp => emp.user._id) || [];
         
         const { suggestions, metadata } = await teamSelectionService.selectComplementaryTeam(
           project,

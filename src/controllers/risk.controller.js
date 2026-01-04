@@ -442,6 +442,14 @@ class RiskController {
         });
       }
       
+      // Ensure organization is populated
+      if (!project.organization) {
+        return res.status(400).json({
+          success: false,
+          error: 'Project organization not found'
+        });
+      }
+      
       const organizationId = project.organization._id || project.organization;
       const projectFeatures = cbrService.extractProjectFeatures(project);
       const similarCases = await cbrService.retrieveSimilarCases(
