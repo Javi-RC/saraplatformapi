@@ -58,8 +58,13 @@ const bfi44ResponseSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Índice compuesto para búsquedas eficientes
+// OPTIMIZATION: Compound index for efficient profile lookups
+// This index supports both single-user and bulk queries with sorting
+bfi44ResponseSchema.index({ userId: 1, createdAt: -1 });
 bfi44ResponseSchema.index({ userId: 1, completedAt: -1 });
+
+// Index for time-based queries
+bfi44ResponseSchema.index({ createdAt: -1 });
 
 /**
  * Método para obtener el perfil más reciente de un usuario

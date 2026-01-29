@@ -117,7 +117,6 @@ const requireOwnerOrOrgAdmin = async (req, res, next) => {
     return next();
   }
 
-  // Si es org_admin, verificar que el usuario objetivo pertenece a su organización
   if (req.user.role === 'org_admin') {
     try {
       const Organization = require('../models/organization.model');

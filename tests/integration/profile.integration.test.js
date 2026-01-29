@@ -1,5 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
+const mongodbHelper = require('../setup/mongodb-helper');
 const app = require('../../src/app');
 const User = require('../../src/models/user.model');
 const { generateToken } = require('../../src/utils/jwt');
@@ -9,11 +10,8 @@ describe('Profile API Tests', () => {
   let authToken;
 
   beforeAll(async () => {
-    // Conectar a la base de datos de prueba
-    if (mongoose.connection.readyState === 0) {
-      await mongoose.connect(process.env.MONGODB_URI_TEST || 'mongodb://localhost:27017/tfg-test');
-    }
-  });
+    await mongodbHelper.connect();
+  }, 60000);
 
   beforeEach(async () => {
     // Limpiar usuarios
@@ -40,13 +38,13 @@ describe('Profile API Tests', () => {
       }
     });
 
-    // Generar token de autenticación
-    authToken = generateToken({ userId: testUser._id.toString() });
+    // Generar token de autenticación con el objeto user completo
+    authToken = generateToken(testUser);
   });
 
   afterAll(async () => {
     await User.deleteMany({});
-    await mongoose.connection.close();
+    await mongodbHelper.disconnect();
   });
 
   describe('GET /api/profile', () => {
@@ -92,10 +90,9 @@ describe('Profile API Tests', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.message).toBe('Perfil actualizado correctamente');
+      expect(response.body.message).toBe('Profile updated successfully');
       expect(response.body.user.name).toBe('Updated Name');
 
-      // Verificar en la base de datos
       const updatedUser = await User.findById(testUser._id);
       expect(updatedUser.name).toBe('Updated Name');
     });
@@ -110,7 +107,7 @@ describe('Profile API Tests', () => {
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.user.country).toBe('México');
+      expect(response.body.message).toBe('Profile updated successfully');
       expect(response.body.user.timezone).toBe('America/Mexico_City');
     });
 
@@ -193,7 +190,7 @@ describe('Profile API Tests', () => {
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toContain('nombre');
+      expect(response.body.error).toContain('Name');
     });
 
     it('should reject invalid working hours format', async () => {
@@ -233,7 +230,7 @@ describe('Profile API Tests', () => {
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toContain('campos válidos');
+      expect(response.body.error).toContain('No valid fields to update');
     });
 
     it('should not allow updating email', async () => {

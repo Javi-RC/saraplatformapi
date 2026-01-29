@@ -17,10 +17,6 @@ const isAdmin = (req, res, next) => {
   next();
 };
 
-// ============================================
-// Rutas públicas para usuarios autenticados
-// ============================================
-
 /**
  * GET /api/notifications
  * Obtiene las notificaciones del usuario autenticado
@@ -70,10 +66,6 @@ router.patch('/:id/archive', authMiddleware, notificationController.archive);
  * Elimina una notificación
  */
 router.delete('/:id', authMiddleware, notificationController.delete);
-
-// ============================================
-// Rutas administrativas (solo para org_admin)
-// ============================================
 
 /**
  * POST /api/notifications

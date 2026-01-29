@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequenceDiagram>
+    <meta>
+        <title>Diagrama de Secuencia - Inicio de Sesión (Login) - Caso Exitoso</title>
+        <theme>plain</theme>
+        <settings>
+            <sequenceMessageAlign>center</sequenceMessageAlign>
+            <responseMessageBelowArrow>true</responseMessageBelowArrow>
+            <maxMessageSize>200</maxMessageSize>
+        </settings>
+    </meta>
+
+    <participants>
+        <actor id="user" name="Usuario" />
+        
+        <box name="Frontend" color="#LightBlue">
+            <participant id="loginPage" name="LoginPage" stereotype="View" />
+            <participant id="authCtx" name="AuthContext" stereotype="Context" />
+            <participant id="authSvc" name="authService" stereotype="Service" />
+        </box>
+
+        <box name="Backend" color="#LightGreen">
+            <participant id="authRoutes" name="auth.routes" stereotype="Router" />
+            <participant id="authCtrl" name="auth.controller" stereotype="Controller" />
+            <participant id="validators" name="validators" stereotype="Utils" />
+            <participant id="authService" name="auth.service" stereotype="Service" />
+            <participant id="userRepo" name="userRepository" stereotype="Repository" />
+            <participant id="jwtUtils" name="jwt" stereotype="Utils" />
+            <participant id="respHandler" name="responseHandler" stereotype="Utils" />
+        </box>
+
+        <database id="db" name="MongoDB" />
+    </participants>
+
+    <sequence name="Flujo de Inicio de Sesión">
+        <!-- Usuario introduce credenciales -->
+        <message from="user" to="loginPage" text="Introduce email y password" />
+        <activate participant="loginPage" />
+
+        <!-- Frontend: LoginPage procesa formulario -->
+        <message from="loginPage" to="loginPage" text="handleSubmit(e)" />
+        <message from="loginPage" to="authCtx" text="login(email, password)" />
+        <activate participant="authCtx" />
+
+        <!-- Frontend: AuthContext llama al servicio -->
+        <message from="authCtx" to="authSvc" text="login(email, password)" />
+        <activate participant="authSvc" />
+
+        <!-- Frontend -> Backend: HTTP Request -->
+        <message from="authSvc" to="authRoutes" text="POST /auth/login {email, password}" />
+        <activate participant="authRoutes" />
+
+        <!-- Backend: Router invoca Controller -->
+        <message from="authRoutes" to="authCtrl" text="login(req, res)" />
+        <activate participant="authCtrl" />
+
+        <!-- Backend: Validación de datos -->
+        <message from="authCtrl" to="validators" text="validateLoginData(email, password)" />
+        <activate participant="validators" />
+        <return from="validators" to="authCtrl" text="void" />
+        <deactivate participant="validators" />
+
+        <!-- Backend: Controller invoca Service -->
+        <message from="authCtrl" to="authService" text="login({email, password})" />
+        <activate participant="authService" />
+
+        <!-- Backend: Service busca usuario via Repository -->
+        <message from="authService" to="userRepo" text="findByEmail(email.toLowerCase(), {select: '+passwordHash'})" />
+        <activate participant="userRepo" />
+
+        <!-- Backend: Repository consulta MongoDB -->
+        <message from="userRepo" to="db" text="findOne({email}, options)" />
+        <activate participant="db" />
+        <return from="db" to="userRepo" text="userData" />
+        <deactivate participant="db" />
+
+        <return from="userRepo" to="authService" text="user" />
+        <deactivate participant="userRepo" />
+
+        <!-- Backend: Verificación de cuenta confirmada -->
+        <message from="authService" to="authService" text="Verificar user.isConfirmed === true" />
+
+        <!-- Backend: Verificación de contraseña -->
+        <message from="authService" to="authService" text="bcrypt.compare(password, user.passwordHash)" />
+        <note position="right">Validación de contraseña</note>
+
+        <!-- Backend: Actualizar último login -->
+        <message from="authService" to="userRepo" text="updateLastLogin(user._id)" />
+        <activate participant="userRepo" />
+
+        <message from="userRepo" to="db" text="updateOne({_id: userId}, {$set: {lastLogin: new Date()}})" />
+        <activate participant="db" />
+        <return from="db" to="userRepo" text="updateResult" />
+        <deactivate participant="db" />
+
+        <return from="userRepo" to="authService" text="void" />
+        <deactivate participant="userRepo" />
+
+        <!-- Backend: Generar JWT -->
+        <message from="authService" to="jwtUtils" text="generateToken(user)" />
+        <activate participant="jwtUtils" />
+        <message from="jwtUtils" to="jwtUtils" text="jwt.sign(payload, JWT_SECRET, {expiresIn: JWT_EXPIRES_IN})" />
+        <return from="jwtUtils" to="authService" text="token (JWT)" />
+        <deactivate participant="jwtUtils" />
+
+        <!-- Backend: Retorno al Controller -->
+        <return from="authService" to="authCtrl" text="{token, user: {id, email, name, role}}" />
+        <deactivate participant="authService" />
+
+        <!-- Backend: Controller usa responseHandler -->
+        <message from="authCtrl" to="respHandler" text="success(res, {message, token, user}, 200)" />
+        <activate participant="respHandler" />
+        <return from="respHandler" to="authRoutes" text="HTTP 200 {success: true, data: {message, token, user}}" />
+        <deactivate participant="respHandler" />
+        <deactivate participant="authCtrl" />
+
+        <!-- Backend -> Frontend: HTTP Response -->
+        <return from="authRoutes" to="authSvc" text="Response JSON" />
+        <deactivate participant="authRoutes" />
+
+        <return from="authSvc" to="authCtx" text="{token, user}" />
+        <deactivate participant="authSvc" />
+
+        <!-- Frontend: Guardar estado de autenticación -->
+        <message from="authCtx" to="authCtx" text="localStorage.setItem('token', token)" />
+        <message from="authCtx" to="authCtx" text="setUser(user)" />
+        <message from="authCtx" to="authCtx" text="setIsAuthenticated(true)" />
+
+        <return from="authCtx" to="loginPage" text="success" />
+        <deactivate participant="authCtx" />
+
+        <!-- Frontend: Navegación al Dashboard -->
+        <message from="loginPage" to="loginPage" text="navigate('/dashboard')" />
+        <return from="loginPage" to="user" text="Redirige al Dashboard" />
+        <deactivate participant="loginPage" />
+    </sequence>
+</sequenceDiagram>

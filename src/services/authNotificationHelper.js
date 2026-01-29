@@ -23,8 +23,8 @@ class AuthNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.EMAIL_CONFIRMATION,
-        title: '¡Bienvenido!',
-        message: `Hola ${userName}, tu cuenta ha sido creada exitosamente. Por favor, confirma tu email para comenzar.`,
+        title: 'Welcome!',
+        message: `Hi ${userName}, your account has been successfully created. Please confirm your email to get started.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         metadata: {
@@ -44,12 +44,12 @@ class AuthNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.EMAIL_CONFIRMATION,
-        title: 'Cuenta Confirmada',
-        message: `¡Felicidades ${userName}! Tu cuenta ha sido confirmada exitosamente. Ya puedes acceder a todas las funcionalidades.`,
+        title: 'Account Confirmed',
+        message: `Congratulations ${userName}! Your account has been successfully confirmed. You can now access all features.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         actionUrl: '/dashboard',
-        actionText: 'Ir al Dashboard',
+        actionText: 'Go to Dashboard',
         metadata: {
           event: 'account_confirmed'
         }
@@ -65,16 +65,16 @@ class AuthNotificationHelper {
   async notifyRoleChanged(userId, userName, newRole, oldRole) {
     try {
       const roleNames = {
-        employee: 'Empleado',
-        org_admin: 'Administrador',
-        unassigned: 'Sin asignar'
+        employee: 'Employee',
+        org_admin: 'Administrator',
+        unassigned: 'Unassigned'
       };
 
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.ROLE_CHANGED,
-        title: 'Rol Actualizado',
-        message: `Hola ${userName}, tu rol ha sido actualizado de ${roleNames[oldRole]} a ${roleNames[newRole]}.`,
+        title: 'Role Updated',
+        message: `Hi ${userName}, your role has been updated from ${roleNames[oldRole]} to ${roleNames[newRole]}.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         metadata: {
@@ -98,12 +98,12 @@ class AuthNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.ACCOUNT_UPDATED,
-        title: 'Cuenta Actualizada',
-        message: `Hola ${userName}, tu perfil ha sido actualizado. Campos modificados: ${changesList}`,
+        title: 'Account Updated',
+        message: `Hi ${userName}, your profile has been updated. Modified fields: ${changesList}`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         actionUrl: '/profile',
-        actionText: 'Ver Perfil',
+        actionText: 'View Profile',
         metadata: {
           event: 'account_updated',
           changes
@@ -122,12 +122,12 @@ class AuthNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.ACCOUNT_UPDATED,
-        title: '⚠️ Inicio de Sesión Detectado',
-        message: `Se ha detectado un inicio de sesión en tu cuenta desde ${loginDetails.location || 'ubicación desconocida'}. Si fuiste tú, puedes ignorar este mensaje.`,
+        title: '⚠️ Login Detected',
+        message: `A login to your account has been detected from ${loginDetails.location || 'unknown location'}. If this was you, you can ignore this message.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.URGENT,
         actionUrl: '/security',
-        actionText: 'Revisar Seguridad',
+        actionText: 'Review Security',
         metadata: {
           event: 'suspicious_login',
           ...loginDetails

@@ -11,19 +11,16 @@ class NotificationValidator {
     const { recipientId, type, title, message, channels, priority } = req.body;
     const errors = [];
 
-    // Validar recipientId
     if (!recipientId) {
       errors.push('recipientId is required');
     }
 
-    // Validar type
     if (!type) {
       errors.push('type is required');
     } else if (!Object.values(NotificationTypes).includes(type)) {
       errors.push(`type must be one of: ${Object.values(NotificationTypes).join(', ')}`);
     }
 
-    // Validar title
     if (!title) {
       errors.push('title is required');
     } else if (typeof title !== 'string' || title.trim().length === 0) {
@@ -32,7 +29,6 @@ class NotificationValidator {
       errors.push('title cannot exceed 200 characters');
     }
 
-    // Validar message
     if (!message) {
       errors.push('message is required');
     } else if (typeof message !== 'string' || message.trim().length === 0) {
@@ -41,7 +37,6 @@ class NotificationValidator {
       errors.push('message cannot exceed 1000 characters');
     }
 
-    // Validar channels (opcional)
     if (channels) {
       if (!Array.isArray(channels)) {
         errors.push('channels must be an array');
@@ -54,7 +49,6 @@ class NotificationValidator {
       }
     }
 
-    // Validar priority (opcional)
     if (priority && !Object.values(NotificationPriority).includes(priority)) {
       errors.push(`priority must be one of: ${Object.values(NotificationPriority).join(', ')}`);
     }
@@ -77,7 +71,6 @@ class NotificationValidator {
     const { recipientIds, type, title, message } = req.body;
     const errors = [];
 
-    // Validar recipientIds
     if (!recipientIds) {
       errors.push('recipientIds is required');
     } else if (!Array.isArray(recipientIds)) {
@@ -88,7 +81,6 @@ class NotificationValidator {
       errors.push('recipientIds cannot have more than 1000 items');
     }
 
-    // Validar type, title, message (igual que create)
     if (!type) {
       errors.push('type is required');
     } else if (!Object.values(NotificationTypes).includes(type)) {
@@ -158,12 +150,10 @@ class NotificationValidator {
     const { page, limit, status, type } = req.query;
     const errors = [];
 
-    // Validar page
     if (page && (isNaN(page) || parseInt(page) < 1)) {
       errors.push('page must be a number greater than 0');
     }
 
-    // Validar limit
     if (limit) {
       const limitNum = parseInt(limit);
       if (isNaN(limit) || limitNum < 1 || limitNum > 100) {
@@ -171,12 +161,10 @@ class NotificationValidator {
       }
     }
 
-    // Validar status
     if (status && !['pending', 'sent', 'delivered', 'read', 'failed'].includes(status)) {
       errors.push('status must be: pending, sent, delivered, read or failed');
     }
 
-    // Validar type
     if (type && !Object.values(NotificationTypes).includes(type)) {
       errors.push('type must be a valid notification type');
     }

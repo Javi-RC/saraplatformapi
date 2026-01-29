@@ -96,13 +96,11 @@ class Validators {
       throw new Error('BFI44_INVALID_RESPONSES_FORMAT');
     }
 
-    // Verificar que existan exactamente 44 respuestas
     const responseKeys = Object.keys(responses);
     if (responseKeys.length !== 44) {
       throw new Error('BFI44_INVALID_RESPONSE_COUNT');
     }
 
-    // Validar cada respuesta
     for (let i = 1; i <= 44; i++) {
       const key = i.toString();
       const value = responses[key];
@@ -132,7 +130,6 @@ class Validators {
       notificationPreferences 
     } = req.body;
 
-    // Validar nombre si se proporciona
     if (name !== undefined) {
       if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 50) {
         return res.status(400).json({
@@ -142,7 +139,6 @@ class Validators {
       }
     }
 
-    // Validar country si se proporciona
     if (country !== undefined) {
       if (typeof country !== 'string' || country.trim().length === 0) {
         return res.status(400).json({
@@ -152,7 +148,6 @@ class Validators {
       }
     }
 
-    // Validar timezone si se proporciona
     if (timezone !== undefined) {
       if (typeof timezone !== 'string' || timezone.trim().length === 0) {
         return res.status(400).json({
@@ -162,7 +157,6 @@ class Validators {
       }
     }
 
-    // Validar flexibleSchedule si se proporciona
     if (flexibleSchedule !== undefined) {
       if (typeof flexibleSchedule !== 'boolean') {
         return res.status(400).json({
@@ -172,7 +166,6 @@ class Validators {
       }
     }
 
-    // Validar preferredWorkingHours si se proporciona
     if (preferredWorkingHours !== undefined) {
       if (typeof preferredWorkingHours !== 'object' || preferredWorkingHours === null) {
         return res.status(400).json({
@@ -199,7 +192,6 @@ class Validators {
       }
     }
 
-    // Validar notificationPreferences si se proporciona
     if (notificationPreferences !== undefined) {
       if (typeof notificationPreferences !== 'object' || notificationPreferences === null) {
         return res.status(400).json({

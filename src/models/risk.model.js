@@ -6,9 +6,6 @@ const mongoose = require('mongoose');
  * Part of the CBR + Decision Tree risk prediction system
  */
 const riskSchema = new mongoose.Schema({
-  // ============================================
-  // 1. Basic Information
-  // ============================================
   project: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
@@ -23,32 +20,8 @@ const riskSchema = new mongoose.Schema({
     index: true
   },
   
-  // ============================================
-  // 2. Risk Classification
-  // ============================================
   type: {
     type: String,
-    enum: [
-      'communication_breakdown',
-      'skill_gap',
-      'team_overload',
-      'dependency_blockage',
-      'scope_creep',
-      'process_mismatch',
-      'technical_infrastructure',
-      'quality_degradation',
-      'vendor_issue',
-      'security_compliance',
-      'budget_overrun',
-      'resource_unavailability',
-      // NEW: Enhanced risk types from research [14-21]
-      'knowledge_management_gap',
-      'remote_work_support_gap',
-      'role_clarity_gap',
-      'standards_compliance_gap',
-      'timezone_scheduling_gap',
-      'other'
-    ],
     required: true,
     index: true
   },
@@ -69,52 +42,39 @@ const riskSchema = new mongoose.Schema({
   
   category: {
     type: String,
-    enum: ['coordination', 'technical', 'team', 'management', 'organizational'],
+    enum: ['coordination', 'technical', 'team', 'management', 'organizational', 'other'],
     required: true
   },
   
-  // ============================================
-  // 3. Prediction Information
-  // ============================================
   severity: {
     type: String,
     enum: ['low', 'medium', 'medium-high', 'high', 'critical', 'emerging'],
     required: true
   },
-  
-  probability: {
-    type: Number,
-    required: true,
-    min: 0,
-    max: 1,
-    validate: {
-      validator: function(value) {
-        return value >= 0 && value <= 1;
-      },
-      message: 'Probability must be between 0 and 1'
-    }
-  },
-  
-  confidence: {
-    type: Number,
-    required: true,
-    min: 0,
-    max: 1,
-    validate: {
-      validator: function(value) {
-        return value >= 0 && value <= 1;
-      },
-      message: 'Confidence must be between 0 and 1'
-    }
-  },
-  
-  // ============================================
-  // 4. Source and Reasoning
-  // ============================================
+    
   source: {
     type: String,
-    enum: ['expert_rules', 'cbr', 'combined', 'seed_cases', 'emerging_pattern'],
+    enum: [
+      'expert_rules', 
+      'cbr', 
+      'combined', 
+      'seed_cases', 
+      'emerging_pattern', 
+      'manual', 
+      'expert_rules_early_warning',
+      'expert_rules_hofstede',
+      'expert_rules_linguistic',
+      'expert_rules_project_requirements',
+      'expert_rules_enhanced'
+    ],
     required: true
+  },
+  
+  // Flag to indicate user has edited the content (title, description, etc.)
+  // When true, i18n should NOT overwrite user's custom content
+  userEdited: {
+    type: Boolean,
+    default: false
   },
   
   reasoning: [{
@@ -129,9 +89,6 @@ const riskSchema = new mongoose.Schema({
     maxlength: [300, 'Indicator cannot exceed 300 characters']
   }],
   
-  // ============================================
-  // 5. CBR-Specific Data
-  // ============================================
   basedOnCases: [{
     caseId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -157,80 +114,12 @@ const riskSchema = new mongoose.Schema({
     organizational: Number
   },
   
-  // ============================================
-  // 6. Predictions and Timeline
-  // ============================================
-  predictedImpact: {
-    scheduleDelay: {
-      min: Number, // days
-      max: Number,
-      description: String
-    },
-    budgetOverrun: {
-      min: Number, // percentage
-      max: Number,
-      description: String
-    },
-    qualityImpact: {
-      type: String,
-      enum: ['low', 'medium', 'high']
-    },
-    teamMoraleImpact: {
-      type: String,
-      enum: ['low', 'medium', 'high']
-    }
-  },
-  
-  expectedWeek: {
-    type: Number,
-    min: 1,
-    max: 100
-  },
-  
-  expectedWeekRange: {
-    min: Number,
-    max: Number
-  },
-  
-  // ============================================
-  // 7. Recommendations
-  // ============================================
   recommendations: [{
     type: String,
     trim: true,
     maxlength: [1000, 'Recommendation cannot exceed 1000 characters']
   }],
-  
-  mitigationStrategies: [{
-    strategy: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    effectivenessScore: {
-      type: Number,
-      min: 0,
-      max: 1
-    },
-    basedOnCases: [String], // caseIds where this worked
-    effort: {
-      type: String,
-      enum: ['low', 'medium', 'high']
-    }
-  }],
-  
-  // ============================================
-  // 8. Early Warning Signals
-  // ============================================
-  earlyWarningSignals: [{
-    signal: String,
-    threshold: String,
-    checkFrequency: String
-  }],
-  
-  // ============================================
-  // 9. Actual Outcome (Updated Post-Project)
-  // ============================================
+    
   occurred: {
     type: Boolean,
     default: null
@@ -247,38 +136,14 @@ const riskSchema = new mongoose.Schema({
     default: null
   },
   
-  mitigatedAt: {
-    type: Date,
-    default: null
-  },
-  
-  actualImpact: {
-    scheduleDelayDays: Number,
-    budgetOverrunPercent: Number,
-    qualityScore: Number,
-    description: String
-  },
-  
+ 
   rootCause: {
     type: String,
     trim: true,
     maxlength: [1000, 'Root cause description cannot exceed 1000 characters']
   },
   
-  // ============================================
-  // 10. Prediction Accuracy
-  // ============================================
-  predictionAccuracy: {
-    severityMatch: Boolean, // predicted severity === actual severity
-    occurrenceMatch: Boolean, // predicted to occur === actually occurred
-    impactAccuracy: Number, // 0-1 score
-    timelineAccuracy: Number, // 0-1 score
-    overallScore: Number // 0-1 combined score
-  },
   
-  // ============================================
-  // 11. Feedback and Learning
-  // ============================================
   feedback: {
     usefulnessRating: {
       type: Number,
@@ -302,12 +167,9 @@ const riskSchema = new mongoose.Schema({
     providedAt: Date
   },
   
-  // ============================================
-  // 12. Metadata
-  // ============================================
   status: {
     type: String,
-    enum: ['predicted', 'monitoring', 'mitigated', 'occurred', 'avoided', 'false_positive'],
+    enum: ['not occurred','occurred', 'predicted'],
     default: 'predicted'
   },
   
@@ -331,21 +193,11 @@ const riskSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// ============================================
-// Indexes
-// ============================================
 riskSchema.index({ project: 1, type: 1 });
 riskSchema.index({ organization: 1, occurred: 1 });
-riskSchema.index({ probability: -1, severity: 1 });
+riskSchema.index({ similarity: -1, severity: 1 });
 riskSchema.index({ 'basedOnCases.caseId': 1 });
 
-// ============================================
-// Methods
-// ============================================
-
-/**
- * Mark risk as occurred with actual data
- */
 riskSchema.methods.markAsOccurred = function(actualData) {
   this.occurred = true;
   this.actualSeverity = actualData.severity;
@@ -376,22 +228,7 @@ riskSchema.methods.markAsOccurred = function(actualData) {
 
 /**
  * Mark risk as avoided (did not occur)
- */
-riskSchema.methods.markAsAvoided = function(reason) {
-  this.occurred = false;
-  this.status = 'avoided';
-  this.note = reason;
-  
-  // Calculate prediction accuracy (false positive)
-  this.predictionAccuracy = {
-    severityMatch: false,
-    occurrenceMatch: false,
-    impactAccuracy: 0,
-    overallScore: 0
-  };
-  
-  return this.save();
-};
+ *
 
 /**
  * Mark risk as mitigated
@@ -408,38 +245,6 @@ riskSchema.methods.markAsMitigated = function(mitigationDate, effectiveness) {
 };
 
 /**
- * Calculate impact accuracy
- */
-riskSchema.methods.calculateImpactAccuracy = function(actualImpact) {
-  if (!this.predictedImpact || !actualImpact) return 0.5;
-  
-  let score = 0;
-  let count = 0;
-  
-  // Schedule delay accuracy
-  if (this.predictedImpact.scheduleDelay && actualImpact.scheduleDelayDays) {
-    const predicted = (this.predictedImpact.scheduleDelay.min + 
-                      this.predictedImpact.scheduleDelay.max) / 2;
-    const actual = actualImpact.scheduleDelayDays;
-    const error = Math.abs(predicted - actual) / Math.max(predicted, actual);
-    score += Math.max(0, 1 - error);
-    count++;
-  }
-  
-  // Budget overrun accuracy
-  if (this.predictedImpact.budgetOverrun && actualImpact.budgetOverrunPercent) {
-    const predicted = (this.predictedImpact.budgetOverrun.min + 
-                      this.predictedImpact.budgetOverrun.max) / 2;
-    const actual = actualImpact.budgetOverrunPercent;
-    const error = Math.abs(predicted - actual) / Math.max(predicted, actual);
-    score += Math.max(0, 1 - error);
-    count++;
-  }
-  
-  return count > 0 ? score / count : 0.5;
-};
-
-/**
  * Get risk priority score (for sorting)
  */
 riskSchema.methods.getPriorityScore = function() {
@@ -451,18 +256,15 @@ riskSchema.methods.getPriorityScore = function() {
     critical: 5
   }[this.severity] || 2;
   
-  // Priority = (severity * probability * confidence)
-  return severityScore * this.probability * this.confidence;
+  // Priority = (severity * similarity)
+  return severityScore * (this.similarity || 0.5);
 };
-
-// ============================================
 // Statics
-// ============================================
 
 /**
  * Get all risks for a project
  */
-riskSchema.statics.getProjectRisks = function(projectId, options = {}) {
+riskSchema.statics.getProjectRisks = async function(projectId, options = {}) {
   const query = { project: projectId };
   
   if (options.status) {
@@ -473,9 +275,26 @@ riskSchema.statics.getProjectRisks = function(projectId, options = {}) {
     query.occurred = options.occurred;
   }
   
-  return this.find(query)
-    .populate('basedOnCases.caseId')
-    .sort({ probability: -1, severity: 1 });
+  try {
+    // Check if CaseBase model is registered before attempting populate
+    const modelExists = mongoose.modelNames().includes('CaseBase');
+    
+    if (modelExists) {
+      return await this.find(query)
+        .populate({
+          path: 'basedOnCases.caseId',
+          options: { strictPopulate: false }
+        })
+        .sort({ similarity: -1, severity: 1 });
+    } else {
+      // CaseBase model not registered, return without populate
+      return await this.find(query).sort({ similarity: -1, severity: 1 });
+    }
+  } catch (error) {
+    // If populate fails for any reason, return without populate
+    console.error('Error in getProjectRisks, returning risks without case details:', error.message);
+    return await this.find(query).sort({ similarity: -1, severity: 1 });
+  }
 };
 
 /**
@@ -503,8 +322,6 @@ riskSchema.statics.getOrganizationStats = async function(organizationId) {
   
   // Calculate averages
   if (risks.length > 0) {
-    stats.avgConfidence = risks.reduce((sum, r) => sum + r.confidence, 0) / risks.length;
-    
     const risksWithAccuracy = risks.filter(r => r.predictionAccuracy?.overallScore);
     if (risksWithAccuracy.length > 0) {
       stats.avgAccuracy = risksWithAccuracy.reduce(
@@ -565,10 +382,7 @@ riskSchema.statics.getAccuracyReport = async function(organizationId) {
   
   return report;
 };
-
-// ============================================
 // Pre-save hook
-// ============================================
 riskSchema.pre('save', function(next) {
   this.updatedAt = new Date();
   next();

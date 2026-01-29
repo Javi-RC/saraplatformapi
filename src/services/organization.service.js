@@ -1,8 +1,13 @@
-const Organization = require('../models/organization.model');
-const User = require('../models/user.model');
 const organizationNotificationHelper = require('./organizationNotificationHelper');
 const bfi44NotificationHelper = require('./bfi44NotificationHelper');
-const BFI44Response = require('../models/bfi44.model');
+const { toStableBfi44Profile } = require('../utils/bfi44ProfileMapper');
+
+// Import repositories instead of models
+const {
+  organizationRepository,
+  userRepository,
+  bfi44Repository
+} = require('../repositories');
 
 /**
  * Servicio de Gestión de Organizaciones
@@ -19,32 +24,28 @@ class OrganizationService {
    * @returns {Promise<Object>} Organización creada
    */
   async createOrganization(organizationData, adminId) {
-    // Validar que el usuario existe y puede ser administrador
-    const admin = await User.findById(adminId);
+    const admin = await userRepository.findById(adminId);
     if (!admin) {
       throw new Error('Usuario administrador no encontrado');
     }
 
-    // Verificar que el usuario no administre ya otra organización activa
-    const existingOrg = await Organization.findOne({
+    const existingOrg = await organizationRepository.findOne({
       admin: adminId,
       status: 'active'
     });
 
     if (existingOrg) {
-      throw new Error('El usuario ya administra una organización activa');
+      throw new Error('User already administers an active organization');
     }
 
     // Crear la organización
-    const organization = new Organization({
+    const organization = await organizationRepository.create({
       ...organizationData,
       admin: adminId,
       status: 'active',
       createdAt: Date.now(),
       lastActivityAt: Date.now()
     });
-
-    await organization.save();
 
     // Actualizar el rol del usuario a org_admin
     admin.role = 'org_admin';
@@ -60,21 +61,35 @@ class OrganizationService {
    * Obtiene una organización por su ID
    * @param {string} organizationId - ID de la organización
    * @param {boolean} includeEmployees - Incluir datos de empleados
+   * @param {string} userId - ID del usuario que solicita (opcional, para validar permisos)
    * @returns {Promise<Object>} Organización encontrada
    */
-  async getOrganizationById(organizationId, includeEmployees = false) {
-    let query = Organization.findById(organizationId)
-      .populate('admin', 'name email avatar role')
-      .populate('additionalAdmins', 'name email avatar role');
+  async getOrganizationById(organizationId, includeEmployees = false, userId = null) {
+    const populateOptions = [
+      { path: 'admin', select: 'name email avatar role' },
+      { path: 'additionalAdmins', select: 'name email avatar role' }
+    ];
 
     if (includeEmployees) {
-      query = query.populate('employees.user', 'name email avatar');
+      populateOptions.push({ path: 'employees.user', select: 'name email avatar' });
     }
 
-    const organization = await query;
+    const organization = await organizationRepository.findById(organizationId, {
+      populate: populateOptions
+    });
 
     if (!organization) {
-      throw new Error('Organización no encontrada');
+      throw new Error('Organization not found');
+    }
+
+    // Si se proporciona userId, validar que tenga permisos para ver la organización
+    if (userId) {
+      const isAdmin = organization.isAdmin(userId);
+      const isEmployee = organization.isEmployee(userId);
+      
+      if (!isAdmin && !isEmployee) {
+        throw new Error('UNAUTHORIZED_ACCESS');
+      }
     }
 
     return organization;
@@ -88,18 +103,16 @@ class OrganizationService {
    * @returns {Promise<Object>} Organización actualizada
    */
   async updateOrganization(organizationId, updateData, userId) {
-    const organization = await Organization.findById(organizationId);
+    const organization = await organizationRepository.findById(organizationId);
 
     if (!organization) {
-      throw new Error('Organización no encontrada');
+      throw new Error('Organization not found');
     }
 
-    // Verificar permisos
     if (!organization.isAdmin(userId)) {
       throw new Error('No tienes permisos para actualizar esta organización');
     }
 
-    // Campos que no se pueden actualizar directamente
     const protectedFields = ['admin', 'employees', 'additionalAdmins', 'createdAt'];
     protectedFields.forEach(field => delete updateData[field]);
 
@@ -120,7 +133,7 @@ class OrganizationService {
    * @returns {Promise<Array>} Lista de organizaciones
    */
   async getOrganizationsByAdmin(userId) {
-    const organizations = await Organization.findByAdmin(userId);
+    const organizations = await organizationRepository.findByAdmin(userId);
     return organizations;
   }
 
@@ -130,7 +143,7 @@ class OrganizationService {
    * @returns {Promise<Array>} Lista de organizaciones
    */
   async getOrganizationsByEmployee(userId) {
-    const organizations = await Organization.findByEmployee(userId);
+    const organizations = await organizationRepository.find({ 'employees.user': userId });
     return organizations;
   }
 
@@ -151,7 +164,7 @@ class OrganizationService {
     }
 
     // Verificar que el usuario existe
-    const user = await User.findById(userId);
+    const user = await userRepository.findById(userId);
     if (!user) {
       throw new Error('Usuario no encontrado');
     }
@@ -171,7 +184,7 @@ class OrganizationService {
     });
 
     // Notificar sobre el test BFI-44 si no lo ha completado
-    const hasProfile = await BFI44Response.hasProfile(user._id);
+    const hasProfile = await bfi44Repository.userHasCompleted(user._id);
     if (!hasProfile) {
       bfi44NotificationHelper.notifyTestPending(user._id, user.name).catch(err => {
         console.error('Error enviando notificación de test BFI-44:', err);
@@ -191,13 +204,11 @@ class OrganizationService {
   async removeEmployee(organizationId, userId, adminId) {
     const organization = await this.getOrganizationById(organizationId);
 
-    // Verificar permisos
     if (!organization.isAdmin(adminId)) {
       throw new Error('No tienes permisos para remover empleados');
     }
 
-    // Obtener usuario antes de remover
-    const user = await User.findById(userId);
+    const user = await userRepository.findById(userId);
 
     await organization.removeEmployee(userId);
 
@@ -222,15 +233,13 @@ class OrganizationService {
   async updateEmployeeStatus(organizationId, userId, newStatus, adminId) {
     const organization = await this.getOrganizationById(organizationId);
 
-    // Verificar permisos
     if (!organization.isAdmin(adminId)) {
       throw new Error('No tienes permisos para actualizar el estado de empleados');
     }
 
     await organization.updateEmployeeStatus(userId, newStatus);
 
-    // Obtener usuario para notificar
-    const user = await User.findById(userId);
+    const user = await userRepository.findById(userId);
     if (user) {
       organizationNotificationHelper.notifyEmployeeStatusChanged(organization, user, newStatus).catch(err => {
         console.error('Error enviando notificación de cambio de estado:', err);
@@ -256,7 +265,7 @@ class OrganizationService {
     }
 
     // Verificar que el usuario existe
-    const user = await User.findById(newAdminId);
+    const user = await userRepository.findById(newAdminId);
     if (!user) {
       throw new Error('Usuario no encontrado');
     }
@@ -287,11 +296,11 @@ class OrganizationService {
    * @returns {Promise<Array>} Lista de empleados
    */
   async getEmployees(organizationId, filters = {}, userId) {
+    const { cvRepository } = require('../repositories');
     const organization = await this.getOrganizationById(organizationId, true);
 
-    // Verificar permisos
     if (!organization.isAdmin(userId) && !organization.isEmployee(userId)) {
-      throw new Error('No tienes permisos para ver los empleados de esta organización');
+      throw new Error('You do not have permission to view employees of this organization');
     }
 
     // Filter out employees with null user (deleted users)
@@ -314,7 +323,60 @@ class OrganizationService {
       );
     }
 
-    return employees;
+    const employeeUserIds = employees.map(emp => emp.user._id);
+    const cvs = await cvRepository.find({
+      userId: { $in: employeeUserIds },
+      organization: organizationId,
+      organizationStatus: 'accepted'
+    });
+
+    const bfi44Responses = await bfi44Repository.find(
+      { user: { $in: employeeUserIds } },
+      { select: 'user results completedAt' }
+    );
+
+    // Crear un mapa de userId -> CV para búsqueda rápida
+    const cvMap = new Map();
+    cvs.forEach(cv => {
+      cvMap.set(cv.userId.toString(), cv);
+    });
+
+    // Crear un mapa de userId -> último perfil BFI-44 (por completedAt)
+    const bfi44Map = new Map();
+    for (const response of bfi44Responses) {
+      const key = response.user.toString();
+      const existing = bfi44Map.get(key);
+      if (!existing) {
+        bfi44Map.set(key, response);
+        continue;
+      }
+      const existingCompletedAt = existing.completedAt ? new Date(existing.completedAt).getTime() : 0;
+      const candidateCompletedAt = response.completedAt ? new Date(response.completedAt).getTime() : 0;
+      if (candidateCompletedAt >= existingCompletedAt) {
+        bfi44Map.set(key, response);
+      }
+    }
+
+    // Agregar el CV a cada empleado
+    const employeesWithCV = employees.map(emp => {
+      const employeeObj = emp.toObject ? emp.toObject() : emp;
+      const cv = cvMap.get(emp.user._id.toString());
+      const stableProfile = toStableBfi44Profile(bfi44Map.get(emp.user._id.toString())?.results || null);
+      
+      return {
+        ...employeeObj,
+        user: employeeObj.user
+          ? {
+              ...employeeObj.user,
+              bfi44Profile: stableProfile
+            }
+          : employeeObj.user,
+        cv: cv || null,
+        hasCv: !!cv
+      };
+    });
+
+    return employeesWithCV;
   }
 
   /**
@@ -355,12 +417,16 @@ class OrganizationService {
     const sortOptions = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
     const [organizations, total] = await Promise.all([
-      Organization.find(query)
-        .populate('admin', 'name email avatar')
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(limit),
-      Organization.countDocuments(query)
+      organizationRepository.find(
+        query,
+        {
+          populate: [{ path: 'admin', select: 'name email avatar' }],
+          sort: sortOptions,
+          skip,
+          limit
+        }
+      ),
+      organizationRepository.count(query)
     ]);
 
     return {
@@ -385,7 +451,7 @@ class OrganizationService {
 
     // Solo el administrador principal puede desactivar
     if (organization.admin.toString() !== adminId.toString()) {
-      throw new Error('Solo el administrador principal puede desactivar la organización');
+      throw new Error('Only the main administrator can deactivate the organization');
     }
 
     organization.status = 'inactive';
@@ -406,7 +472,7 @@ class OrganizationService {
 
     // Solo el administrador principal puede reactivar
     if (organization.admin.toString() !== adminId.toString()) {
-      throw new Error('Solo el administrador principal puede reactivar la organización');
+      throw new Error('Only the main administrator can reactivate the organization');
     }
 
     organization.status = 'active';
@@ -428,7 +494,7 @@ class OrganizationService {
 
     // Verificar permisos
     if (!organization.isAdmin(adminId)) {
-      throw new Error('No tienes permisos para actualizar la configuración');
+      throw new Error('You do not have permission to update the configuration');
     }
 
     // Actualizar solo los campos de settings proporcionados
@@ -455,7 +521,7 @@ class OrganizationService {
 
     // Verificar permisos
     if (!organization.isAdmin(userId)) {
-      throw new Error('No tienes permisos para ver las estadísticas');
+      throw new Error('You do not have permission to view the statistics');
     }
 
     const stats = {
@@ -484,33 +550,29 @@ class OrganizationService {
    * @returns {Promise<Object>} Organización actualizada
    */
   async setProjectManagerRole(organizationId, employeeId, isProjectManager, adminId) {
-    const organization = await Organization.findById(organizationId);
+    const organization = await organizationRepository.findById(organizationId);
 
     if (!organization) {
-      throw new Error('Organización no encontrada');
+      throw new Error('Organization not found');
     }
 
-    // Verificar permisos - solo administradores pueden asignar jefes de proyecto
     if (!organization.isAdmin(adminId)) {
-      throw new Error('No tienes permisos para asignar jefes de proyecto');
+      throw new Error('You do not have permission to assign project managers');
     }
 
-    // Verificar que el empleado pertenece a la organización
     if (!organization.isEmployee(employeeId)) {
-      throw new Error('El empleado no pertenece a esta organización');
+      throw new Error('Employee does not belong to this organization');
     }
 
-    // Asignar/remover el rol
     await organization.setProjectManagerRole(employeeId, isProjectManager);
 
-    // Poblar los datos
     await organization.populate('admin', 'name email avatar');
     await organization.populate('additionalAdmins', 'name email avatar');
     await organization.populate('employees.user', 'name email avatar');
 
     // Enviar notificación al empleado
     try {
-      const employee = await User.findById(employeeId);
+      const employee = await userRepository.findById(employeeId);
       if (employee) {
         await organizationNotificationHelper.notifyProjectManagerRoleChanged(
           organization,
@@ -531,11 +593,13 @@ class OrganizationService {
    * @returns {Promise<Array>} Lista de jefes de proyecto
    */
   async getProjectManagers(organizationId) {
-    const organization = await Organization.findById(organizationId)
-      .populate('employees.user', 'name email avatar');
+    const organization = await organizationRepository.findById(
+      organizationId,
+      { populate: [{ path: 'employees.user', select: 'name email avatar' }] }
+    );
 
     if (!organization) {
-      throw new Error('Organización no encontrada');
+      throw new Error('Organization not found');
     }
 
     const projectManagers = organization.employees

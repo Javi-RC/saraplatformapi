@@ -35,6 +35,10 @@ class AppError extends Error {
   static conflict(code, message, details) {
     return new AppError(code, 409, message, details);
   }
+
+  static tooManyRequests(code, message, details) {
+    return new AppError(code, 429, message, details);
+  }
 }
 
 module.exports = AppError;

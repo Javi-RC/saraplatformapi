@@ -22,7 +22,7 @@ class OrganizationController {
 
       return res.status(201).json({
         success: true,
-        message: 'Organización creada exitosamente',
+        message: 'Organization created successfully',
         data: organization
       });
     } catch (error) {
@@ -42,11 +42,13 @@ class OrganizationController {
   async getOrganization(req, res) {
     try {
       const { id } = req.params;
+      const userId = req.user.id;
       const includeEmployees = req.query.includeEmployees === 'true';
 
       const organization = await organizationService.getOrganizationById(
         id,
-        includeEmployees
+        includeEmployees,
+        userId
       );
 
       return res.status(200).json({
@@ -55,10 +57,23 @@ class OrganizationController {
       });
     } catch (error) {
       console.error('Error al obtener organización:', error);
-      const statusCode = error.message.includes('no encontrada') ? 404 : 400;
+      
+      const errorMessages = {
+        'Organization not found': 'Organización no encontrada',
+        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver esta organización'
+      };
+      
+      const statusCodes = {
+        'Organization not found': 404,
+        'UNAUTHORIZED_ACCESS': 403
+      };
+      
+      const message = errorMessages[error.message] || error.message;
+      const statusCode = statusCodes[error.message] || 400;
+      
       return res.status(statusCode).json({
         success: false,
-        error: error.message
+        error: message
       });
     }
   }
@@ -81,7 +96,7 @@ class OrganizationController {
 
       return res.status(200).json({
         success: true,
-        message: 'Organización actualizada exitosamente',
+        message: 'Organization updated successfully',
         data: organization
       });
     } catch (error) {
@@ -139,7 +154,7 @@ class OrganizationController {
       if (!userId) {
         return res.status(400).json({
           success: false,
-          error: 'Se requiere el ID del usuario'
+          error: 'User ID is required'
         });
       }
 
@@ -152,7 +167,7 @@ class OrganizationController {
 
       return res.status(201).json({
         success: true,
-        message: 'Empleado agregado exitosamente',
+        message: 'Employee added successfully',
         data: organization
       });
     } catch (error) {
@@ -183,7 +198,7 @@ class OrganizationController {
 
       return res.status(200).json({
         success: true,
-        message: 'Empleado removido exitosamente',
+        message: 'Employee removed successfully',
         data: organization
       });
     } catch (error) {
@@ -223,7 +238,7 @@ class OrganizationController {
 
       return res.status(200).json({
         success: true,
-        message: 'Estado del empleado actualizado exitosamente',
+        message: 'Employee status updated successfully',
         data: organization
       });
     } catch (error) {
@@ -250,7 +265,7 @@ class OrganizationController {
       if (!userId) {
         return res.status(400).json({
           success: false,
-          error: 'Se requiere el ID del usuario'
+          error: 'User ID is required'
         });
       }
 
@@ -262,7 +277,7 @@ class OrganizationController {
 
       return res.status(201).json({
         success: true,
-        message: 'Administrador agregado exitosamente',
+        message: 'Administrator added successfully',
         data: organization
       });
     } catch (error) {
@@ -355,7 +370,7 @@ class OrganizationController {
 
       return res.status(200).json({
         success: true,
-        message: 'Organización desactivada exitosamente',
+        message: 'Organization deactivated successfully',
         data: organization
       });
     } catch (error) {
@@ -382,7 +397,7 @@ class OrganizationController {
 
       return res.status(200).json({
         success: true,
-        message: 'Organización activada exitosamente',
+        message: 'Organization activated successfully',
         data: organization
       });
     } catch (error) {
@@ -414,7 +429,7 @@ class OrganizationController {
 
       return res.status(200).json({
         success: true,
-        message: 'Configuración actualizada exitosamente',
+        message: 'Settings updated successfully',
         data: organization
       });
     } catch (error) {
@@ -481,8 +496,8 @@ class OrganizationController {
       return res.status(200).json({
         success: true,
         message: isProjectManager 
-          ? 'Empleado asignado como jefe de proyecto exitosamente'
-          : 'Rol de jefe de proyecto removido exitosamente',
+          ? 'Employee assigned as project manager successfully'
+          : 'Project manager role removed successfully',
         data: organization
       });
     } catch (error) {

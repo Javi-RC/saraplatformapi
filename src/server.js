@@ -3,19 +3,17 @@ const connectDB = require('./config/db');
 const CleanupUnverifiedUsersJob = require('./jobs/cleanupUnverifiedUsers');
 
 const PORT = process.env.PORT || 3000;
+const UNVERIFIED_USERS_EXPIRY_HOURS = 48;
+const UNVERIFIED_USERS_CLEANUP_INTERVAL_HOURS = 6;
 
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Servidor corriendo en http://localhost:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      
-      // Start cleanup job for unverified users
-      const cleanupJob = new CleanupUnverifiedUsersJob(48); // 48 hours expiry
-      cleanupJob.start(6); // Run every 6 hours
+      const cleanupJob = new CleanupUnverifiedUsersJob(UNVERIFIED_USERS_EXPIRY_HOURS);
+      cleanupJob.start(UNVERIFIED_USERS_CLEANUP_INTERVAL_HOURS);
     });
   })
   .catch((err) => {
-    console.error('No se pudo iniciar el servidor:', err);
+    console.error('Could not start server:', err);
     process.exit(1);
   });

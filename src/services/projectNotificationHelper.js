@@ -38,7 +38,6 @@ class ProjectNotificationHelper {
       const adminsToNotify = adminIds.filter(adminId => adminId !== projectManagerId);
 
       if (adminsToNotify.length === 0) {
-        console.log('No administrators to notify about project creation');
         return;
       }
 
@@ -65,7 +64,6 @@ class ProjectNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Project creation notifications sent to ${adminsToNotify.length} administrators`);
     } catch (error) {
       console.error('Error notifying project creation:', error);
     }
@@ -119,7 +117,6 @@ class ProjectNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Project update notifications sent to ${allRecipients.length} users`);
     } catch (error) {
       console.error('Error notifying project update:', error);
     }
@@ -164,7 +161,6 @@ class ProjectNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Project deletion notifications sent to ${recipients.length} users`);
     } catch (error) {
       console.error('Error notifying project deletion:', error);
     }
@@ -214,7 +210,6 @@ class ProjectNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Project activation notifications sent to ${recipients.length} users`);
     } catch (error) {
       console.error('Error notifying project activation:', error);
     }
@@ -266,7 +261,6 @@ class ProjectNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Project completion notifications sent to ${recipients.length} users`);
     } catch (error) {
       console.error('Error notifying project completion:', error);
     }
@@ -318,7 +312,6 @@ class ProjectNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Project cancellation notifications sent to ${recipients.length} users`);
     } catch (error) {
       console.error('Error notifying project cancellation:', error);
     }
@@ -354,7 +347,6 @@ class ProjectNotificationHelper {
         actionText: 'View project'
       });
 
-      console.log(`Assignment notification sent to employee ${employee.name || employee.email}`);
     } catch (error) {
       console.error('Error notifying employee assignment:', error);
     }
@@ -386,7 +378,6 @@ class ProjectNotificationHelper {
         }
       });
 
-      console.log(`Removal notification sent to employee ${employee.name || employee.email}`);
     } catch (error) {
       console.error('Error notifying employee removal:', error);
     }
@@ -411,35 +402,34 @@ class ProjectNotificationHelper {
       const allRecipients = [...new Set([projectManagerId, ...adminIds])];
 
       if (allRecipients.length === 0) {
-        console.log('No recipients for insufficient team notification');
         return;
       }
 
-      // Generar descripción detallada
+      // Generate detailed description
       const description = [
-        `El proyecto "${project.projectName}" requiere ${metadata.requestedSize} empleados pero solo hay ${metadata.selectedSize} disponibles.`,
-        `Faltan ${metadata.shortage} miembro(s) del equipo.`,
+        `The project "${project.projectName}" requires ${metadata.requestedSize} employees but only ${metadata.selectedSize} are available.`,
+        `${metadata.shortage} team member(s) are missing.`,
         metadata.employeesWithAcceptedCV < metadata.allEmployeesInOrg 
-          ? `Hay ${metadata.allEmployeesInOrg - metadata.employeesWithAcceptedCV} empleado(s) en la organización sin CV aceptado.`
+          ? `There are ${metadata.allEmployeesInOrg - metadata.employeesWithAcceptedCV} employee(s) in the organization without accepted CV.`
           : null,
         summary.skillsGaps && summary.skillsGaps.length > 0
-          ? `Tecnologías no cubiertas: ${summary.skillsGaps.join(', ')}`
+          ? `Technologies not covered: ${summary.skillsGaps.join(', ')}`
           : null
       ].filter(Boolean).join(' ');
 
       const recommendations = [
-        '• Considerar contratar nuevos empleados',
-        '• Reducir el alcance del proyecto',
-        '• Extender los plazos de entrega',
-        '• Revisar CVs pendientes de aprobación',
-        '• Evaluar disponibilidad de empleados en otros proyectos'
+        '• Consider hiring new employees',
+        '• Reduce project scope',
+        '• Extend delivery timelines',
+        '• Review pending CV approvals',
+        '• Evaluate employee availability in other projects'
       ].join('\n');
 
       const notificationPromises = allRecipients.map(recipientId =>
         notificationService.create({
           recipientId: recipientId,
-          type: NotificationTypes.PROJECT_UPDATED, // O crear nuevo tipo PROJECT_INSUFFICIENT_TEAM
-          title: '⚠️ Equipo Insuficiente para Proyecto',
+          type: NotificationTypes.PROJECT_UPDATED, // Or create new type PROJECT_INSUFFICIENT_TEAM
+          title: '⚠️ Insufficient Team for Project',
           message: description,
           channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
           priority: metadata.shortage >= metadata.requestedSize * 0.5 
@@ -467,7 +457,6 @@ class ProjectNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Insufficient team notifications sent to ${allRecipients.length} recipients`);
     } catch (error) {
       console.error('Error notifying insufficient team:', error);
     }

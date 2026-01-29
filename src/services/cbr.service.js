@@ -5,7 +5,7 @@
  */
 
 const CaseBase = require('../models/caseBase.model');
-const { DIMENSION_WEIGHTS } = require('./decisionTree.service');
+const { getConfigSection } = require('../config/teamSelectionDefaults');
 
 /**
  * Maximum difference values for numeric normalization
@@ -26,8 +26,21 @@ const MAX_DIFFERENCES = {
  */
 async function predictRisksWithCBR(project, organizationId, k = 5, teamAnalysis = null) {
   try {
-    // Step 1: RETRIEVE similar cases (pass team analysis)
-    const similarCases = await retrieveSimilarCases(project, organizationId, k, teamAnalysis);
+    // Get CBR configuration from project with defaults
+    const cbrConfig = getConfigSection(project, 'cbr');
+    const kCases = cbrConfig.kSimilarCases || k;
+    const minSimilarity = cbrConfig.minSimilarityThreshold || 0.3;
+    
+    console.log(`[CBR] Configuration:`, {
+      projectId: project._id,
+      projectName: project.projectName,
+      kCases,
+      minSimilarity,
+      hasCustomConfig: !!project.teamSelectionConfig,
+      cbrConfig: project.teamSelectionConfig?.cbr
+    });
+    
+    const similarCases = await retrieveSimilarCases(project, organizationId, kCases, teamAnalysis, minSimilarity);
     
     if (!similarCases || similarCases.length === 0) {
       return {
@@ -37,10 +50,8 @@ async function predictRisksWithCBR(project, organizationId, k = 5, teamAnalysis 
       };
     }
     
-    // Step 2: REUSE solutions from similar cases
     const predictedRisks = reuseSolution(similarCases, project);
     
-    // Step 3: Calculate overall confidence
     const confidence = calculateCBRConfidence(similarCases, organizationId);
     
     return {
@@ -64,15 +75,13 @@ async function predictRisksWithCBR(project, organizationId, k = 5, teamAnalysis 
   }
 }
 
-// ============================================
-// PHASE 1: RETRIEVE - Find Similar Cases
-// ============================================
-
 /**
  * Retrieve K most similar cases from the case base
- * NOW ACCEPTS: teamAnalysis parameter
+ * NOW ACCEPTS: teamAnalysis parameter and minSimilarity threshold
  */
-async function retrieveSimilarCases(project, organizationId, k = 5, teamAnalysis = null) {
+async function retrieveSimilarCases(project, organizationId, k = 5, teamAnalysis = null, minSimilarity = 0.3) {
+  console.log(`[CBR] Retrieving cases for organizationId: ${organizationId}, minSimilarity: ${minSimilarity}`);
+  
   // Get all cases for the organization (real + seed)
   const realCases = await CaseBase.find({
     organization: organizationId,
@@ -82,6 +91,8 @@ async function retrieveSimilarCases(project, organizationId, k = 5, teamAnalysis
   const seedCases = await CaseBase.find({
     type: 'seed'
   });
+  
+  console.log(`[CBR] Found ${realCases.length} real cases and ${seedCases.length} seed cases`);
   
   // Extract features from the current project (with team analysis)
   const projectFeatures = extractProjectFeatures(project, teamAnalysis);
@@ -100,16 +111,16 @@ async function retrieveSimilarCases(project, organizationId, k = 5, teamAnalysis
     };
   });
   
-  // Calculate similarity for seed cases (with reduced weight)
+  // Calculate similarity for seed cases
   const similaritiesSeeds = seedCases.map(caseDoc => {
     const similarity = calculateSimilarity(projectFeatures, caseDoc.problem.features);
     const breakdown = getSimilarityBreakdown(projectFeatures, caseDoc.problem.features);
     
     return {
       case: caseDoc,
-      similarity: similarity * 0.6, // Reduce similarity by 40%
+      similarity,
       breakdown,
-      weight: 0.6,
+      weight: 1.0,
       isGeneric: true
     };
   });
@@ -118,10 +129,19 @@ async function retrieveSimilarCases(project, organizationId, k = 5, teamAnalysis
   const allSimilarities = [...similaritiesReal, ...similaritiesSeeds];
   allSimilarities.sort((a, b) => b.similarity - a.similarity);
   
-  // Filter by minimum similarity threshold (0.3) and take top K
+  console.log(`[CBR] Top 5 similarities:`, allSimilarities.slice(0, 5).map(s => ({
+    projectName: s.case.problem.projectName,
+    similarity: s.similarity.toFixed(3),
+    isGeneric: s.isGeneric
+  })));
+  
+  // Filter by minimum similarity threshold (from config) and take top K
+  // Using >= instead of > to allow exact matches when minSimilarity is 1.0
   const topCases = allSimilarities
-    .filter(s => s.similarity > 0.3)
+    .filter(s => s.similarity >= minSimilarity)
     .slice(0, k);
+  
+  console.log(`[CBR] After filtering (similarity >= ${minSimilarity}): ${topCases.length} cases selected`);
   
   // Mark cases as reused
   topCases.forEach(async (sc) => {
@@ -139,14 +159,14 @@ async function retrieveSimilarCases(project, organizationId, k = 5, teamAnalysis
  */
 function extractProjectFeatures(project, teamAnalysis = null) {
   return {
+    _project: project, // Store project reference to access configuration
     coordination: {
-      teamRegions: project.teamRegions || [],
+      involvedCountries: project.involvedCountries || [],
       timeOverlap: project.expectedTimeOverlap?.value || 24,
       requiresSyncComm: project.requiresSynchronousCommunication || 'no',
       weeklyMeetings: project.weeklyMeetingsCount || 0,
       culturalDiversity: project.culturalDiversityLevel || 'low',
       realTimeCommunicationLevel: project.realTimeCommunicationLevel || 'low',
-      // ===== NEW: Language barriers from CVs =====
       hasLanguageBarriers: teamAnalysis?.languages ? !teamAnalysis.languages.hasAllRequired : false,
       languageCoverage: teamAnalysis?.languages?.coverage || 0
     },
@@ -154,11 +174,9 @@ function extractProjectFeatures(project, teamAnalysis = null) {
     technical: {
       mainTechnologies: project.mainTechnologies || [],
       experienceLevel: project.requiredExperienceLevel || 'mid',
-      systemComplexity: project.systemComplexity || 'medium',
       documentationLevel: project.documentationLevel || 'partial',
       requiresSpecializedTools: project.requiresSpecializedTools?.needed || false,
       sharedInfrastructureDependency: project.sharedInfrastructureDependency || 'medium',
-      // ===== NEW: Actual team skills from CVs =====
       techMatchPercentage: teamAnalysis?.technicalMatch?.matchPercentage || 0,
       missingTechnologies: teamAnalysis?.technicalMatch?.missing?.length || 0,
       avgProficiency: teamAnalysis?.technicalMatch?.avgProficiency || 0
@@ -170,7 +188,6 @@ function extractProjectFeatures(project, teamAnalysis = null) {
       distributedExperience: project.distributedWorkExperienceLevel || 'medium',
       requiredLanguages: project.requiredLanguages || [],
       languageProficiency: project.minimumLanguageProficiency || 'B1',
-      // ===== NEW: Experience level from work history =====
       actualExperienceLevel: teamAnalysis?.experience?.overallLevel || 'mid',
       experienceGap: teamAnalysis?.experienceMatch?.gap || 0,
       juniorRatio: teamAnalysis?.experience?.distribution ? 
@@ -179,10 +196,8 @@ function extractProjectFeatures(project, teamAnalysis = null) {
           teamAnalysis.experience.distribution.mid + 
           teamAnalysis.experience.distribution.senior + 
           teamAnalysis.experience.distribution.expert)) : 0,
-      // ===== NEW: Workload from other projects =====
       isOverloaded: teamAnalysis?.workload?.isOverloaded || false,
       avgHoursPerWeek: teamAnalysis?.workload?.avgHoursPerWeek || 40,
-      // ===== NEW: Personality traits from BFI-44 =====
       avgConscientiousness: teamAnalysis?.personality?.traits?.Conscientiousness?.average || 3,
       avgOpenness: teamAnalysis?.personality?.traits?.Openness?.average || 3,
       personalityConcerns: teamAnalysis?.personality?.concerns?.length || 0
@@ -207,14 +222,26 @@ function extractProjectFeatures(project, teamAnalysis = null) {
 
 /**
  * Calculate overall similarity between two projects
+ * Uses dimension weights from project configuration (stored in features1.project)
  */
 function calculateSimilarity(features1, features2) {
   if (!features2) return 0;
   
+  // Get dimension weights from project configuration
+  const project = features1._project;
+  const cbrConfig = project ? getConfigSection(project, 'cbr') : null;
+  const dimensionWeights = cbrConfig?.dimensionWeights || {
+    coordination: 0.25,
+    technical: 0.30,
+    team: 0.20,
+    management: 0.15,
+    organizational: 0.10
+  };
+  
   let totalSimilarity = 0;
   
   // Calculate similarity for each dimension with its weight
-  for (const [dimension, weight] of Object.entries(DIMENSION_WEIGHTS)) {
+  for (const [dimension, weight] of Object.entries(dimensionWeights)) {
     if (features1[dimension] && features2[dimension]) {
       const dimSimilarity = calculateDimensionSimilarity(
         features1[dimension],
@@ -287,9 +314,20 @@ function calculateDimensionSimilarity(features1, features2, dimension) {
  * Get similarity breakdown by dimension
  */
 function getSimilarityBreakdown(features1, features2) {
+  // Get dimension weights from project configuration
+  const project = features1._project;
+  const cbrConfig = project ? getConfigSection(project, 'cbr') : null;
+  const dimensionWeights = cbrConfig?.dimensionWeights || {
+    coordination: 0.25,
+    technical: 0.30,
+    team: 0.20,
+    management: 0.15,
+    organizational: 0.10
+  };
+  
   const breakdown = {};
   
-  for (const dimension of Object.keys(DIMENSION_WEIGHTS)) {
+  for (const dimension of Object.keys(dimensionWeights)) {
     if (features1[dimension] && features2[dimension]) {
       breakdown[dimension] = calculateDimensionSimilarity(
         features1[dimension],
@@ -304,242 +342,102 @@ function getSimilarityBreakdown(features1, features2) {
   return breakdown;
 }
 
-// ============================================
-// PHASE 2: REUSE - Adapt Solutions
-// ============================================
-
 /**
  * Reuse solutions from similar cases to predict risks
  */
 function reuseSolution(similarCases, project) {
   if (!similarCases || similarCases.length === 0) {
+    console.log('[CBR] No similar cases to reuse');
     return [];
   }
   
-  // Aggregate risks from similar cases
-  const riskAggregation = {};
+  console.log(`[CBR] Reusing solutions from ${similarCases.length} similar cases (Nearest Neighbor approach)`);
   
-  similarCases.forEach(({ case: caseDoc, similarity, weight }) => {
+  // Group risks by type across all cases
+  const risksByType = {};
+  
+  similarCases.forEach(({ case: caseDoc, similarity }) => {
+    console.log(`[CBR]   Case: ${caseDoc.problem.projectName}, Similarity: ${similarity.toFixed(3)}, Risks: ${caseDoc.solution.actualRisks.length}`);
+    
     caseDoc.solution.actualRisks.forEach(risk => {
-      const key = `${risk.type}-${risk.severity}`;
-      
-      if (!riskAggregation[key]) {
-        riskAggregation[key] = {
-          type: risk.type,
-          severity: risk.severity,
-          category: getCategoryForRiskType(risk.type),
-          weightSum: 0,
-          examples: [],
-          impacts: [],
-          descriptions: []
-        };
+      if (!risksByType[risk.type]) {
+        risksByType[risk.type] = [];
       }
       
-      // Accumulate weight (similarity * case weight)
-      const effectiveWeight = similarity * weight;
-      riskAggregation[key].weightSum += effectiveWeight;
-      
-      // Collect examples
-      riskAggregation[key].examples.push({
+      risksByType[risk.type].push({
         caseId: caseDoc.caseId,
         projectName: caseDoc.problem.projectName,
         similarity,
-        description: risk.description,
-        rootCause: risk.rootCause,
-        impact: risk.actualImpact
+        risk: risk,
+        originalSource: risk.originalSource || 'unknown'
       });
-      
-      // Collect impacts for averaging
-      if (risk.actualImpact) {
-        riskAggregation[key].impacts.push(risk.actualImpact);
-      }
-      
-      // Collect descriptions
-      if (risk.description) {
-        riskAggregation[key].descriptions.push(risk.description);
-      }
     });
   });
   
-  // Calculate total weight for probability normalization
-  const totalWeight = similarCases.reduce((sum, sc) => 
-    sum + (sc.similarity * sc.weight), 0
-  );
+  console.log(`[CBR] Found ${Object.keys(risksByType).length} unique risk types across cases`);
   
-  // Convert aggregated risks to predictions
-  const predictedRisks = Object.values(riskAggregation).map(aggRisk => {
-    // Probability = accumulated weight / total weight
-    const probability = totalWeight > 0 ? aggRisk.weightSum / totalWeight : 0;
+  // For each risk type, use the one from the most similar case
+  const predictedRisks = [];
+  
+  Object.entries(risksByType).forEach(([riskType, occurrences]) => {
+    // Sort by similarity (highest first)
+    occurrences.sort((a, b) => b.similarity - a.similarity);
     
-    // Calculate confidence based on number of examples and agreement
-    const confidence = calculateRiskConfidence(aggRisk, similarCases.length);
+    // Take the risk from the most similar case
+    const primary = occurrences[0];
+    const otherCases = occurrences.slice(1);
     
-    // Generate recommendations from case history
-    const recommendations = generateRecommendationsFromCases(aggRisk.examples);
-    
-    // Calculate predicted impact from historical data
-    const predictedImpact = calculatePredictedImpact(aggRisk.impacts);
-    
-    // Generate title and description based on risk type
-    const title = generateRiskTitle(aggRisk.type);
-    const description = generateRiskDescription(aggRisk, aggRisk.examples.length);
-    
-    return {
-      type: aggRisk.type,
-      title,
-      description,
-      category: aggRisk.category,
-      severity: aggRisk.severity,
-      probability,
-      confidence,
-      source: 'cbr',
-      basedOnCases: aggRisk.examples.map(ex => ({
-        caseId: ex.caseId,
-        similarity: ex.similarity,
-        description: ex.description
-      })),
-      reasoning: generateReasoningFromCases(aggRisk.examples),
-      indicators: generateIndicatorsFromCases(aggRisk.examples),
-      predictedImpact,
-      recommendations,
-      earlyWarningSignals: []
-    };
-  });
-  
-  // Filter by minimum probability threshold and sort
-  return predictedRisks
-    .filter(r => r.probability > 0.3)
-    .sort((a, b) => b.probability - a.probability);
-}
-
-/**
- * Calculate confidence for a specific risk based on case evidence
- */
-function calculateRiskConfidence(aggRisk, totalCases) {
-  const exampleCount = aggRisk.examples.length;
-  
-  // Factor 1: Number of examples (more examples = higher confidence)
-  const coverageFactor = Math.min(exampleCount / totalCases, 1);
-  
-  // Factor 2: Similarity of examples (higher similarity = higher confidence)
-  const avgSimilarity = aggRisk.examples.reduce((sum, ex) => 
-    sum + ex.similarity, 0
-  ) / exampleCount;
-  
-  // Factor 3: Consistency (all examples have same severity = higher confidence)
-  const severities = new Set(aggRisk.examples.map(ex => ex.severity));
-  const consistencyFactor = 1 / severities.size;
-  
-  // Combined confidence
-  const confidence = (
-    coverageFactor * 0.4 +
-    avgSimilarity * 0.4 +
-    consistencyFactor * 0.2
-  );
-  
-  return Math.min(Math.max(confidence, 0.3), 0.95);
-}
-
-/**
- * Generate recommendations based on case history
- */
-function generateRecommendationsFromCases(examples) {
-  const recommendations = [];
-  
-  // Extract unique recommendations from successful mitigations
-  const mitigationStrategies = new Map();
-  
-  examples.forEach(ex => {
-    if (ex.impact && ex.impact.scheduleDelayDays < 10) {
-      // This case handled the risk well
-      recommendations.push(
-        `Basado en ${ex.projectName}: ${ex.rootCause || 'implementar mitigación temprana'}`
-      );
+    console.log(`[CBR]   Risk "${riskType}" from ${primary.projectName} (similarity: ${primary.similarity.toFixed(3)}, source: ${primary.originalSource})`);
+    if (otherCases.length > 0) {
+      console.log(`[CBR]     Also found in ${otherCases.length} other case(s)`);
     }
+    
+    predictedRisks.push({
+      type: primary.risk.type,
+      title: primary.risk.title,
+      description: primary.risk.description,
+      category: getCategoryForRiskType(primary.risk.type),
+      severity: primary.risk.severity,
+      similarity: primary.similarity,
+      source: 'cbr',
+      originalSource: primary.originalSource,
+      rootCause: primary.risk.rootCause,
+      basedOnCases: occurrences.map(occ => ({
+        caseId: occ.caseId,
+        projectName: occ.projectName,
+        similarity: occ.similarity,
+        description: occ.risk.description,
+        originalSource: occ.originalSource
+      })),
+      reasoning: [
+        `Basado en proyecto "${primary.projectName}" (similaridad: ${(primary.similarity * 100).toFixed(0)}%)`,
+        ...(otherCases.length > 0 ? [`También ocurrió en ${otherCases.length} proyecto(s) similar(es)`] : [])
+      ],
+      indicators: [
+        `Origen: ${primary.originalSource === 'manual' ? 'Identificado manualmente' : 'Predicho y confirmado'}`,
+        `Encontrado en ${occurrences.length} proyecto(s) similar(es)`
+      ],
+      recommendations: primary.risk.mitigationStrategies || [],
+      earlyWarningSignals: []
+    });
   });
   
-  // If no specific recommendations, add generic one
-  if (recommendations.length === 0) {
-    recommendations.push(
-      `Este riesgo ocurrió en ${examples.length} proyectos similares - requiere atención`
-    );
-  }
+  // Get minSimilarity from project configuration
+  const cbrConfig = getConfigSection(project, 'cbr');
+  const minSimilarity = cbrConfig.minSimilarityThreshold || 0.3;
   
-  return recommendations.slice(0, 5); // Max 5 recommendations
-}
-
-/**
- * Generate reasoning from case examples
- */
-function generateReasoningFromCases(examples) {
-  const reasoning = [];
+  // Filter by minimum similarity threshold and sort by similarity
+  const filtered = predictedRisks
+    .filter(r => r.similarity >= minSimilarity)
+    .sort((a, b) => b.similarity - a.similarity);
   
-  // Top 3 most similar cases
-  const topCases = examples
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, 3);
-  
-  topCases.forEach((ex, idx) => {
-    reasoning.push(
-      `Caso ${idx + 1}: "${ex.projectName}" (similaridad ${(ex.similarity * 100).toFixed(0)}%) - ${ex.description}`
-    );
+  console.log(`[CBR] After filtering (similarity >= ${minSimilarity}): ${filtered.length} risks returned`);
+  filtered.forEach(r => {
+    console.log(`[CBR]   - ${r.type}: similarity=${r.similarity.toFixed(3)}, from ${r.basedOnCases[0].projectName}`);
   });
   
-  return reasoning;
+  return filtered;
 }
-
-/**
- * Generate indicators from case examples
- */
-function generateIndicatorsFromCases(examples) {
-  return [
-    `Basado en ${examples.length} casos similares`,
-    `Similaridad promedio: ${(examples.reduce((sum, ex) => sum + ex.similarity, 0) / examples.length * 100).toFixed(0)}%`,
-    `Rango de impacto histórico: ${getImpactRange(examples)}`
-  ];
-}
-
-/**
- * Calculate predicted impact from historical impacts
- */
-function calculatePredictedImpact(impacts) {
-  if (!impacts || impacts.length === 0) {
-    return {
-      scheduleDelay: { min: 5, max: 20, description: 'Sin datos históricos' },
-      budgetOverrun: { min: 10, max: 25, description: 'Sin datos históricos' },
-      qualityImpact: 'medium',
-      teamMoraleImpact: 'medium'
-    };
-  }
-  
-  // Calculate delay statistics
-  const delays = impacts
-    .filter(i => i.scheduleDelayDays)
-    .map(i => i.scheduleDelayDays);
-  
-  const budgets = impacts
-    .filter(i => i.budgetOverrunPercent)
-    .map(i => i.budgetOverrunPercent);
-  
-  return {
-    scheduleDelay: {
-      min: delays.length > 0 ? Math.min(...delays) : 5,
-      max: delays.length > 0 ? Math.max(...delays) : 20,
-      description: `Basado en ${delays.length} casos históricos`
-    },
-    budgetOverrun: {
-      min: budgets.length > 0 ? Math.min(...budgets) : 10,
-      max: budgets.length > 0 ? Math.max(...budgets) : 25,
-      description: `Basado en ${budgets.length} casos históricos`
-    },
-    qualityImpact: getMostCommonQualityImpact(impacts),
-    teamMoraleImpact: 'medium'
-  };
-}
-
-// ============================================
-// PHASE 3: REVISE - Validate and Adapt
-// ============================================
 
 /**
  * Revise CBR predictions with decision tree rules
@@ -555,7 +453,6 @@ function reviseWithTreeRules(cbrRisks, treeRisks) {
       revisedRisks.push({
         ...treeRisk,
         source: 'decision_tree',
-        confidence: Math.min(treeRisk.confidence || 0.6, 0.7), // Lower confidence
         note: 'Detectado por reglas expertas (no visto en casos similares)'
       });
     }
@@ -563,10 +460,6 @@ function reviseWithTreeRules(cbrRisks, treeRisks) {
   
   return revisedRisks;
 }
-
-// ============================================
-// PHASE 4: RETAIN - Store New Case
-// ============================================
 
 /**
  * Create a new case from a completed project
@@ -577,7 +470,12 @@ async function retainCase(project, postProjectData, organization) {
   // Check if case already exists for this project
   let existingCase = await CaseBase.findOne({ caseId: project._id });
   
+  console.log(`[CBR] Retaining case for project ${project.projectName} (${project._id})`);
+  console.log(`[CBR]   Organization: ${organization._id}`);
+  console.log(`[CBR]   Actual risks: ${postProjectData.actualRisks?.length || 0}`);
+  
   if (existingCase) {
+    console.log(`[CBR]   Updating existing case`);
     // Update existing case instead of creating a new one
     existingCase.problem = {
       projectName: project.projectName,
@@ -610,6 +508,7 @@ async function retainCase(project, postProjectData, organization) {
     existingCase.updatedAt = new Date();
     
     await existingCase.save();
+    console.log(`[CBR]   Case updated successfully with ${existingCase.solution.actualRisks.length} actual risks`);
     
     return existingCase;
   }
@@ -658,13 +557,11 @@ async function retainCase(project, postProjectData, organization) {
   });
   
   await newCase.save();
+  console.log(`[CBR]   New case created successfully with ${newCase.solution.actualRisks.length} actual risks`);
   
   return newCase;
 }
-
-// ============================================
 // CBR System Confidence
-// ============================================
 
 /**
  * Calculate overall CBR system confidence
@@ -690,16 +587,12 @@ async function calculateCBRConfidence(similarCases, organizationId) {
   // Factor 4: Recency (how fresh are the cases)
   const recencyScore = calculateRecency(similarCases);
   
-  // Factor 5: Track record (historical accuracy)
-  const trackRecordScore = caseBaseStats.avgQualityScore || 0.5;
-  
-  // Weighted combination
+  // Weighted combination (redistributed without trackRecordScore)
   const confidence = (
-    caseQualityScore * 0.30 +
-    coverageScore * 0.20 +
-    consensusScore * 0.20 +
-    recencyScore * 0.15 +
-    trackRecordScore * 0.15
+    caseQualityScore * 0.35 +
+    coverageScore * 0.25 +
+    consensusScore * 0.25 +
+    recencyScore * 0.15
   );
   
   return Math.min(Math.max(confidence, 0), 1);
@@ -747,10 +640,7 @@ function calculateRecency(similarCases) {
   // Score decreases as average age increases (decay over 36 months)
   return Math.max(0, 1 - (avgAge / 36));
 }
-
-// ============================================
 // Helper Functions
-// ============================================
 
 function getMaxDifference(key, dimension) {
   return MAX_DIFFERENCES[key] || 10;
@@ -811,8 +701,8 @@ function extractTags(project, postProjectData) {
     tags.push(...project.mainTechnologies.slice(0, 3));
   }
   
-  // Add complexity tag
-  tags.push(project.systemComplexity);
+  // Add experience level tag
+  tags.push(project.requiredExperienceLevel || 'mid');
   
   // Add outcome tags
   if (postProjectData) {
@@ -822,7 +712,7 @@ function extractTags(project, postProjectData) {
   }
   
   // Add distributed tag
-  if (project.teamRegions && project.teamRegions.length > 1) {
+  if (project.involvedCountries && project.involvedCountries.length > 1) {
     tags.push('distributed');
   }
   
@@ -859,64 +749,6 @@ function getMostCommonQualityImpact(impacts) {
   return Object.keys(counts).reduce((a, b) => 
     counts[a] > counts[b] ? a : b
   );
-}
-
-/**
- * Generate a human-readable title for a risk type
- */
-function generateRiskTitle(riskType) {
-  const titles = {
-    'communication_breakdown': 'Barreras de Comunicación',
-    'skill_gap': 'Brecha de Habilidades Técnicas',
-    'team_overload': 'Sobrecarga del Equipo',
-    'dependency_blockage': 'Bloqueos por Dependencias',
-    'scope_creep': 'Alcance Inestable (Scope Creep)',
-    'process_mismatch': 'Procesos Inadecuados',
-    'technical_infrastructure': 'Infraestructura Técnica Deficiente',
-    'quality_degradation': 'Degradación de Calidad',
-    'vendor_issue': 'Problemas con Proveedores',
-    'security_compliance': 'Incumplimiento de Seguridad',
-    'budget_overrun': 'Sobrecosto Presupuestario',
-    'resource_unavailability': 'Recursos No Disponibles',
-    'knowledge_management_gap': 'Brecha en Gestión del Conocimiento',
-    'remote_work_support_gap': 'Soporte Inadecuado para Trabajo Remoto',
-    'role_clarity_gap': 'Falta de Claridad en Roles',
-    'standards_compliance_gap': 'Brecha en Cumplimiento de Estándares',
-    'timezone_scheduling_gap': 'Problemas de Programación por Zonas Horarias'
-  };
-  
-  return titles[riskType] || 'Riesgo Detectado';
-}
-
-/**
- * Generate a description based on similar cases
- */
-function generateRiskDescription(aggRisk, caseCount) {
-  const type = aggRisk.type;
-  const severity = aggRisk.severity;
-  
-  // Base description on case history
-  let baseDesc = `Riesgo detectado en ${caseCount} proyecto(s) similar(es)`;
-  
-  // Add type-specific details
-  if (type === 'communication_breakdown') {
-    baseDesc = `Problemas de comunicación reportados en ${caseCount} casos similares, resultando en coordinación ineficiente`;
-  } else if (type === 'skill_gap') {
-    baseDesc = `Brecha de habilidades identificada en ${caseCount} proyectos similares, impactando capacidad de ejecución`;
-  } else if (type === 'team_overload') {
-    baseDesc = `Sobrecarga de equipo documentada en ${caseCount} casos similares, causando burnout y retrasos`;
-  } else if (type === 'dependency_blockage') {
-    baseDesc = `Bloqueos por dependencias en ${caseCount} proyectos similares, generando retrasos en cascada`;
-  } else if (type === 'scope_creep') {
-    baseDesc = `Cambios de alcance no controlados en ${caseCount} casos históricos, aumentando costos y timeline`;
-  }
-  
-  // Add severity context
-  if (severity === 'high' || severity === 'critical') {
-    baseDesc += `. Requiere atención inmediata`;
-  }
-  
-  return baseDesc;
 }
 
 module.exports = {

@@ -10,6 +10,8 @@ const NotificationTypes = {
   
   // Notificaciones de cuenta
   ACCOUNT_UPDATED: 'account_updated',
+  ACCOUNT_DELETION_CONFIRMED: 'account_deletion_confirmed',
+  ACCOUNT_DELETION_REQUIREMENTS: 'account_deletion_requirements',
   ROLE_CHANGED: 'role_changed',
   
   // Notificaciones de CV
@@ -37,6 +39,10 @@ const NotificationTypes = {
   PROJECT_CANCELLED: 'project_cancelled',
   ASSIGNED_TO_PROJECT: 'assigned_to_project',
   REMOVED_FROM_PROJECT: 'removed_from_project',
+  
+  // Notificaciones de BFI-44
+  BFI44_COMPLETED: 'bfi44_completed',
+  BFI44_REMINDER: 'bfi44_reminder',
   
   // Notificaciones administrativas
   ADMIN_ANNOUNCEMENT: 'admin_announcement',
@@ -303,9 +309,7 @@ notificationSchema.statics.getUserStats = async function(userId) {
   return result;
 };
 
-// Middleware pre-save para validaciones
 notificationSchema.pre('save', function(next) {
-  // Validar que si hay actionUrl, debe haber actionText
   if (this.actionUrl && !this.actionText) {
     this.actionText = 'Ver más';
   }

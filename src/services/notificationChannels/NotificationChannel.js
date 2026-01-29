@@ -12,7 +12,7 @@ class NotificationChannel {
    * @returns {Promise<Object>} Resultado del envío con status y detalles
    */
   async send(notification, recipient) {
-    throw new Error('El método send debe ser implementado por la clase hija');
+    throw new Error('The send method must be implemented by the child class');
   }
 
   /**
@@ -30,7 +30,7 @@ class NotificationChannel {
    * @returns {string}
    */
   getChannelType() {
-    throw new Error('El método getChannelType debe ser implementado por la clase hija');
+    throw new Error('The getChannelType method must be implemented by the child class');
   }
 }
 

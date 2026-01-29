@@ -4,7 +4,6 @@ class ResponseHandler {
   handleError(error, res) {
     console.error('Controller Error:', error);
 
-    // Prefer structured application errors
     if (error && (error.name === 'AppError' || error.code)) {
       const status = Number(error.status || error.statusCode) || 500;
       const code = error.code || error.message || 'INTERNAL_ERROR';
@@ -30,13 +29,11 @@ class ResponseHandler {
       'MISSING_EMAIL_OR_NAME': { status: 400, message: 'Email and name are required' },
       'ERROR_PROCESSING_CV': { status: 500, message: 'Error processing the CV. Check the Gemini API configuration.' },
       'CV_NOT_FOUND': { status: 404, message: 'CV not found' },
-      // BFI-44 Errors
       'INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
       'BFI44_INVALID_RESPONSES_FORMAT': { status: 400, message: 'Invalid responses format' },
       'BFI44_INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
       'BFI44_RESPONSE_NOT_FOUND': { status: 404, message: 'BFI-44 response not found' },
 
-      // Common plain-text errors currently thrown by services
       'Project not found': { status: 404, message: 'Project not found' },
       'Organization not found': { status: 404, message: 'Organization not found' },
       'Project manager not found': { status: 404, message: 'Project manager not found' },
@@ -44,7 +41,8 @@ class ResponseHandler {
       'Usuario receptor no encontrado': { status: 404, message: 'Notification recipient not found' }
     };
 
-    const errorInfo = errorMap[error.message] || { status: Number(error.statusCode) || 500, message: 'Internal server error' };
+    const errorMessage = error && error.message ? error.message : null;
+    const errorInfo = errorMap[errorMessage] || { status: Number(error && error.statusCode) || 500, message: 'Internal server error' };
     
     return res.status(errorInfo.status).json({
       success: false,

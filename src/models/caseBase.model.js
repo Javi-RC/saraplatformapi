@@ -6,21 +6,20 @@ const mongoose = require('mongoose');
  * Each case represents a completed project with its characteristics and outcomes
  */
 const caseBaseSchema = new mongoose.Schema({
-  // ============================================
-  // 1. Case Identification
-  // ============================================
   caseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
-    required: true,
-    unique: true,
-    index: true
+    required: function() {
+      return this.type !== 'seed';
+    }
   },
   
   organization: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
-    required: true,
+    required: function() {
+      return this.type !== 'seed';
+    },
     index: true
   },
   
@@ -37,10 +36,6 @@ const caseBaseSchema = new mongoose.Schema({
     enum: ['completed_project', 'literature', 'expert_knowledge', 'imported'],
     default: 'completed_project'
   },
-  
-  // ============================================
-  // 2. PROBLEM: Project Characteristics
-  // ============================================
   problem: {
     // General info
     projectName: String,
@@ -54,7 +49,7 @@ const caseBaseSchema = new mongoose.Schema({
     features: {
       // Coordination (weight: 0.25)
       coordination: {
-        teamRegions: [String],
+        involvedCountries: [String],
         timeOverlap: Number, // hours
         requiresSyncComm: String,
         weeklyMeetings: Number,
@@ -66,7 +61,6 @@ const caseBaseSchema = new mongoose.Schema({
       technical: {
         mainTechnologies: [String],
         experienceLevel: String,
-        systemComplexity: String,
         documentationLevel: String,
         requiresSpecializedTools: Boolean,
         sharedInfrastructureDependency: String
@@ -99,27 +93,11 @@ const caseBaseSchema = new mongoose.Schema({
       }
     }
   },
-  
-  // ============================================
-  // 3. SOLUTION: What Actually Happened
-  // ============================================
   solution: {
     // Outcome metrics
     completed: {
       type: Boolean,
       required: true
-    },
-    
-    onTime: Boolean,
-    
-    delayDays: {
-      type: Number,
-      default: 0
-    },
-    
-    budgetOverrun: {
-      type: Number, // percentage
-      default: 0
     },
     
     qualityScore: {
@@ -142,7 +120,10 @@ const caseBaseSchema = new mongoose.Schema({
     
     // Risks that materialized
     actualRisks: [{
-      type: String,
+      type: {
+        type: String
+      },
+      title: String,
       severity: {
         type: String,
         enum: ['low', 'medium', 'high', 'critical']
@@ -153,8 +134,6 @@ const caseBaseSchema = new mongoose.Schema({
       mitigatedAt: Date,
       rootCause: String,
       actualImpact: {
-        scheduleDelayDays: Number,
-        budgetOverrunPercent: Number,
         qualityImpact: String
       }
     }],
@@ -170,10 +149,6 @@ const caseBaseSchema = new mongoose.Schema({
       cicdStability: Number // 1-5
     }
   },
-  
-  // ============================================
-  // 4. RESULT: Lessons Learned
-  // ============================================
   result: {
     lessonsLearned: [{
       type: String,
@@ -197,15 +172,8 @@ const caseBaseSchema = new mongoose.Schema({
       type: String,
       trim: true,
       maxlength: [1000, 'Recommendation cannot exceed 1000 characters']
-    }],
-    
-    keySuccessFactors: [String],
-    keyFailureFactors: [String]
+    }]
   },
-  
-  // ============================================
-  // 5. Metadata and Statistics
-  // ============================================
   metadata: {
     createdAt: {
       type: Date,
@@ -251,10 +219,6 @@ const caseBaseSchema = new mongoose.Schema({
       avgAccuracyScore: Number
     }
   },
-  
-  // ============================================
-  // 6. Similarity Indexing (for faster retrieval)
-  // ============================================
   similarityIndex: {
     coordinationSignature: String,
     technicalSignature: String,
@@ -262,10 +226,6 @@ const caseBaseSchema = new mongoose.Schema({
     managementSignature: String,
     organizationalSignature: String
   },
-  
-  // ============================================
-  // 7. Feedback and Continuous Learning
-  // ============================================
   feedback: [{
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -296,20 +256,25 @@ const caseBaseSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// ============================================
-// Indexes for Fast Retrieval
-// ============================================
+// CaseId must be unique for non-seed cases. Seed cases may omit caseId.
+caseBaseSchema.index(
+  { caseId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      type: { $ne: 'seed' },
+      caseId: { $type: 'objectId' }
+    }
+  }
+);
+
 caseBaseSchema.index({ organization: 1, type: 1 });
 caseBaseSchema.index({ 'metadata.tags': 1 });
 caseBaseSchema.index({ 'metadata.timesReused': -1 });
 caseBaseSchema.index({ 'metadata.usefulnessScore': -1 });
 caseBaseSchema.index({ 'problem.features.technical.mainTechnologies': 1 });
-caseBaseSchema.index({ 'problem.features.coordination.teamRegions': 1 });
+caseBaseSchema.index({ 'problem.features.coordination.involvedCountries': 1 });
 caseBaseSchema.index({ 'similarityIndex.technicalSignature': 1 });
-
-// ============================================
-// Methods
-// ============================================
 
 /**
  * Mark case as reused (increment counter)
@@ -347,12 +312,10 @@ caseBaseSchema.methods.addFeedback = function(projectId, feedbackData) {
     providedAt: new Date()
   });
   
-  // Update overall usefulness score
   if (feedbackData.accuracyRating) {
     this.updateUsefulnessScore(feedbackData.accuracyRating);
   }
   
-  // Update prediction accuracy stats
   if (!this.metadata.predictionAccuracy) {
     this.metadata.predictionAccuracy = {
       timesUsedForPrediction: 0,
@@ -385,14 +348,14 @@ caseBaseSchema.methods.generateSimilaritySignature = function() {
   
   this.similarityIndex = {
     coordinationSignature: [
-      features.coordination.teamRegions?.length || 0,
+      features.coordination.involvedCountries?.length || 0,
       features.coordination.timeOverlap || 0,
       features.coordination.culturalDiversity || 'medium'
     ].join('|'),
     
     technicalSignature: [
       features.technical.mainTechnologies?.join(',') || '',
-      features.technical.systemComplexity || 'medium'
+      features.technical.experienceLevel || 'mid'
     ].join('|'),
     
     teamSignature: [
@@ -457,10 +420,6 @@ caseBaseSchema.methods.getQualityScore = function() {
   return factors > 0 ? score / factors : 0.5;
 };
 
-// ============================================
-// Statics
-// ============================================
-
 /**
  * Get all cases for an organization
  */
@@ -490,13 +449,23 @@ caseBaseSchema.statics.getSeedCases = function() {
  * Get statistics about the case base
  */
 caseBaseSchema.statics.getCaseBaseStats = async function(organizationId) {
-  const cases = await this.find({ organization: organizationId });
+  // Get organization-specific cases AND global seed cases
+  const realCases = await this.find({ 
+    organization: organizationId,
+    type: 'real'
+  });
+  
+  const seedCases = await this.find({ 
+    type: 'seed'
+  });
+  
+  const cases = [...realCases, ...seedCases];
   
   const stats = {
     total: cases.length,
     byType: {
-      real: cases.filter(c => c.type === 'real').length,
-      seed: cases.filter(c => c.type === 'seed').length,
+      real: realCases.length,
+      seed: seedCases.length,
       synthetic: cases.filter(c => c.type === 'synthetic').length
     },
     avgUsefulnessScore: 0,
@@ -562,10 +531,10 @@ caseBaseSchema.statics.getCaseBaseStats = async function(organizationId) {
     caseDoc.problem.features.technical.mainTechnologies?.forEach(tech => 
       uniqueTechs.add(tech)
     );
-    caseDoc.problem.features.coordination.teamRegions?.forEach(region => 
-      uniqueRegions.add(region)
+    caseDoc.problem.features.coordination.involvedCountries?.forEach(country => 
+      uniqueRegions.add(country)
     );
-    uniqueComplexities.add(caseDoc.problem.features.technical.systemComplexity);
+    uniqueComplexities.add(caseDoc.problem.features.technical.experienceLevel);
   });
   
   // Diversity = average of unique values across dimensions
@@ -595,10 +564,7 @@ caseBaseSchema.statics.findSimilar = async function(projectFeatures, organizatio
   
   return qualityCases.slice(0, limit);
 };
-
-// ============================================
 // Pre-save hook
-// ============================================
 caseBaseSchema.pre('save', function(next) {
   // Generate similarity signature if not exists
   if (!this.similarityIndex || !this.similarityIndex.technicalSignature) {

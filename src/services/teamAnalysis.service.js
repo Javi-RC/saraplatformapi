@@ -2,6 +2,8 @@
  * Team Analysis Service
  * Analyzes team composition, skills, experience, personality and organization context
  * Used by Decision Tree and CBR services for accurate risk prediction
+ * 
+ * Enhanced with personality synergy analysis for better team insights
  */
 
 const User = require('../models/user.model');
@@ -9,6 +11,8 @@ const CV = require('../models/cv.model');
 const BFI44 = require('../models/bfi44.model');
 const Organization = require('../models/organization.model');
 const Project = require('../models/project.model');
+const teamSynergyService = require('./teamSynergy.service');
+const { getConfigSection } = require('../config/teamSelectionDefaults');
 
 /**
  * Helper function to extract organization ID
@@ -21,12 +25,14 @@ function getOrganizationId(organization) {
 
 /**
  * Get complete team analysis for a project
+ * Includes technical analysis and personality synergy metrics
+ * 
  * @param {ObjectId} projectId - Project ID
+ * @param {boolean} includeSynergyAnalysis - Include personality synergy analysis (default: true)
  * @returns {Promise<Object>} Complete team analysis
  */
-async function getTeamAnalysis(projectId) {
+async function getTeamAnalysis(projectId, includeSynergyAnalysis = true) {
   try {
-    // Get project with all populated data
     const project = await Project.findById(projectId)
       .populate({
         path: 'assignedEmployees.user',
@@ -45,26 +51,32 @@ async function getTeamAnalysis(projectId) {
       throw new Error('Project not found');
     }
     
-    // Get team member IDs (filter out null users)
+    // Debug: Log if teamSelectionConfig exists
+    if (project.teamSelectionConfig) {
+      console.log('[TeamAnalysis] Project has teamSelectionConfig:', {
+        projectId: project._id,
+        hasCBR: !!project.teamSelectionConfig.cbr,
+        minSimilarity: project.teamSelectionConfig?.cbr?.minSimilarityThreshold
+      });
+    } else {
+      console.log('[TeamAnalysis] Project does NOT have teamSelectionConfig, will use defaults');
+    }
+    
     const teamMemberIds = project.assignedEmployees
       .filter(emp => emp.user != null)
       .map(emp => emp.user._id || emp.user);
     
-    // Fetch CVs for all team members
     const cvs = await CV.find({ 
       userId: { $in: teamMemberIds },
       organizationStatus: 'accepted'
     });
     
-    // Fetch BFI-44 results for all team members
     const bfi44Results = await BFI44.find({
       userId: { $in: teamMemberIds }
     });
     
-    // Get organization ID safely
     const organizationId = getOrganizationId(project.organization);
     
-    // Get other active projects in organization (for workload analysis)
     const otherProjects = await Project.find({
       organization: organizationId,
       _id: { $ne: projectId },
@@ -72,16 +84,35 @@ async function getTeamAnalysis(projectId) {
       'assignedEmployees.user': { $in: teamMemberIds }
     }).select('projectName assignedEmployees expectedDuration estimatedEndDate');
     
-    // Analyze team composition
     const teamAnalysis = analyzeTeamComposition(project, cvs, bfi44Results, otherProjects);
     
-    // Analyze organization context
-    const orgAnalysis = analyzeOrganizationContext(project.organization, project);
+    // Analyze organization context for risk detection
+    const organizationContext = analyzeOrganizationContext(project.organization, project);
+    
+    let synergyAnalysis = null;
+    if (includeSynergyAnalysis && teamAnalysis.personality.available) {
+      try {
+        synergyAnalysis = await teamSynergyService.explainTeamSynergy(
+          project.assignedEmployees,
+          {
+            projectType: project.projectType,
+            requiredExperienceLevel: project.requiredExperienceLevel,
+            expectedDuration: project.expectedDuration,
+            isInnovative: project.isInnovative,
+            isMaintenance: project.isMaintenance,
+            synergyWeights: getConfigSection(project, 'phase2')?.synergyWeights
+          }
+        );
+      } catch (error) {
+        console.error('Error calculating team synergy:', error);
+      }
+    }
     
     return {
       project,
       team: teamAnalysis,
-      organization: orgAnalysis,
+      organization: organizationContext,
+      synergy: synergyAnalysis,
       otherProjects
     };
     
@@ -126,19 +157,17 @@ function extractTeamSkills(cvs) {
   };
   
   cvs.forEach(cv => {
-    if (cv.skills && Array.isArray(cv.skills)) {
-      cv.skills.forEach(skill => {
+    if (cv.skills && cv.skills.technical && Array.isArray(cv.skills.technical)) {
+      cv.skills.technical.forEach(skill => {
         const skillName = skill.name.toLowerCase();
         allSkills.add(skillName);
         
-        // Track highest proficiency level for each skill
-        const proficiency = skill.proficiency || 'intermediate';
+        const proficiency = skill.level || 'intermedio';
         if (!skillLevels[skillName] || 
             getProficiencyScore(proficiency) > getProficiencyScore(skillLevels[skillName])) {
           skillLevels[skillName] = proficiency;
         }
         
-        // Categorize skills
         categorizeSkill(skillName, skill.category || 'other', skillCategories);
       });
     }
@@ -173,7 +202,6 @@ function analyzeTeamExperience(cvs, project) {
         const years = calculateYearsOfExperience(exp.startDate, exp.endDate);
         totalYears += years;
         
-        // Check if experience is relevant to project technologies
         if (isRelevantExperience(exp, project)) {
           relevantExperience += years;
         }
@@ -190,7 +218,6 @@ function analyzeTeamExperience(cvs, project) {
   
   const avgYearsPerPerson = cvs.length > 0 ? totalYears / cvs.length : 0;
   
-  // Determine experience level
   let overallLevel = 'junior';
   if (avgYearsPerPerson >= 7) overallLevel = 'expert';
   else if (avgYearsPerPerson >= 5) overallLevel = 'senior';
@@ -222,12 +249,12 @@ function analyzeTeamLanguages(cvs, project) {
     if (cv.languages && Array.isArray(cv.languages)) {
       cv.languages.forEach(lang => {
         const langName = lang.language.toLowerCase();
-        const proficiencyScore = getLanguageProficiencyScore(lang.proficiency);
+        const proficiencyScore = getLanguageProficiencyScore(lang.level);
         
         if (!languageCoverage.has(langName)) {
           languageCoverage.set(langName, {
             speakers: 0,
-            maxProficiency: lang.proficiency,
+            maxProficiency: lang.level,
             maxScore: proficiencyScore
           });
         }
@@ -236,14 +263,14 @@ function analyzeTeamLanguages(cvs, project) {
         current.speakers++;
         
         if (proficiencyScore > current.maxScore) {
-          current.maxProficiency = lang.proficiency;
+          current.maxProficiency = lang.level;
           current.maxScore = proficiencyScore;
         }
       });
     }
   });
   
-  // Check coverage of required languages
+
   const missingLanguages = [];
   const insufficientProficiency = [];
   
@@ -300,7 +327,6 @@ function analyzeTeamPersonality(bfi44Results) {
     });
   });
   
-  // Calculate averages and distribution
   const analysis = {};
   Object.keys(traits).forEach(trait => {
     if (traits[trait].length > 0) {
@@ -319,10 +345,8 @@ function analyzeTeamPersonality(bfi44Results) {
     }
   });
   
-  // Detect potential issues
   const concerns = [];
   
-  // High neuroticism average → stress risk
   if (analysis.Neuroticism && analysis.Neuroticism.average > 3.5) {
     concerns.push({
       type: 'high_stress_tendency',
@@ -331,7 +355,6 @@ function analyzeTeamPersonality(bfi44Results) {
     });
   }
   
-  // Low conscientiousness → quality risk
   if (analysis.Conscientiousness && analysis.Conscientiousness.average < 2.5) {
     concerns.push({
       type: 'low_discipline',
@@ -340,7 +363,6 @@ function analyzeTeamPersonality(bfi44Results) {
     });
   }
   
-  // High variance in agreeableness → conflict risk
   if (analysis.Agreeableness && analysis.Agreeableness.variance > 1.5) {
     concerns.push({
       type: 'personality_conflict',
@@ -349,7 +371,6 @@ function analyzeTeamPersonality(bfi44Results) {
     });
   }
   
-  // Low openness + high complexity → innovation risk
   if (analysis.Openness && analysis.Openness.average < 2.5) {
     concerns.push({
       type: 'low_adaptability',
@@ -362,7 +383,7 @@ function analyzeTeamPersonality(bfi44Results) {
     available: true,
     traits: analysis,
     concerns,
-    teamCoverage: (bfi44Results.length / traits.Extraversion.length) * 100 // % of team with BFI data
+    teamCoverage: (bfi44Results.length / traits.Extraversion.length) * 100
   };
 }
 
@@ -372,7 +393,6 @@ function analyzeTeamPersonality(bfi44Results) {
 function analyzeTeamWorkload(project, otherProjects) {
   const memberWorkload = new Map();
   
-  // Initialize with current project (filter out null users)
   project.assignedEmployees
     .filter(emp => emp.user != null)
     .forEach(emp => {
@@ -430,6 +450,35 @@ function analyzeTechnicalMatch(cvs, project) {
   const requiredTechs = project.mainTechnologies || [];
   const teamSkills = extractTeamSkills(cvs);
   
+  // Early return if no technologies are defined in the project
+  if (requiredTechs.length === 0) {
+    return {
+      matches: [],
+      missing: [],
+      partial: [],
+      matchPercentage: null, // Changed from 100 to null to indicate no comparison possible
+      hasAllRequired: false,
+      avgProficiency: 0,
+      noProjectTechnologies: true, // Flag to indicate project has no technologies defined
+      teamHasSkills: teamSkills.count > 0,
+      teamSkillCount: teamSkills.count
+    };
+  }
+  
+  // Early return if team has no skills
+  if (teamSkills.count === 0) {
+    return {
+      matches: [],
+      missing: requiredTechs.map(tech => tech),
+      partial: [],
+      matchPercentage: 0,
+      hasAllRequired: false,
+      avgProficiency: 0,
+      noTeamSkills: true, // Flag to indicate team has no skills
+      projectTechCount: requiredTechs.length
+    };
+  }
+  
   const matches = [];
   const missing = [];
   const partial = [];
@@ -471,7 +520,9 @@ function analyzeTechnicalMatch(cvs, project) {
     hasAllRequired: missing.length === 0,
     avgProficiency: matches.length > 0
       ? matches.reduce((sum, m) => sum + m.proficiencyScore, 0) / matches.length
-      : 0
+      : 0,
+    noProjectTechnologies: false,
+    noTeamSkills: false
   };
 }
 
@@ -579,15 +630,10 @@ function analyzeOrgMaturity(organization, project) {
   if (project.internalToolsFragmentation === 'low') maturityScore += 2;
   else if (project.internalToolsFragmentation === 'medium') maturityScore += 1;
   
-  // Max score: 8
   if (maturityScore >= 7) return 'high';
   if (maturityScore >= 4) return 'medium';
   return 'low';
 }
-
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
 
 function calculateYearsOfExperience(startDate, endDate) {
   if (!startDate) return 0;
@@ -602,7 +648,6 @@ function isRelevantExperience(experience, project) {
   const projectTechs = (project.mainTechnologies || []).map(t => t.toLowerCase());
   const expTechs = (experience.technologies || []).map(t => t.toLowerCase());
   
-  // Check if any technology overlaps
   return expTechs.some(tech => projectTechs.includes(tech));
 }
 
@@ -625,23 +670,39 @@ function categorizeSkill(skillName, category, categories) {
   }
 }
 
-function getProficiencyScore(proficiency) {
+function getProficiencyScore(level) {
   const scores = {
-    'beginner': 1,
+    'básico': 1,
     'basic': 1,
+    'beginner': 1,
+    'intermedio': 2,
     'intermediate': 2,
+    'avanzado': 3,
     'advanced': 3,
+    'experto': 4,
     'expert': 4
   };
-  return scores[proficiency.toLowerCase()] || 2;
+  const levelLower = (level || '').toLowerCase();
+  return scores[levelLower] || 2;
 }
 
-function getLanguageProficiencyScore(proficiency) {
+function getLanguageProficiencyScore(level) {
+  const levelUpper = (level || '').toUpperCase();
+  const levelLower = (level || '').toLowerCase();
+  
   const scores = {
     'A1': 1, 'A2': 2, 'B1': 3, 'B2': 4, 'C1': 5, 'C2': 6,
-    'native': 7, 'bilingual': 7
+    'básico': 1,
+    'intermedio': 3,
+    'avanzado': 5,
+    'fluido': 6,
+    'bilingüe': 7,
+    'bilingual': 7,
+    'nativo': 7,
+    'native': 7
   };
-  return scores[proficiency] || 3;
+  
+  return scores[levelUpper] || scores[levelLower] || 3;
 }
 
 function getExperienceLevelScore(level) {
@@ -693,5 +754,6 @@ module.exports = {
   analyzeTechnicalMatch,
   analyzeExperienceMatch,
   analyzeTeamAvailability,
-  analyzeOrganizationContext
+  analyzeOrganizationContext,
+  extractTeamSkills // Export for debugging purposes
 };

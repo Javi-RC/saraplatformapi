@@ -10,12 +10,7 @@ const { validateOrganizationCreation, validateOrganizationUpdate } = require('..
  * Siguiendo principios REST y separación de responsabilidades
  */
 
-// Middleware de autenticación
 const authenticate = passport.authenticate('jwt', { session: false });
-
-// ============================================
-// RUTAS PÚBLICAS DE BÚSQUEDA
-// ============================================
 
 /**
  * Buscar organizaciones con filtros
@@ -23,10 +18,6 @@ const authenticate = passport.authenticate('jwt', { session: false });
  * Query params: name, industry, size, status, page, limit, sortBy, sortOrder
  */
 router.get('/search', authenticate, organizationController.searchOrganizations);
-
-// ============================================
-// RUTAS DE GESTIÓN DE ORGANIZACIONES
-// ============================================
 
 /**
  * Obtener las organizaciones del usuario autenticado
@@ -90,10 +81,6 @@ router.patch('/:id/settings', authenticate, organizationController.updateSetting
  */
 router.get('/:id/stats', authenticate, organizationController.getStats);
 
-// ============================================
-// RUTAS DE GESTIÓN DE EMPLEADOS
-// ============================================
-
 /**
  * Obtener empleados de la organización
  * GET /api/organizations/:id/employees
@@ -134,20 +121,12 @@ router.patch('/:id/employees/:employeeId/project-manager', authenticate, organiz
  */
 router.get('/:id/project-managers', authenticate, organizationController.getProjectManagers);
 
-// ============================================
-// RUTAS DE GESTIÓN DE ADMINISTRADORES
-// ============================================
-
 /**
  * Agregar un administrador adicional
  * POST /api/organizations/:id/admins
  * Body: { userId }
  */
 router.post('/:id/admins', authenticate, organizationController.addAdmin);
-
-// ============================================
-// RUTAS DE GESTIÓN DE CVs
-// ============================================
 
 /**
  * Obtener CVs enviados a la organización
@@ -168,10 +147,6 @@ router.get('/:id/cvs/:cvId', authenticate, require('../controllers/cv.controller
  * Body: { status: 'pending' | 'reviewed' | 'accepted' | 'rejected', notes }
  */
 router.patch('/:id/cvs/:cvId/status', authenticate, require('../controllers/cv.controller').updateCVStatus);
-
-// ============================================
-// RUTAS DE GESTIÓN DE PROYECTOS
-// ============================================
 
 /**
  * Obtener proyectos de la organización

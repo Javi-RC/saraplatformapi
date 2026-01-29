@@ -1,9 +1,14 @@
-const Project = require('../models/project.model');
-const Organization = require('../models/organization.model');
-const User = require('../models/user.model');
 const projectNotificationHelper = require('./projectNotificationHelper');
 const teamSelectionService = require('./teamSelection.service');
 const AppError = require('../utils/AppError');
+const { toStableBfi44Profile } = require('../utils/bfi44ProfileMapper');
+
+// Import repositories instead of models
+const {
+  projectRepository,
+  organizationRepository,
+  userRepository
+} = require('../repositories');
 
 /**
  * Project Service
@@ -22,25 +27,21 @@ class ProjectService {
    * @returns {Promise<Object>} Created project
    */
   async createProject(projectData, projectManagerId, organizationId) {
-    // Validate organization exists
-    const organization = await Organization.findById(organizationId);
+    const organization = await organizationRepository.findById(organizationId);
     if (!organization) {
       throw AppError.notFound('ORGANIZATION_NOT_FOUND', 'Organization not found');
     }
 
-    // Validate user is a project manager in the organization
     if (!organization.isProjectManager(projectManagerId)) {
       throw AppError.forbidden('NOT_PROJECT_MANAGER', 'User is not authorized as a project manager in this organization');
     }
 
-    // Validate project manager exists
-    const projectManager = await User.findById(projectManagerId);
+    const projectManager = await userRepository.findById(projectManagerId);
     if (!projectManager) {
       throw AppError.notFound('PROJECT_MANAGER_NOT_FOUND', 'Project manager not found');
     }
 
-    // Create project
-    const project = new Project({
+    const project = await projectRepository.create({
       ...projectData,
       organization: organizationId,
       projectManager: projectManagerId,
@@ -48,8 +49,6 @@ class ProjectService {
       createdAt: Date.now(),
       lastActivityAt: Date.now()
     });
-
-    await project.save();
 
     // NO asignar equipo automáticamente
     // El PM debe solicitar recomendaciones usando:
@@ -79,18 +78,72 @@ class ProjectService {
    * @returns {Promise<Object>} Found project
    */
   async getProjectById(projectId, includeAssignedEmployees = false) {
-    let query = Project.findById(projectId)
-      .populate('organization', 'name')
-      .populate('projectManager', 'name email avatar');
+    const populateOptions = [
+      { path: 'organization', select: 'name' },
+      { path: 'projectManager', select: 'name email avatar' }
+    ];
 
     if (includeAssignedEmployees) {
-      query = query.populate('assignedEmployees.user', 'name email avatar');
+      populateOptions.push({ path: 'assignedEmployees.user', select: 'name email avatar' });
     }
 
-    const project = await query;
+    const project = await projectRepository.findById(projectId, {
+      populate: populateOptions
+    });
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
+    }
+
+    // Si se solicitan empleados, cargar CVs y perfiles BFI44
+    if (includeAssignedEmployees && project.assignedEmployees && project.assignedEmployees.length > 0) {
+      const CV = require('../models/cv.model');
+      const BFI44 = require('../models/bfi44.model');
+      
+      const teamMemberIds = project.assignedEmployees
+        .filter(emp => emp.user != null)
+        .map(emp => emp.user._id || emp.user);
+      
+      // Obtener CVs de los miembros del equipo
+      const cvs = await CV.find({ 
+        userId: { $in: teamMemberIds },
+        organizationStatus: 'accepted'
+      });
+      
+      // Obtener perfiles BFI44 de los miembros del equipo
+      const bfi44Profiles = await BFI44.find({
+        userId: { $in: teamMemberIds }
+      });
+      
+      // Crear mapas para acceso rápido
+      const cvMap = new Map();
+      cvs.forEach(cv => cvMap.set(cv.userId.toString(), cv.toObject()));
+      
+      const bfi44Map = new Map();
+      bfi44Profiles.forEach(profile => bfi44Map.set(profile.userId.toString(), profile));
+      
+      // Convertir proyecto a objeto plano para poder modificarlo
+      const projectObj = project.toObject();
+      
+      // Agregar CVs y perfiles BFI44 a los usuarios
+      projectObj.assignedEmployees = projectObj.assignedEmployees.map(emp => {
+        if (emp.user) {
+          const userId = (emp.user._id || emp.user).toString();
+          const stableProfile = toStableBfi44Profile(bfi44Map.get(userId)?.results || null);
+          
+          return {
+            ...emp,
+            user: {
+              ...emp.user,
+              cv: cvMap.get(userId) || null,
+              bfi44Profile: stableProfile
+            }
+          };
+        }
+        return emp;
+      });
+      
+      return projectObj;
     }
 
     return project;
@@ -104,14 +157,14 @@ class ProjectService {
    * @returns {Promise<Object>} Updated project
    */
   async updateProject(projectId, updateData, userId) {
-    const project = await Project.findById(projectId);
+    const project = await projectRepository.findById(projectId);
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions: only project manager or organization admin
-    const organization = await Organization.findById(project.organization);
+    const organization = await organizationRepository.findById(project.organization);
     if (!project.isProjectManager(userId) && !organization.isAdmin(userId)) {
       throw AppError.forbidden('NO_PERMISSION', 'You do not have permission to update this project');
     }
@@ -148,14 +201,14 @@ class ProjectService {
    * @returns {Promise<Object>} Deletion result
    */
   async deleteProject(projectId, userId) {
-    const project = await Project.findById(projectId);
+    const project = await projectRepository.findById(projectId);
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
     // Verify permissions: only organization admin can delete
-    const organization = await Organization.findById(project.organization);
+    const organization = await organizationRepository.findById(project.organization);
     if (!organization.isAdmin(userId)) {
       throw AppError.forbidden('ADMIN_ONLY', 'Only organization administrators can delete projects');
     }
@@ -167,7 +220,7 @@ class ProjectService {
       console.error('Error sending project deletion notification:', notificationError);
     }
 
-    await Project.findByIdAndDelete(projectId);
+    await projectRepository.deleteById(projectId);
 
     return { message: 'Project successfully deleted', projectId };
   }
@@ -190,21 +243,26 @@ class ProjectService {
       query.projectManager = filters.projectManager;
     }
 
-    const projects = await Project.find(query)
-      .populate('projectManager', 'name email avatar')
-      .populate('assignedEmployees.user', 'name email avatar')
-      .sort({ createdAt: -1 });
+    const projects = await projectRepository.find(query, {
+      populate: [
+        { path: 'projectManager', select: 'name email avatar' },
+        { path: 'assignedEmployees.user', select: 'name email avatar' }
+      ],
+      sort: { createdAt: -1 }
+    });
 
     return projects;
   }
 
   /**
    * Get all projects managed by a user
+   * Also includes projects from organizations where the user is an administrator
    * @param {string} userId - User ID
    * @param {Object} filters - Optional filters
    * @returns {Promise<Array>} List of projects
    */
   async getProjectsByManager(userId, filters = {}) {
+    // First, get projects where user is the project manager
     const query = { projectManager: userId };
 
     if (filters.status) {
@@ -215,12 +273,53 @@ class ProjectService {
       query.organization = filters.organizationId;
     }
 
-    const projects = await Project.find(query)
-      .populate('organization', 'name')
-      .populate('assignedEmployees.user', 'name email avatar')
-      .sort({ createdAt: -1 });
+    const managedProjects = await projectRepository.find(query, {
+      populate: [
+        { path: 'organization', select: 'name' },
+        { path: 'assignedEmployees.user', select: 'name email avatar' }
+      ],
+      sort: { createdAt: -1 }
+    });
 
-    return projects;
+    // Get organizations where user is admin (primary or additional)
+    const organizations = await organizationRepository.find({
+      $or: [
+        { admin: userId },
+        { additionalAdmins: userId }
+      ]
+    });
+
+    // If no organizations where user is admin, return only managed projects
+    if (organizations.length === 0) {
+      return managedProjects;
+    }
+
+    // Get all projects from organizations where user is admin
+    const organizationIds = organizations.map(org => org._id);
+    
+    const adminQuery = {
+      organization: { $in: organizationIds },
+      projectManager: { $ne: userId } // Exclude projects already in managedProjects
+    };
+
+    if (filters.status) {
+      adminQuery.status = filters.status;
+    }
+
+    if (filters.organizationId) {
+      adminQuery.organization = filters.organizationId;
+    }
+
+    const adminProjects = await projectRepository.find(adminQuery, {
+      populate: [
+        { path: 'organization', select: 'name' },
+        { path: 'assignedEmployees.user', select: 'name email avatar' }
+      ],
+      sort: { createdAt: -1 }
+    });
+
+    // Combine and return all projects
+    return [...managedProjects, ...adminProjects];
   }
 
   /**
@@ -229,7 +328,7 @@ class ProjectService {
    * @returns {Promise<Array>} List of projects
    */
   async getProjectsByAssignedEmployee(userId) {
-    const projects = await Project.findByAssignedEmployee(userId);
+    const projects = await projectRepository.findByAssignedUser(userId);
     return projects;
   }
 
@@ -242,9 +341,12 @@ class ProjectService {
    * @returns {Promise<Object>} Updated project
    */
   async assignEmployeeToProject(projectId, employeeId, assignedRole, requesterId) {
-    const project = await Project.findById(projectId)
-      .populate('organization')
-      .populate('projectManager', 'name email avatar');
+    const project = await projectRepository.findById(projectId, {
+      populate: [
+        'organization',
+        { path: 'projectManager', select: 'name email avatar' }
+      ]
+    });
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
@@ -266,9 +368,16 @@ class ProjectService {
     // Populate assigned employees
     await project.populate('assignedEmployees.user', 'name email avatar');
 
+    // OPTIMIZATION: Invalidate synergy cache (will recalculate on next request)
+    // This is lightweight and doesn't block the response
+    const teamSynergyService = require('./teamSynergy.service');
+    teamSynergyService.invalidateCache(projectId).catch(err => {
+      console.error('Error invalidating synergy cache:', err);
+    });
+
     // Send notification
     try {
-      const employee = await User.findById(employeeId);
+      const employee = await userRepository.findById(employeeId);
       await projectNotificationHelper.notifyEmployeeAssigned(
         project,
         employee,
@@ -289,9 +398,12 @@ class ProjectService {
    * @returns {Promise<Object>} Updated project
    */
   async removeEmployeeFromProject(projectId, employeeId, requesterId) {
-    const project = await Project.findById(projectId)
-      .populate('organization')
-      .populate('projectManager', 'name email avatar');
+    const project = await projectRepository.findById(projectId, {
+      populate: [
+        'organization',
+        { path: 'projectManager', select: 'name email avatar' }
+      ]
+    });
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
@@ -304,7 +416,7 @@ class ProjectService {
 
     // Send notification before removal
     try {
-      const employee = await User.findById(employeeId);
+      const employee = await userRepository.findById(employeeId);
       await projectNotificationHelper.notifyEmployeeRemoved(
         project,
         employee,
@@ -319,6 +431,12 @@ class ProjectService {
 
     await project.populate('assignedEmployees.user', 'name email avatar');
 
+    // OPTIMIZATION: Invalidate synergy cache after removal
+    const teamSynergyService = require('./teamSynergy.service');
+    teamSynergyService.invalidateCache(projectId).catch(err => {
+      console.error('Error invalidating synergy cache:', err);
+    });
+
     return project;
   }
 
@@ -329,9 +447,12 @@ class ProjectService {
    * @returns {Promise<Object>} Activated project
    */
   async activateProject(projectId, userId) {
-    const project = await Project.findById(projectId)
-      .populate('organization')
-      .populate('projectManager', 'name email avatar');
+    const project = await projectRepository.findById(projectId, {
+      populate: [
+        'organization',
+        { path: 'projectManager', select: 'name email avatar' }
+      ]
+    });
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
@@ -361,15 +482,108 @@ class ProjectService {
   }
 
   /**
+   * Auto-save manual risks to CBR when project is completed
+   * This ensures manual risks are captured even if post-project form is not filled
+   * @param {string} projectId - Project ID
+   */
+  async autoSaveManualRisksToCBR(projectId) {
+    const Risk = require('../models/risk.model');
+    const cbrService = require('./cbr.service');
+    const { caseBaseRepository } = require('../repositories');
+
+    // Check if case already exists (avoid duplicates)
+    const existingCase = await caseBaseRepository.findOne({ caseId: projectId });
+    if (existingCase) {
+      console.log(`CBR case already exists for project ${projectId}, skipping auto-save`);
+      return;
+    }
+
+    // Get project with all necessary data
+    const project = await projectRepository.findById(projectId, {
+      populate: 'organization'
+    });
+
+    if (!project || !project.organization) {
+      console.log('Project or organization not found for auto-save');
+      return;
+    }
+
+    // Get all relevant risks: manual + predicted that occurred
+    const allRisks = await Risk.find({
+      project: projectId,
+      $or: [
+        { source: 'manual' },
+        { source: { $ne: 'manual' }, occurred: true }
+      ]
+    });
+
+    if (allRisks.length === 0) {
+      console.log(`No risks found for project ${projectId}, skipping CBR save`);
+      return;
+    }
+
+    console.log(`Found ${allRisks.length} risks to save: ${allRisks.filter(r => r.source === 'manual').length} manual, ${allRisks.filter(r => r.source !== 'manual').length} predicted`);
+
+    // Transform risks to actualized risks format with originalSource tracking
+    const actualizedRisks = allRisks.map(risk => ({
+      type: risk.type,
+      title: risk.title,
+      occurred: risk.occurred !== false,
+      severity: risk.actualSeverity || risk.severity,
+      description: risk.description,
+      rootCause: risk.rootCause,
+      originalSource: risk.source,
+      actualImpact: {
+        scheduleDelayDays: risk.actualImpact?.scheduleDelayDays || 0,
+        budgetOverrunPercent: risk.actualImpact?.budgetOverrunPercent || 0,
+        qualityScore: risk.actualImpact?.qualityScore || 'medium',
+        description: risk.actualImpact?.description || ''
+      },
+      mitigationStrategies: risk.mitigationStrategies || []
+    }));
+
+    // Calculate basic metrics
+    const delayDays = project.actualEndDate && project.estimatedEndDate
+      ? Math.max(0, Math.ceil((project.actualEndDate - project.estimatedEndDate) / (1000 * 60 * 60 * 24)))
+      : 0;
+
+    // Create minimal post-project data for CBR
+    const postProjectData = {
+      completed: true,
+      onTime: delayDays === 0,
+      delayDays,
+      budgetOverrun: 0,
+      qualityScore: 3,
+      clientSatisfaction: 3,
+      teamMorale: 3,
+      actualRisks: actualizedRisks,
+      metrics: {},
+      completedAt: project.actualEndDate || new Date(),
+      lessonsLearned: [],
+      successfulPractices: [],
+      unsuccessfulPractices: [],
+      recommendations: []
+    };
+
+    // Save to CBR
+    await cbrService.retainCase(project, postProjectData, project.organization);
+
+    console.log(`Auto-saved ${actualizedRisks.length} risks to CBR for project ${project.projectName}`);
+  }
+
+  /**
    * Complete a project
    * @param {string} projectId - Project ID
    * @param {string} userId - ID of user completing the project
    * @returns {Promise<Object>} Completed project
    */
   async completeProject(projectId, userId) {
-    const project = await Project.findById(projectId)
-      .populate('organization')
-      .populate('projectManager', 'name email avatar');
+    const project = await projectRepository.findById(projectId, {
+      populate: [
+        'organization',
+        { path: 'projectManager', select: 'name email avatar' }
+      ]
+    });
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
@@ -388,6 +602,14 @@ class ProjectService {
 
     await project.populate('assignedEmployees.user', 'name email avatar');
 
+    // Automatically save manual risks to CBR when completing project
+    try {
+      await this.autoSaveManualRisksToCBR(projectId);
+    } catch (cbrError) {
+      console.error('Error auto-saving manual risks to CBR:', cbrError);
+      // Don't block project completion if CBR save fails
+    }
+
     // Send notification
     try {
       await projectNotificationHelper.notifyProjectCompleted(project, project.organization);
@@ -405,9 +627,12 @@ class ProjectService {
    * @returns {Promise<Object>} Cancelled project
    */
   async cancelProject(projectId, userId) {
-    const project = await Project.findById(projectId)
-      .populate('organization')
-      .populate('projectManager', 'name email avatar');
+    const project = await projectRepository.findById(projectId, {
+      populate: [
+        'organization',
+        { path: 'projectManager', select: 'name email avatar' }
+      ]
+    });
 
     if (!project) {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
@@ -442,7 +667,7 @@ class ProjectService {
    * @returns {Promise<Object>} Project statistics
    */
   async getProjectStatistics(organizationId) {
-    const projects = await Project.find({ organization: organizationId });
+    const projects = await projectRepository.findByOrganization(organizationId);
 
     const stats = {
       total: projects.length,

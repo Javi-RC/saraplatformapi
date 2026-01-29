@@ -1,6 +1,7 @@
 const notificationService = require('../services/notification.service');
 const { NotificationTypes, NotificationChannels, NotificationPriority } = require('../models/notification.model');
 const responseHandler = require('../utils/responseHandler');
+const i18nService = require('../i18n/i18n.service');
 
 /**
  * Controlador de Notificaciones
@@ -12,6 +13,8 @@ class NotificationController {
    * GET /api/notifications
    */
   async getNotifications(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
+    console.log('[NotificationController] Detected language:', lang, '| Query:', req.query?.lang, '| User pref:', req.user?.preferredLanguage);
     try {
       const userId = req.user.userId;
       const {
@@ -34,16 +37,22 @@ class NotificationController {
 
       const result = await notificationService.getUserNotifications(userId, options);
       
+      // Traducir las notificaciones según el idioma
+      const translatedNotifications = i18nService.translateNotifications(result.notifications, lang);
+      
       return res.status(200).json({
         success: true,
-        data: result,
-        message: 'Notificaciones obtenidas correctamente'
+        data: {
+          ...result,
+          notifications: translatedNotifications
+        },
+        message: i18nService.translate(lang, 'notifications.messages.obtained_successfully')
       });
     } catch (error) {
       console.error('Error obteniendo notificaciones:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al obtener notificaciones'
+        error: i18nService.translate(lang, 'notifications.messages.error_obtaining')
       });
     }
   }
@@ -53,6 +62,7 @@ class NotificationController {
    * GET /api/notifications/unread-count
    */
   async getUnreadCount(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const userId = req.user.userId;
       const count = await notificationService.getUnreadCount(userId);
@@ -60,13 +70,13 @@ class NotificationController {
       return res.status(200).json({
         success: true,
         data: { count },
-        message: 'Conteo obtenido correctamente'
+        message: i18nService.translate(lang, 'notifications.messages.count_obtained_successfully')
       });
     } catch (error) {
       console.error('Error obteniendo conteo de no leídas:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al obtener el conteo'
+        error: i18nService.translate(lang, 'notifications.messages.error_obtaining_count')
       });
     }
   }
@@ -76,6 +86,7 @@ class NotificationController {
    * GET /api/notifications/stats
    */
   async getStats(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const userId = req.user.userId;
       const stats = await notificationService.getUserStats(userId);
@@ -83,13 +94,13 @@ class NotificationController {
       return res.status(200).json({
         success: true,
         data: stats,
-        message: 'Estadísticas obtenidas correctamente'
+        message: i18nService.translate(lang, 'notifications.messages.statistics_obtained_successfully')
       });
     } catch (error) {
       console.error('Error obteniendo estadísticas:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al obtener estadísticas'
+        error: i18nService.translate(lang, 'notifications.messages.error_obtaining_statistics')
       });
     }
   }
@@ -99,28 +110,30 @@ class NotificationController {
    * PATCH /api/notifications/:id/read
    */
   async markAsRead(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const { id } = req.params;
       const userId = req.user.userId;
 
       const notification = await notificationService.markAsRead(id, userId);
+      const translatedNotification = i18nService.translateNotification(notification, lang);
       
       return res.status(200).json({
         success: true,
-        data: notification,
-        message: 'Notificación marcada como leída'
+        data: translatedNotification,
+        message: i18nService.translate(lang, 'notifications.messages.marked_as_read')
       });
     } catch (error) {
       console.error('Error marcando como leída:', error);
-      if (error.message === 'Notificación no encontrada') {
+      if (error.message === 'Notification not found') {
         return res.status(404).json({
           success: false,
-          error: error.message
+          error: i18nService.translate(lang, 'notifications.messages.not_found')
         });
       }
       return res.status(500).json({
         success: false,
-        error: 'Error al marcar como leída'
+        error: i18nService.translate(lang, 'notifications.messages.error_marking_as_read')
       });
     }
   }
@@ -130,6 +143,7 @@ class NotificationController {
    * PATCH /api/notifications/read-multiple
    */
   async markMultipleAsRead(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const { notificationIds } = req.body;
       const userId = req.user.userId;
@@ -137,7 +151,7 @@ class NotificationController {
       if (!Array.isArray(notificationIds) || notificationIds.length === 0) {
         return res.status(400).json({
           success: false,
-          error: 'Se requiere un array de IDs de notificaciones'
+          error: i18nService.translate(lang, 'notifications.messages.array_required')
         });
       }
 
@@ -146,13 +160,13 @@ class NotificationController {
       return res.status(200).json({
         success: true,
         data: { count },
-        message: `${count} notificaciones marcadas como leídas`
+        message: i18nService.translate(lang, 'notifications.messages.marked_as_read_multiple', { count })
       });
     } catch (error) {
       console.error('Error marcando múltiples como leídas:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al marcar notificaciones'
+        error: i18nService.translate(lang, 'notifications.messages.error_marking_multiple')
       });
     }
   }
@@ -162,6 +176,7 @@ class NotificationController {
    * PATCH /api/notifications/read-all
    */
   async markAllAsRead(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const userId = req.user.userId;
       const count = await notificationService.markAllAsRead(userId);
@@ -169,13 +184,13 @@ class NotificationController {
       return res.status(200).json({
         success: true,
         data: { count },
-        message: `${count} notificaciones marcadas como leídas`
+        message: i18nService.translate(lang, 'notifications.messages.marked_as_read_all', { count })
       });
     } catch (error) {
       console.error('Error marcando todas como leídas:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al marcar todas como leídas'
+        error: i18nService.translate(lang, 'notifications.messages.error_marking_all')
       });
     }
   }
@@ -185,28 +200,30 @@ class NotificationController {
    * PATCH /api/notifications/:id/archive
    */
   async archive(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const { id } = req.params;
       const userId = req.user.userId;
 
       const notification = await notificationService.archive(id, userId);
+      const translatedNotification = i18nService.translateNotification(notification, lang);
       
       return res.status(200).json({
         success: true,
-        data: notification,
-        message: 'Notificación archivada'
+        data: translatedNotification,
+        message: i18nService.translate(lang, 'notifications.messages.archived')
       });
     } catch (error) {
       console.error('Error archivando notificación:', error);
-      if (error.message === 'Notificación no encontrada') {
+      if (error.message === 'Notification not found') {
         return res.status(404).json({
           success: false,
-          error: error.message
+          error: i18nService.translate(lang, 'notifications.messages.not_found')
         });
       }
       return res.status(500).json({
         success: false,
-        error: 'Error al archivar notificación'
+        error: i18nService.translate(lang, 'notifications.messages.error_archiving')
       });
     }
   }
@@ -216,6 +233,7 @@ class NotificationController {
    * DELETE /api/notifications/:id
    */
   async delete(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const { id } = req.params;
       const userId = req.user.userId;
@@ -225,20 +243,20 @@ class NotificationController {
       if (!deleted) {
         return res.status(404).json({
           success: false,
-          error: 'Notificación no encontrada'
+          error: i18nService.translate(lang, 'notifications.messages.not_found')
         });
       }
       
       return res.status(200).json({
         success: true,
         data: null,
-        message: 'Notificación eliminada correctamente'
+        message: i18nService.translate(lang, 'notifications.messages.deleted_successfully')
       });
     } catch (error) {
       console.error('Error eliminando notificación:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al eliminar notificación'
+        error: i18nService.translate(lang, 'notifications.messages.error_deleting')
       });
     }
   }
@@ -248,6 +266,7 @@ class NotificationController {
    * POST /api/notifications
    */
   async create(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const {
         recipientId,
@@ -266,7 +285,7 @@ class NotificationController {
       if (!recipientId || !type || !title || !message) {
         return res.status(400).json({
           success: false,
-          error: 'recipientId, type, title y message son requeridos'
+          error: i18nService.translate(lang, 'notifications.messages.required_fields')
         });
       }
 
@@ -274,7 +293,7 @@ class NotificationController {
       if (!Object.values(NotificationTypes).includes(type)) {
         return res.status(400).json({
           success: false,
-          error: 'Tipo de notificación inválido'
+          error: i18nService.translate(lang, 'notifications.messages.invalid_type')
         });
       }
 
@@ -292,22 +311,24 @@ class NotificationController {
         senderId: req.user.userId
       });
 
+      const translatedNotification = i18nService.translateNotification(notification, lang);
+
       return res.status(201).json({
         success: true,
-        data: notification,
-        message: 'Notificación creada correctamente'
+        data: translatedNotification,
+        message: i18nService.translate(lang, 'notifications.messages.created_successfully')
       });
     } catch (error) {
       console.error('Error creando notificación:', error);
-      if (error.message === 'Usuario receptor no encontrado') {
+      if (error.message === 'Recipient user not found') {
         return res.status(404).json({
           success: false,
-          error: error.message
+          error: i18nService.translate(lang, 'notifications.messages.recipient_not_found')
         });
       }
       return res.status(500).json({
         success: false,
-        error: 'Error al crear notificación'
+        error: i18nService.translate(lang, 'notifications.messages.error_creating')
       });
     }
   }
@@ -317,6 +338,7 @@ class NotificationController {
    * POST /api/notifications/bulk
    */
   async sendBulk(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const {
         recipientIds,
@@ -334,14 +356,14 @@ class NotificationController {
       if (!Array.isArray(recipientIds) || recipientIds.length === 0) {
         return res.status(400).json({
           success: false,
-          error: 'Se requiere un array de recipientIds'
+          error: i18nService.translate(lang, 'notifications.messages.required_array_recipients')
         });
       }
 
       if (!type || !title || !message) {
         return res.status(400).json({
           success: false,
-          error: 'type, title y message son requeridos'
+          error: i18nService.translate(lang, 'notifications.messages.required_fields_bulk')
         });
       }
 
@@ -360,16 +382,18 @@ class NotificationController {
         }
       );
 
+      const translatedNotifications = i18nService.translateNotifications(notifications, lang);
+
       return res.status(201).json({
         success: true,
-        data: { count: notifications.length, notifications },
-        message: `${notifications.length} notificaciones enviadas correctamente`
+        data: { count: translatedNotifications.length, notifications: translatedNotifications },
+        message: i18nService.translate(lang, 'notifications.messages.bulk_sent_successfully', { count: notifications.length })
       });
     } catch (error) {
       console.error('Error enviando notificaciones masivas:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al enviar notificaciones masivas'
+        error: i18nService.translate(lang, 'notifications.messages.error_sending_bulk')
       });
     }
   }
@@ -379,6 +403,7 @@ class NotificationController {
    * POST /api/notifications/send-to-role
    */
   async sendToRole(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const {
         role,
@@ -396,7 +421,7 @@ class NotificationController {
       if (!role || !type || !title || !message) {
         return res.status(400).json({
           success: false,
-          error: 'role, type, title y message son requeridos'
+          error: i18nService.translate(lang, 'notifications.messages.required_fields_role')
         });
       }
 
@@ -415,13 +440,13 @@ class NotificationController {
       return res.status(201).json({
         success: true,
         data: { count: notifications.length },
-        message: `${notifications.length} notificaciones enviadas al rol ${role}`
+        message: i18nService.translate(lang, 'notifications.messages.sent_to_role', { count: notifications.length, role })
       });
     } catch (error) {
       console.error('Error enviando notificaciones por rol:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al enviar notificaciones por rol'
+        error: i18nService.translate(lang, 'notifications.messages.error_sending_to_role')
       });
     }
   }
@@ -431,6 +456,7 @@ class NotificationController {
    * POST /api/notifications/send-to-all
    */
   async sendToAll(req, res) {
+    const lang = i18nService.getLanguageFromRequest(req);
     try {
       const {
         type,
@@ -447,7 +473,7 @@ class NotificationController {
       if (!type || !title || !message) {
         return res.status(400).json({
           success: false,
-          error: 'type, title y message son requeridos'
+          error: i18nService.translate(lang, 'notifications.messages.required_fields_bulk')
         });
       }
 
@@ -466,13 +492,13 @@ class NotificationController {
       return res.status(201).json({
         success: true,
         data: { count: notifications.length },
-        message: `${notifications.length} notificaciones enviadas a todos los usuarios`
+        message: i18nService.translate(lang, 'notifications.messages.sent_to_all', { count: notifications.length })
       });
     } catch (error) {
       console.error('Error enviando notificaciones a todos:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error al enviar notificaciones a todos'
+        error: i18nService.translate(lang, 'notifications.messages.error_sending_to_all')
       });
     }
   }

@@ -7,7 +7,6 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined in environment variables');
 }
 
-// Generar token JWT
 exports.generateToken = (user) => {
   const payload = {
     userId: user._id.toString(),
@@ -21,7 +20,6 @@ exports.generateToken = (user) => {
   });
 };
 
-// Verificar token JWT
 exports.verifyToken = (token) => {
   try {
     return jwt.verify(token, JWT_SECRET);
@@ -34,7 +32,6 @@ exports.verifyToken = (token) => {
   }
 };
 
-// Middleware de autenticación
 exports.authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;

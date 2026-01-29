@@ -1,5 +1,7 @@
 const BFI44Service = require('../services/bfi44.service');
 const responseHandler = require('../utils/responseHandler');
+const Organization = require('../models/organization.model');
+const User = require('../models/user.model');
 
 /**
  * BFI-44 Controller
@@ -29,18 +31,16 @@ class BFI44Controller {
   static async submitResponses(req, res) {
     try {
       const { responses } = req.body;
-      const userId = req.user.id; // Obtenido del middleware de autenticación
+      const userId = req.user.id;
 
-      // Validar que existan respuestas
       if (!responses) {
         return responseHandler.error(res, 'Las respuestas son requeridas', 400);
       }
 
-      // Procesar respuestas
       const result = await BFI44Service.submitResponses(userId, responses);
 
       return responseHandler.success(res, {
-        message: 'Cuestionario completado exitosamente',
+        message: 'Questionnaire completed successfully',
         ...result
       }, 201);
 
@@ -58,15 +58,26 @@ class BFI44Controller {
     try {
       const { userId } = req.params;
 
-      // Verificar autorización: solo el propio usuario o admin puede ver su perfil
       if (req.user.id !== userId && req.user.role !== 'org_admin') {
-        return responseHandler.error(res, 'No autorizado para ver este perfil', 403);
+        const targetUser = await User.findById(userId).select('organization');
+        const organizationId = targetUser?.organization;
+
+        if (!organizationId) {
+          return responseHandler.error(res, 'No autorizado para ver este perfil', 403);
+        }
+
+        const organization = await Organization.findById(organizationId);
+        const isAllowed = organization && (organization.isAdmin(req.user.id) || organization.isProjectManager(req.user.id));
+
+        if (!isAllowed) {
+          return responseHandler.error(res, 'No autorizado para ver este perfil', 403);
+        }
       }
 
       const profile = await BFI44Service.getUserProfile(userId);
 
       if (!profile) {
-        return responseHandler.error(res, 'Perfil BFI-44 no encontrado', 404);
+        return responseHandler.error(res, 'BFI-44 profile not found', 404);
       }
 
       return responseHandler.success(res, profile);
@@ -107,7 +118,6 @@ class BFI44Controller {
     try {
       const { responseId } = req.params;
 
-      // Solo org_admin puede recalcular
       if (req.user.role !== 'org_admin') {
         return responseHandler.error(res, 'No autorizado', 403);
       }
@@ -115,7 +125,7 @@ class BFI44Controller {
       const result = await BFI44Service.recalculateProfile(responseId);
 
       return responseHandler.success(res, {
-        message: 'Perfil recalculado exitosamente',
+        message: 'Profile recalculated successfully',
         ...result
       });
 
@@ -149,12 +159,10 @@ class BFI44Controller {
    */
   static async notifyPendingEmployees(req, res) {
     try {
-      // Verificar que el usuario sea org_admin
       if (req.user.role !== 'org_admin') {
         return responseHandler.error(res, 'No autorizado', 403);
       }
 
-      // Verificar que el admin tenga organización
       if (!req.user.organization) {
         return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
       }
@@ -178,12 +186,10 @@ class BFI44Controller {
    */
   static async getEmployeesWithoutTest(req, res) {
     try {
-      // Verificar que el usuario sea org_admin
       if (req.user.role !== 'org_admin') {
         return responseHandler.error(res, 'No autorizado', 403);
       }
 
-      // Verificar que el admin tenga organización
       if (!req.user.organization) {
         return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
       }
@@ -211,12 +217,10 @@ class BFI44Controller {
    */
   static async getOrganizationStats(req, res) {
     try {
-      // Verificar que el usuario sea org_admin
       if (req.user.role !== 'org_admin') {
         return responseHandler.error(res, 'No autorizado', 403);
       }
 
-      // Verificar que el admin tenga organización
       if (!req.user.organization) {
         return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
       }

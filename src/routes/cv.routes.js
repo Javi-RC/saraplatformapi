@@ -4,7 +4,6 @@ const cvController = require('../controllers/cv.controller');
 const passport = require('passport');
 const multer = require('multer');
 
-// Configurar multer para manejar archivos en memoria
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
@@ -12,7 +11,6 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024 // Límite de 5MB
   },
   fileFilter: (req, file, cb) => {
-    // Aceptar solo PDF y TXT
     if (file.mimetype === 'application/pdf' || file.mimetype === 'text/plain') {
       cb(null, true);
     } else {
@@ -21,10 +19,8 @@ const upload = multer({
   }
 });
 
-// Middleware de autenticación JWT
 const authenticate = passport.authenticate('jwt', { session: false });
 
-// Middleware de autorización para admin
 const isAdmin = (req, res, next) => {
   if (req.user && req.user.role === 'org_admin') {
     return next();
@@ -98,7 +94,44 @@ router.get('/admin/all', authenticate, isAdmin, cvController.getAllCVs);
  */
 router.post('/admin/search', authenticate, isAdmin, cvController.searchCVs);
 
-// Manejo de errores de multer
+/**
+ * @route   GET /api/cv/completeness
+ * @desc    Obtiene el estado de completitud del CV del usuario
+ * @access  Private
+ */
+router.get('/completeness', authenticate, cvController.getCompleteness);
+
+/**
+ * @route   GET /api/cv/missing-fields-questions
+ * @desc    Obtiene preguntas dinámicas para completar los campos faltantes del CV
+ * @access  Private
+ * @query   language - Idioma de las preguntas ('en' o 'es', por defecto 'en')
+ * @query   groupByCategory - Si es 'true', agrupa las preguntas por categoría
+ */
+router.get('/missing-fields-questions', authenticate, cvController.getMissingFieldsQuestions);
+
+/**
+ * @route   PATCH /api/cv/complete-fields
+ * @desc    Completa los campos faltantes del CV
+ * @access  Private
+ */
+router.patch('/complete-fields', authenticate, cvController.completeFields);
+
+/**
+ * @route   POST /api/cv/questionnaire/next
+ * @desc    Submit phase responses and get next phase
+ * @access  Private
+ */
+router.post('/questionnaire/next', authenticate, cvController.submitPhaseResponses);
+
+/**
+ * @route   POST /api/cv/questionnaire/submit
+ * @desc    Submit final questionnaire responses
+ * @access  Private
+ */
+router.post('/questionnaire/submit', authenticate, cvController.submitQuestionnaire);
+
+// Error handler middleware
 router.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {

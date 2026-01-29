@@ -7,14 +7,9 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const riskController = require('../controllers/risk.controller');
-const { requireOrganizationMember } = require('../middleware/authorization');
+const { requireOrganizationMember, requireRole } = require('../middleware/authorization');
 
-// Authentication middleware
 const authenticate = passport.authenticate('jwt', { session: false });
-
-// ========================================
-// RISK PREDICTION ENDPOINTS
-// ========================================
 
 /**
  * POST /api/projects/:id/risks/predict
@@ -40,6 +35,50 @@ router.get(
 );
 
 /**
+ * POST /api/projects/:id/risks/manual
+ * Add a manual risk (discovered during project execution)
+ * Requires: Project Manager
+ */
+router.post(
+  '/projects/:id/risks/manual',
+  authenticate,
+  riskController.addManualRisk
+);
+
+/**
+ * GET /api/projects/:id/risks/manual
+ * Get manual risks for a project
+ * Requires: Project access
+ */
+router.get(
+  '/projects/:id/risks/manual',
+  authenticate,
+  riskController.getProjectManualRisks
+);
+
+/**
+ * PUT /api/projects/:id/risks/:riskId
+ * Update a manual risk during project execution
+ * Requires: Project Manager
+ */
+router.put(
+  '/projects/:id/risks/:riskId',
+  authenticate,
+  riskController.updateManualRisk
+);
+
+/**
+ * DELETE /api/projects/:id/risks/:riskId
+ * Delete a manual risk (only before project completion)
+ * Requires: Project Manager
+ */
+router.delete(
+  '/projects/:id/risks/:riskId',
+  authenticate,
+  riskController.deleteManualRisk
+);
+
+/**
  * GET /api/risks/:id
  * Get specific risk by ID
  * Requires: Authentication
@@ -61,10 +100,6 @@ router.put(
   authenticate,
   riskController.updateRiskFeedback
 );
-
-// ========================================
-// PROJECT OUTCOME ENDPOINTS
-// ========================================
 
 /**
  * POST /api/projects/:id/outcome
@@ -89,10 +124,6 @@ router.get(
   riskController.getOutcomeForm
 );
 
-// ========================================
-// SIMILAR CASES ENDPOINT
-// ========================================
-
 /**
  * GET /api/projects/:id/similar-cases
  * Find similar historical cases
@@ -104,10 +135,6 @@ router.get(
   authenticate,
   riskController.findSimilarCases
 );
-
-// ========================================
-// ORGANIZATION INSIGHTS ENDPOINTS
-// ========================================
 
 /**
  * GET /api/organizations/:id/risks/insights
@@ -148,10 +175,6 @@ router.get(
   riskController.getAccuracyReport
 );
 
-// ========================================
-// CASE BASE ENDPOINTS
-// ========================================
-
 /**
  * GET /api/organizations/:id/case-base/stats
  * Get case base statistics
@@ -189,10 +212,6 @@ router.get(
   riskController.getCaseById
 );
 
-// ========================================
-// SEED CASES ENDPOINTS (Admin)
-// ========================================
-
 /**
  * POST /api/case-base/seed
  * Load seed cases into database
@@ -201,7 +220,7 @@ router.get(
 router.post(
   '/case-base/seed',
   authenticate,
-  // TODO: Add admin middleware
+  requireRole('org_admin'),
   riskController.loadSeedCases
 );
 
@@ -213,8 +232,87 @@ router.post(
 router.get(
   '/case-base/seed',
   authenticate,
-  // TODO: Add admin middleware
+  requireRole('org_admin'),
   riskController.getSeedCases
+);
+
+/**
+ * GET /api/projects/:id/risks/cbr
+ * NEW: Get CBR risks filtered by similarity threshold
+ * Query params: minSimilarity (0.0-1.0, default 0.5)
+ * Used by PM to select which learned risks to monitor
+ * Requires: Project access
+ */
+router.get(
+  '/projects/:id/risks/cbr',
+  authenticate,
+  riskController.getCBRRisks
+);
+
+/**
+ * GET /api/projects/:id/risks/indicators
+ * NEW: Get Decision Tree indicators (early warning signs)
+ * Shows what CAN happen based on project patterns
+ * Requires: Project access
+ */
+router.get(
+  '/projects/:id/risks/indicators',
+  authenticate,
+  riskController.getDTIndicators
+);
+
+/**
+ * POST /api/projects/:id/risks/accept
+ * NEW: Accept specific CBR risks for active monitoring
+ * Body: { riskIds: ['risk_type_1', 'risk_type_2'] }
+ * Used by PM to confirm which learned risks to monitor
+ * Requires: Project Manager role
+ */
+router.post(
+  '/projects/:id/risks/accept',
+  authenticate,
+  riskController.acceptRisks
+);
+
+/**
+ * DEBUG ENDPOINTS
+ * Secret endpoints for development and testing
+ */
+
+/**
+ * GET /api/risks/debug/all
+ * Get all risks with full structure
+ * For debugging and development only
+ * Requires: Authentication
+ */
+router.get(
+  '/risks/debug/all',
+  authenticate,
+  riskController.debugGetAllRisks
+);
+
+/**
+ * GET /api/risks/debug/by-type/:type
+ * Get all risks of a specific type
+ * For debugging and development only
+ * Requires: Authentication
+ */
+router.get(
+  '/risks/debug/by-type/:type',
+  authenticate,
+  riskController.debugGetRisksByType
+);
+
+/**
+ * GET /api/risks/debug/types-summary
+ * Get summary statistics by risk type
+ * For debugging and development only
+ * Requires: Authentication
+ */
+router.get(
+  '/risks/debug/types-summary',
+  authenticate,
+  riskController.debugGetRiskTypesSummary
 );
 
 module.exports = router;

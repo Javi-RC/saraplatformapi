@@ -3,13 +3,15 @@ const router = Router();
 const { authMiddleware } = require('../utils/jwt');
 const User = require('../models/user.model');
 const validators = require('../utils/validators');
+const userController = require('../controllers/user.controller');
 
-// Obtener perfil del usuario autenticado
 router.get('/profile', authMiddleware, async (req, res) => {
   try {
     const userId = req.user?.userId || req.user?.id || req.user?._id;
     
-    const user = await User.findById(userId).select('-passwordHash');
+    const user = await User.findById(userId)
+      .select('-passwordHash')
+      .populate('organization', 'name title');
     
     if (!user) {
       return res.status(404).json({
@@ -20,7 +22,9 @@ router.get('/profile', authMiddleware, async (req, res) => {
 
     res.json({ 
       success: true, 
-      user: user.toJSON()
+      data: {
+        user: user.toJSON()
+      }
     });
   } catch (error) {
     console.error('Error obteniendo perfil:', error);
@@ -31,23 +35,21 @@ router.get('/profile', authMiddleware, async (req, res) => {
   }
 });
 
-// Actualizar perfil del usuario autenticado
 router.patch('/profile', authMiddleware, validators.validateProfileUpdate, async (req, res) => {
   try {
     const userId = req.user?.userId || req.user?.id || req.user?._id;
     const updates = req.body;
 
-    // Campos que el usuario puede actualizar
     const allowedUpdates = [
       'name',
       'country',
       'timezone',
+      'preferredLanguage',
       'flexibleSchedule',
       'preferredWorkingHours',
       'notificationPreferences'
     ];
 
-    // Filtrar solo campos permitidos
     const filteredUpdates = {};
     Object.keys(updates).forEach(key => {
       if (allowedUpdates.includes(key)) {
@@ -93,7 +95,6 @@ router.patch('/profile', authMiddleware, validators.validateProfileUpdate, async
   }
 });
 
-// Obtener estado del consentimiento para procesamiento de CVs con IA
 router.get('/cv-consent', authMiddleware, async (req, res) => {
   try {
     const userId = req.user?.userId || req.user?.id || req.user?._id;
@@ -109,11 +110,13 @@ router.get('/cv-consent', authMiddleware, async (req, res) => {
 
     res.json({
       success: true,
-      consent: user.cvProcessingConsent || {
-        accepted: false,
-        version: '1.0'
-      },
-      hasConsent: user.hasCVProcessingConsent()
+      data: {
+        consent: user.cvProcessingConsent || {
+          accepted: false,
+          version: '1.0'
+        },
+        hasConsent: user.hasCVProcessingConsent()
+      }
     });
 
   } catch (error) {
@@ -125,13 +128,11 @@ router.get('/cv-consent', authMiddleware, async (req, res) => {
   }
 });
 
-// Actualizar consentimiento para procesamiento de CVs con IA
 router.post('/cv-consent', authMiddleware, async (req, res) => {
   try {
     const userId = req.user?.userId || req.user?.id || req.user?._id;
     const { accepted, aiProcessing, thirdPartySharing, dataRetention } = req.body;
 
-    // Validar que se envió el campo accepted
     if (typeof accepted !== 'boolean') {
       return res.status(400).json({
         success: false,
@@ -148,9 +149,7 @@ router.post('/cv-consent', authMiddleware, async (req, res) => {
       });
     }
 
-    // Si el usuario está aceptando el consentimiento
     if (accepted) {
-      // Validar que se aceptaron los términos específicos
       if (aiProcessing !== true) {
         return res.status(400).json({
           success: false,
@@ -158,7 +157,6 @@ router.post('/cv-consent', authMiddleware, async (req, res) => {
         });
       }
 
-      // Obtener IP del usuario (opcional)
       const ipAddress = req.headers['x-forwarded-for'] || 
                        req.headers['x-real-ip'] || 
                        req.connection?.remoteAddress || 
@@ -176,7 +174,6 @@ router.post('/cv-consent', authMiddleware, async (req, res) => {
         }
       };
     } else {
-      // Si el usuario revoca el consentimiento
       user.cvProcessingConsent = {
         accepted: false,
         acceptedAt: undefined,
@@ -209,5 +206,35 @@ router.post('/cv-consent', authMiddleware, async (req, res) => {
     });
   }
 });
+
+/**
+ * GET /api/profile/language
+ * Obtiene la preferencia de idioma del usuario
+ * Acceso: Usuario autenticado
+ */
+router.get('/profile/language', authMiddleware, userController.getLanguagePreference);
+
+/**
+ * PATCH /api/profile/language
+ * Actualiza la preferencia de idioma del usuario
+ * Body: { language: 'es' | 'en' }
+ * Acceso: Usuario autenticado
+ */
+router.patch('/profile/language', authMiddleware, userController.updateLanguagePreference);
+
+/**
+ * GET /api/profile/deletion-prerequisites
+ * Verifica qué requisitos debe cumplir el usuario antes de eliminar su cuenta
+ * Acceso: Usuario autenticado
+ */
+router.get('/profile/deletion-prerequisites', authMiddleware, userController.getDeletionPrerequisites);
+
+/**
+ * DELETE /api/profile/account
+ * Elimina la cuenta del usuario de forma permanente
+ * Body: { password: string (required for non-OAuth users), confirmation: "ELIMINAR" | "DELETE" }
+ * Acceso: Usuario autenticado
+ */
+router.delete('/profile/account', authMiddleware, userController.deleteAccount);
 
 module.exports = router;
