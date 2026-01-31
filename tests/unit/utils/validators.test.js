@@ -52,27 +52,27 @@ describe('Validators - Unit Tests', () => {
     it('debería rechazar datos faltantes', () => {
       expect(() => {
         validators.validateRegistrationData('', 'Test User', 'password123');
-      }).toThrow('MISSING_REQUIRED_FIELDS');
+      }).toThrow(expect.objectContaining({ code: 'MISSING_REQUIRED_FIELDS' }));
 
       expect(() => {
         validators.validateRegistrationData('test@example.com', '', 'password123');
-      }).toThrow('MISSING_REQUIRED_FIELDS');
+      }).toThrow(expect.objectContaining({ code: 'MISSING_REQUIRED_FIELDS' }));
 
       expect(() => {
         validators.validateRegistrationData('test@example.com', 'Test User', '');
-      }).toThrow('MISSING_REQUIRED_FIELDS');
+      }).toThrow(expect.objectContaining({ code: 'MISSING_REQUIRED_FIELDS' }));
     });
 
     it('debería rechazar email inválido', () => {
       expect(() => {
         validators.validateRegistrationData('invalid-email', 'Test User', 'password123');
-      }).toThrow('INVALID_EMAIL_FORMAT');
+      }).toThrow(expect.objectContaining({ code: 'INVALID_EMAIL_FORMAT' }));
     });
 
     it('debería rechazar contraseña corta', () => {
       expect(() => {
         validators.validateRegistrationData('test@example.com', 'Test User', '123');
-      }).toThrow('PASSWORD_TOO_SHORT');
+      }).toThrow(expect.objectContaining({ code: 'PASSWORD_TOO_SHORT' }));
     });
   });
 });

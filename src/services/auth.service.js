@@ -1,48 +1,48 @@
-const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { generateToken } = require('../utils/jwt');
 const emailService = require('./email.service');
 const authNotificationHelper = require('./authNotificationHelper');
 const bfi44NotificationHelper = require('./bfi44NotificationHelper');
-const BFI44Response = require('../models/bfi44.model');
+const AppError = require('../utils/AppError');
+
+// Import repositories instead of models
+const { userRepository, bfi44Repository } = require('../repositories');
 
 class AuthService {
   async register(userData) {
     const { email, name, password, role} = userData;
 
     // Verificar si usuario existe
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await userRepository.findByEmail(email.toLowerCase());
     
     if (existingUser) {
       // Si el usuario ya está verificado, no permitir re-registro
       if (existingUser.isConfirmed) {
-        throw new Error('USER_ALREADY_EXISTS');
+        throw AppError.conflict('USER_ALREADY_EXISTS', 'This email is already registered');
       }
       
       // Usuario existe pero no está verificado
       // Verificar si el token de verificación expiró
       if (existingUser.verificationTokenExpiry && existingUser.verificationTokenExpiry < Date.now()) {
         // Token expirado: permitir re-registro eliminando el usuario anterior
-        await User.deleteOne({ _id: existingUser._id });
-        console.log(`Usuario no verificado eliminado para re-registro: ${email}`);
+        await userRepository.deleteById(existingUser._id);
       } else {
         // Token aún válido: verificar límite de intentos
         if (existingUser.registrationAttempts >= 3) {
-          const error = new Error('TOO_MANY_ATTEMPTS');
-          error.statusCode = 429;
-          throw error;
+          throw new AppError('TOO_MANY_ATTEMPTS', 429, 'Too many registration attempts. Please wait 24 hours or contact support.');
         }
         
         // Permitir reenvío de email de verificación
         const confirmationToken = crypto.randomBytes(32).toString('hex');
         const confirmationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
         
-        existingUser.confirmationToken = confirmationToken;
-        existingUser.confirmationTokenExpiry = confirmationTokenExpiry;
-        existingUser.verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        existingUser.registrationAttempts = (existingUser.registrationAttempts || 0) + 1;
-        await existingUser.save();
+        await userRepository.updateById(existingUser._id, {
+          confirmationToken,
+          confirmationTokenExpiry,
+          verificationTokenExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          registrationAttempts: (existingUser.registrationAttempts || 0) + 1
+        });
         
         // Reenviar email
         const backendUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 3000}`;
@@ -60,7 +60,7 @@ class AuthService {
             email: existingUser.email,
             name: existingUser.name
           },
-          message: 'Email de verificación reenviado. Revisa tu bandeja de entrada.'
+          message: 'Verification email resent. Check your inbox.'
         };
       }
     }
@@ -70,7 +70,7 @@ class AuthService {
     const confirmationToken = crypto.randomBytes(32).toString('hex');
     const confirmationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    const newUser = new User({
+    const newUser = await userRepository.create({
       email: email.toLowerCase(),
       name: name.trim(),
       passwordHash,
@@ -81,8 +81,6 @@ class AuthService {
       isConfirmed: false,
       role: role
     });
-
-    await newUser.save();
 
     // Enviar email
     const backendUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 3000}`;
@@ -111,25 +109,63 @@ class AuthService {
 
   async login(credentials) {
     const { email, password } = credentials;
+    const MAX_LOGIN_ATTEMPTS = 3;
+    const LOCK_TIME_MS = 15 * 60 * 1000; // 15 minutes
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
+    const user = await userRepository.findByEmail(email.toLowerCase(), { select: '+passwordHash +loginAttempts +lockUntil' });
     
     if (!user) {
-      throw new Error('INVALID_CREDENTIALS');
+      throw AppError.unauthorized('INVALID_CREDENTIALS', 'Invalid credentials');
+    }
+
+    // Check if account is locked
+    if (user.lockUntil && user.lockUntil > new Date()) {
+      const remainingMs = user.lockUntil - new Date();
+      const remainingMinutes = Math.ceil(remainingMs / 60000);
+      throw AppError.tooManyRequests(
+        'ACCOUNT_LOCKED',
+        `Account temporarily locked. Try again in ${remainingMinutes} minute(s)`
+      );
+    }
+
+    // Reset lock if expired
+    if (user.lockUntil && user.lockUntil <= new Date()) {
+      await userRepository.resetLoginAttempts(user._id);
     }
 
     if (!user.isConfirmed) {
-      throw new Error('EMAIL_NOT_CONFIRMED');
+      throw AppError.unauthorized('EMAIL_NOT_CONFIRMED', 'Please confirm your email before signing in');
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      throw new Error('INVALID_CREDENTIALS');
+      // Increment failed login attempts
+      const attempts = (user.loginAttempts || 0) + 1;
+      
+      if (attempts >= MAX_LOGIN_ATTEMPTS) {
+        // Lock account for 15 minutes
+        await userRepository.lockAccount(user._id, new Date(Date.now() + LOCK_TIME_MS));
+        throw AppError.tooManyRequests(
+          'ACCOUNT_LOCKED',
+          'Too many failed login attempts. Account locked for 15 minutes'
+        );
+      }
+      
+      await userRepository.incrementLoginAttempts(user._id);
+      const remaining = MAX_LOGIN_ATTEMPTS - attempts;
+      throw AppError.unauthorized(
+        'INVALID_CREDENTIALS',
+        `Invalid credentials. ${remaining} attempt(s) remaining`
+      );
+    }
+
+    // Reset login attempts on successful login
+    if (user.loginAttempts > 0) {
+      await userRepository.resetLoginAttempts(user._id);
     }
 
     // Actualizar último login
-    user.lastLogin = new Date();
-    await user.save();
+    await userRepository.updateLastLogin(user._id);
 
     // Generar JWT
     const token = generateToken(user);
@@ -146,20 +182,23 @@ class AuthService {
   }
 
   async confirmAccount(token) {
-    const user = await User.findOne({ 
+    const user = await userRepository.findOne({ 
       confirmationToken: token, 
       confirmationTokenExpiry: { $gt: new Date() } 
     });
 
     if (!user) {
-      throw new Error('INVALID_OR_EXPIRED_TOKEN');
+      throw AppError.badRequest('INVALID_OR_EXPIRED_TOKEN', 'Invalid or expired token');
     }
 
-    user.isConfirmed = true;
-    user.confirmationToken = undefined;
-    user.confirmationTokenExpiry = undefined;
-    user.lastLogin = new Date();
-    await user.save();
+    await userRepository.updateById(user._id, {
+      isConfirmed: true,
+      $unset: {
+        confirmationToken: 1,
+        confirmationTokenExpiry: 1
+      },
+      lastLogin: new Date()
+    });
 
     // Enviar notificación In-App de cuenta confirmada
     authNotificationHelper.notifyAccountConfirmed(user._id, user.name).catch(err => {
@@ -168,7 +207,7 @@ class AuthService {
 
     // Si es empleado y no ha completado el test BFI-44, notificar
     if (user.role === 'employee') {
-      const hasProfile = await BFI44Response.hasProfile(user._id);
+      const hasProfile = await bfi44Repository.userHasCompleted(user._id);
       if (!hasProfile) {
         bfi44NotificationHelper.notifyTestPending(user._id, user.name).catch(err => {
           console.error('Error enviando notificación de test BFI-44:', err);
@@ -180,10 +219,10 @@ class AuthService {
   }
 
   async resendConfirmationEmail(email, name) {
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await userRepository.findByEmail(email.toLowerCase());
     
     if (!user) {
-      throw new Error('USER_NOT_FOUND');
+      throw AppError.notFound('USER_NOT_FOUND', 'User not found');
     }
 
     // Generar nuevo token
@@ -191,11 +230,12 @@ class AuthService {
     const confirmationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     // Actualizar usuario
-    user.confirmationToken = confirmationToken;
-    user.confirmationTokenExpiry = confirmationTokenExpiry;
-    user.verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    user.registrationAttempts = (user.registrationAttempts || 0) + 1;
-    await user.save();
+    await userRepository.updateById(user._id, {
+      confirmationToken,
+      confirmationTokenExpiry,
+      verificationTokenExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      registrationAttempts: (user.registrationAttempts || 0) + 1
+    });
 
     // Enviar email
     const backendUrl = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 3000}`;
@@ -203,7 +243,7 @@ class AuthService {
 
     await emailService.sendConfirmationEmail(email, name, confirmLink);
 
-    return { message: 'Correo de confirmación enviado' };
+    return { message: 'Confirmation email sent' };
   }
 }
 

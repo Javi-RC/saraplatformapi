@@ -37,11 +37,23 @@ class PushChannel extends NotificationChannel {
   }
 
   /**
-   * Valida que el usuario tenga configurado el canal push
+   * Valida que el usuario tenga configurado el canal push y las preferencias habilitadas
    */
   async canSend(notification, recipient) {
+    if (!recipient) {
+      return false;
+    }
+
+    // Verificar preferencias de notificaciones del usuario
+    if (recipient.notificationPreferences) {
+      if (recipient.notificationPreferences.push === false) {
+        return false;
+      }
+    }
+
     // TODO: Verificar si el usuario tiene tokens de dispositivos registrados
-    return false; // Por ahora, siempre retorna false
+    // Por ahora, retorna false porque el canal no está implementado
+    return false;
   }
 
   getChannelType() {

@@ -5,9 +5,12 @@ const {
   NotificationStatus,
   NotificationChannels 
 } = require('../models/notification.model');
-const User = require('../models/user.model');
 const NotificationChannelFactory = require('./notificationChannels/NotificationChannelFactory');
 const emailService = require('./email.service');
+const AppError = require('../utils/AppError');
+
+// Import repositories instead of direct model access for queries
+const { notificationRepository, userRepository } = require('../repositories');
 
 /**
  * Servicio de Notificaciones
@@ -52,9 +55,9 @@ class NotificationService {
     } = notificationData;
 
     // Validar que el receptor existe
-    const recipient = await User.findById(recipientId);
+    const recipient = await userRepository.findById(recipientId);
     if (!recipient) {
-      throw new Error('Usuario receptor no encontrado');
+      throw AppError.notFound('USER_NOT_FOUND', 'Notification recipient not found');
     }
 
     // Crear la notificación en la base de datos
@@ -175,12 +178,13 @@ class NotificationService {
     const skip = (page - 1) * limit;
 
     const [notifications, total] = await Promise.all([
-      Notification.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate('sender', 'name email avatar'),
-      Notification.countDocuments(query)
+      notificationRepository.find(query, {
+        sort: { createdAt: -1 },
+        skip,
+        limit,
+        populate: { path: 'sender', select: 'name email avatar' }
+      }),
+      notificationRepository.count(query)
     ]);
 
     return {
@@ -201,13 +205,13 @@ class NotificationService {
    * @returns {Promise<Object>}
    */
   async markAsRead(notificationId, userId) {
-    const notification = await Notification.findOne({
+    const notification = await notificationRepository.findOne({
       _id: notificationId,
       recipient: userId
     });
 
     if (!notification) {
-      throw new Error('Notificación no encontrada');
+      throw AppError.notFound('NOTIFICATION_NOT_FOUND', 'Notification not found');
     }
 
     return await notification.markAsRead();
@@ -220,7 +224,7 @@ class NotificationService {
    * @returns {Promise<number>} Cantidad de notificaciones actualizadas
    */
   async markMultipleAsRead(notificationIds, userId) {
-    const result = await Notification.updateMany(
+    const result = await notificationRepository.updateMany(
       {
         _id: { $in: notificationIds },
         recipient: userId,
@@ -241,7 +245,7 @@ class NotificationService {
    * @returns {Promise<number>} Cantidad de notificaciones actualizadas
    */
   async markAllAsRead(userId) {
-    const result = await Notification.updateMany(
+    const result = await notificationRepository.updateMany(
       {
         recipient: userId,
         readAt: null,
@@ -263,13 +267,13 @@ class NotificationService {
    * @returns {Promise<Object>}
    */
   async archive(notificationId, userId) {
-    const notification = await Notification.findOne({
+    const notification = await notificationRepository.findOne({
       _id: notificationId,
       recipient: userId
     });
 
     if (!notification) {
-      throw new Error('Notificación no encontrada');
+      throw AppError.notFound('NOTIFICATION_NOT_FOUND', 'Notification not found');
     }
 
     return await notification.archive();
@@ -282,7 +286,7 @@ class NotificationService {
    * @returns {Promise<boolean>}
    */
   async delete(notificationId, userId) {
-    const result = await Notification.deleteOne({
+    const result = await notificationRepository.deleteOne({
       _id: notificationId,
       recipient: userId
     });
@@ -296,7 +300,7 @@ class NotificationService {
    * @returns {Promise<number>}
    */
   async getUnreadCount(userId) {
-    return await Notification.countDocuments({
+    return await notificationRepository.count({
       recipient: userId,
       readAt: null,
       isArchived: false,
@@ -353,7 +357,10 @@ class NotificationService {
    * @returns {Promise<Array>} Array con las notificaciones creadas
    */
   async sendToRole(role, notificationData) {
-    const users = await User.find({ role, isConfirmed: true }).select('_id');
+    const users = await userRepository.find(
+      { role, isConfirmed: true },
+      { select: '_id' }
+    );
     const recipientIds = users.map(user => user._id.toString());
     
     return await this.sendBulkNotifications(recipientIds, notificationData);
@@ -365,7 +372,10 @@ class NotificationService {
    * @returns {Promise<Array>} Array con las notificaciones creadas
    */
   async sendToAll(notificationData) {
-    const users = await User.find({ isConfirmed: true }).select('_id');
+    const users = await userRepository.find(
+      { isConfirmed: true },
+      { select: '_id' }
+    );
     const recipientIds = users.map(user => user._id.toString());
     
     return await this.sendBulkNotifications(recipientIds, notificationData);

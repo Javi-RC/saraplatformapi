@@ -23,8 +23,8 @@ class CVNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CV_UPLOADED,
-        title: 'CV Subido',
-        message: `Hola ${userName}, tu CV "${cvFileName}" ha sido subido exitosamente y está siendo procesado.`,
+        title: 'CV Uploaded',
+        message: `Hi ${userName}, your CV "${cvFileName}" has been successfully uploaded and is being processed.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         metadata: {
@@ -47,12 +47,12 @@ class CVNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CV_PROCESSED,
-        title: 'CV Procesado',
-        message: `¡Buenas noticias ${userName}! Tu CV ha sido procesado y analizado exitosamente.`,
+        title: 'CV Processed',
+        message: `Good news ${userName}! Your CV has been successfully processed and analyzed.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         actionUrl: `/cv/${cvIdStr}`,
-        actionText: 'Ver CV',
+        actionText: 'View CV',
         metadata: {
           cvId: cvIdStr,
           event: 'cv_processed'
@@ -73,12 +73,12 @@ class CVNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CV_ANALYSIS_READY,
-        title: 'Análisis de CV Completo',
-        message: `${userName}, el análisis detallado de tu CV está listo. ${summary || 'Revisa los resultados para mejorar tu perfil profesional.'}`,
+        title: 'CV Analysis Complete',
+        message: `${userName}, the detailed analysis of your CV is ready. ${summary || 'Review the results to improve your professional profile.'}`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         actionUrl: `/cv/${cvIdStr}/analysis/${analysisIdStr}`,
-        actionText: 'Ver Análisis',
+        actionText: 'View Analysis',
         metadata: {
           cvId: cvIdStr,
           analysisId: analysisIdStr,
@@ -98,12 +98,12 @@ class CVNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CV_ANALYSIS_FAILED,
-        title: 'Error al Procesar CV',
-        message: `${userName}, hubo un problema al procesar tu CV. Por favor, verifica el archivo e intenta nuevamente. ${errorMessage ? `Error: ${errorMessage}` : ''}`,
+        title: 'Error Processing CV',
+        message: `${userName}, there was a problem processing your CV. Please check the file and try again. ${errorMessage ? `Error: ${errorMessage}` : ''}`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         actionUrl: '/cv/upload',
-        actionText: 'Subir Nuevo CV',
+        actionText: 'Upload New CV',
         metadata: {
           cvId: this._extractId(cvId),
           error: errorMessage,
@@ -126,12 +126,12 @@ class CVNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CV_ANALYSIS_READY,
-        title: 'Recomendaciones para tu CV',
-        message: `${userName}, tenemos ${recommendationCount} recomendaciones para mejorar tu CV y destacar más en las búsquedas.`,
+        title: 'Recommendations for Your CV',
+        message: `${userName}, we have ${recommendationCount} recommendations to improve your CV and stand out more in searches.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         actionUrl: `/cv/${cvIdStr}/recommendations`,
-        actionText: 'Ver Recomendaciones',
+        actionText: 'View Recommendations',
         metadata: {
           cvId: cvIdStr,
           recommendationCount,
@@ -151,8 +151,8 @@ class CVNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CV_PROCESSED,
-        title: 'CV Eliminado',
-        message: `${userName}, tu CV "${cvFileName}" ha sido eliminado del sistema.`,
+        title: 'CV Deleted',
+        message: `${userName}, your CV "${cvFileName}" has been deleted from the system.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.LOW,
         metadata: {

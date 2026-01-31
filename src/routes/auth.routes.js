@@ -57,7 +57,6 @@ router.get(
         return res.redirect(redirectUrl);
       }
 
-      // Crear nuevo usuario
       user = new User({
         name: profile.displayName || profile.name,
         email: profile.email,
@@ -82,33 +81,111 @@ router.get(
   }
 );
 
-// Actualizar perfil
+// Endpoint para completar perfil después de OAuth (acepta token en body o header)
+router.put('/complete-profile', async (req, res) => {
+  try {
+    const { role, token } = req.body;
+    
+    // Intentar obtener el token del body o del header Authorization
+    let authToken = token;
+    if (!authToken) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        authToken = authHeader.split(' ')[1];
+      }
+    }
+
+    if (!authToken) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Access token is required' 
+      });
+    }
+
+    // Verificar el token
+    const { verifyToken } = require('../utils/jwt');
+    let decoded;
+    try {
+      decoded = verifyToken(authToken);
+    } catch (error) {
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Invalid or expired token' 
+      });
+    }
+
+    const userId = decoded.userId;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'User not found' 
+      });
+    }
+
+    // Validar que el rol sea válido
+    const validRoles = ['employee', 'org_admin'];
+    if (!role || !validRoles.includes(role)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid role. Must be one of: employee, org_admin' 
+      });
+    }
+
+    user.role = role;
+    await user.save();
+
+    // Generar nuevo token con el rol actualizado
+    const newToken = generateToken(user);
+
+    res.json({
+      success: true,
+      user: user.toJSON(),
+      token: newToken,
+      message: 'Profile completed successfully'
+    });
+
+  } catch (error) {
+    console.error('Error completing profile:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error updating profile'
+    });
+  }
+});
+
+// Endpoint para actualizar perfil (requiere autenticación)
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
     const { role } = req.body;
-    // `authMiddleware` añade el payload decodificado en `req.user`.
-    // El `generateToken` guarda el id como `userId`, así que soportamos ambos formatos.
-    const userId = req.user?.userId || req.user?.id || req.user?._id; // requiere middleware auth
+    const userId = req.user?.userId || req.user?.id || req.user?._id;
 
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'User not found' 
+      });
     }
 
     user.role = role;
     await user.save();
 
     res.json({
+      success: true,
       user: user.toJSON(),
-      message: 'Perfil actualizado correctamente'
+      message: 'Profile updated successfully'
     });
 
   } catch (error) {
     res.status(500).json({
-      error: 'Error al actualizar el perfil'
+      success: false,
+      error: 'Error updating profile'
     });
   }
 });
+
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));

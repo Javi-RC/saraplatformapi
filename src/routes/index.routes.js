@@ -4,7 +4,7 @@ const router = Router();
 router.get('/', (req, res) => {
   res.json({ 
     success: true, 
-    message: 'API del TFG funcionando',
+    message: 'TFG API is running',
     version: '1.0.0'
   });
 });

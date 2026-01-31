@@ -14,7 +14,6 @@ describe('EmailService', () => {
 
   describe('sendConfirmationEmail', () => {
     it('debería enviar email exitosamente', async () => {
-      // Arrange
       const email = 'test@example.com';
       const name = 'Test User';
       const confirmLink = 'http://localhost:3000/auth/confirm?token=abc123';
@@ -25,11 +24,7 @@ describe('EmailService', () => {
       };
 
       global.fetch.mockResolvedValue(mockResponse);
-
-      // Act
       const result = await emailService.sendConfirmationEmail(email, name, confirmLink);
-
-      // Assert
       expect(global.fetch).toHaveBeenCalledWith(
         'https://api.brevo.com/v3/smtp/email',
         expect.objectContaining({
@@ -43,7 +38,6 @@ describe('EmailService', () => {
     });
 
     it('debería lanzar error cuando la API de Brevo falla', async () => {
-      // Arrange
       const email = 'test@example.com';
       const name = 'Test User';
       const confirmLink = 'http://localhost:3000/auth/confirm?token=abc123';
@@ -56,7 +50,6 @@ describe('EmailService', () => {
 
       global.fetch.mockResolvedValue(mockResponse);
 
-      // Act & Assert
       await expect(emailService.sendConfirmationEmail(email, name, confirmLink))
         .rejects
         .toThrow('Brevo API error: 400 - Bad Request');
@@ -65,14 +58,9 @@ describe('EmailService', () => {
 
   describe('getConfirmationEmailTemplate', () => {
     it('debería generar template de email correctamente', () => {
-      // Arrange
       const name = 'Test User';
       const confirmLink = 'http://localhost:3000/auth/confirm?token=abc123';
-
-      // Act
       const template = emailService.getConfirmationEmailTemplate(name, confirmLink);
-
-      // Assert
       expect(template).toContain(name);
       expect(template).toContain(confirmLink);
       expect(template).toContain('Confirmar Mi Cuenta');

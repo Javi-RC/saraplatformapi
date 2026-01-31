@@ -1,0 +1,116 @@
+@startuml Login Sequence Diagram
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 200
+
+title Diagrama de Secuencia - Inicio de Sesión (Login)\n Caso Exitoso
+
+actor Usuario as user
+box "Frontend" #LightBlue
+    participant "LoginPage" as loginPage <<View>>
+    participant "AuthContext" as authCtx <<Context>>
+    participant "authService" as authSvc <<Service>>
+end box
+
+box "Backend" #LightGreen
+    participant "auth.routes" as authRoutes <<Router>>
+    participant "auth.controller" as authCtrl <<Controller>>
+    participant "validators" as validators <<Utils>>
+    participant "auth.service" as authService <<Service>>
+    participant "userRepository" as userRepo <<Repository>>
+    participant "jwt" as jwtUtils <<Utils>>
+    participant "responseHandler" as respHandler <<Utils>>
+end box
+
+database "MongoDB" as db
+
+== Flujo de Inicio de Sesión ==
+
+user -> loginPage: Introduce email y password
+activate loginPage
+
+loginPage -> loginPage: handleSubmit(e)
+loginPage -> authCtx: login(email, password)
+activate authCtx
+
+authCtx -> authSvc: login(email, password)
+activate authSvc
+
+authSvc -> authRoutes: POST /auth/login\n{email, password}
+activate authRoutes
+
+authRoutes -> authCtrl: login(req, res)
+activate authCtrl
+
+authCtrl -> validators: validateLoginData(email, password)
+activate validators
+validators --> authCtrl: void (validación exitosa)
+deactivate validators
+
+authCtrl -> authService: login({email, password})
+activate authService
+
+authService -> userRepo: findByEmail(email.toLowerCase(),\n{select: '+passwordHash'})
+activate userRepo
+
+userRepo -> db: findOne({email})
+activate db
+note right of db: select: '+passwordHash'\nincluye campo oculto
+db --> userRepo: user (con passwordHash)
+deactivate db
+
+userRepo --> authService: user
+deactivate userRepo
+
+authService -> authService: Verificar user.isConfirmed === true
+
+authService -> authService: bcrypt.compare(password,\nuser.passwordHash)
+note right: Validación de contraseña
+
+authService -> userRepo: updateLastLogin(user._id)
+activate userRepo
+
+userRepo -> db: updateOne({_id: userId},\n{$set: {lastLogin: new Date()}})
+activate db
+db --> userRepo: updateResult
+deactivate db
+
+userRepo --> authService: void
+deactivate userRepo
+
+authService -> jwtUtils: generateToken(user)
+activate jwtUtils
+
+jwtUtils -> jwtUtils: jwt.sign(payload, JWT_SECRET,\n{expiresIn: JWT_EXPIRES_IN})
+jwtUtils --> authService: token (JWT)
+deactivate jwtUtils
+
+authService --> authCtrl: {token, user: {id, email, name, role}}
+deactivate authService
+
+authCtrl -> respHandler: success(res, {message, token, user}, 200)
+activate respHandler
+
+respHandler --> authRoutes: HTTP 200\n{success: true, data: {message, token, user}}
+deactivate respHandler
+deactivate authCtrl
+
+authRoutes --> authSvc: Response JSON
+deactivate authRoutes
+
+authSvc --> authCtx: {token, user}
+deactivate authSvc
+
+authCtx -> authCtx: localStorage.setItem('token', token)
+authCtx -> authCtx: setUser(user)
+authCtx -> authCtx: setIsAuthenticated(true)
+
+authCtx --> loginPage: success
+deactivate authCtx
+
+loginPage -> loginPage: navigate('/dashboard')
+loginPage --> user: Redirige al Dashboard
+deactivate loginPage
+
+@enduml

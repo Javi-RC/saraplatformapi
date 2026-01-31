@@ -1,22 +1,17 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongodbHelper = require('../../setup/mongodb-helper');
 const User = require('../../../src/models/user.model');
 const bcrypt = require('bcryptjs');
 
-let mongoServer;
-
 describe('User Model - Unit Tests', () => {
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
+    await mongodbHelper.connect();
     // Ensure model indexes (unique constraints) are created before tests
     await User.init();
-  });
+  }, 60000);
 
   afterAll(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    await mongodbHelper.disconnect();
   });
 
   beforeEach(async () => {
@@ -25,18 +20,13 @@ describe('User Model - Unit Tests', () => {
 
   describe('Creación de Usuario', () => {
     it('debería crear un usuario correctamente', async () => {
-      // Arrange
       const userData = {
         email: 'test@example.com',
         name: 'Test User',
         passwordHash: 'hashedPassword123'
       };
-
-      // Act
       const user = new User(userData);
       const savedUser = await user.save();
-
-      // Assert
       expect(savedUser._id).toBeDefined();
       expect(savedUser.email).toBe(userData.email);
       expect(savedUser.name).toBe(userData.name);
@@ -47,25 +37,20 @@ describe('User Model - Unit Tests', () => {
     });
 
     it('debería rechazar email duplicado', async () => {
-      // Arrange
       const userData = {
         email: 'duplicate@example.com',
         name: 'Test User',
         passwordHash: 'hashedPassword123'
       };
 
-      // Crear primer usuario
       await User.create(userData);
 
-      // Intentar crear segundo usuario con mismo email
       const secondUser = new User(userData);
 
-      // Act & Assert
       await expect(secondUser.save()).rejects.toThrow();
     }, 10000); 
 
     it('debería rechazar email inválido', async () => {
-      // Arrange
       const userData = {
         email: 'invalid-email',
         name: 'Test User',
@@ -74,28 +59,21 @@ describe('User Model - Unit Tests', () => {
 
       const user = new User(userData);
 
-      // Act & Assert
       await expect(user.save()).rejects.toThrow();
     });
 
     it('debería convertir email a minúsculas automáticamente', async () => {
-      // Arrange
       const userData = {
         email: 'TEST@EXAMPLE.COM',
         name: 'Test User',
         passwordHash: 'hashedPassword123'
       };
-
-      // Act
       const user = new User(userData);
       const savedUser = await user.save();
-
-      // Assert
       expect(savedUser.email).toBe('test@example.com');
     });
 
     it('debería eliminar campos sensibles al convertir a JSON', async () => {
-      // Arrange
       const userData = {
         email: 'test@example.com',
         name: 'Test User',
@@ -106,11 +84,7 @@ describe('User Model - Unit Tests', () => {
 
       const user = new User(userData);
       const savedUser = await user.save();
-
-      // Act
       const userJson = savedUser.toJSON();
-
-      // Assert
       expect(userJson.passwordHash).toBeUndefined();
       expect(userJson.confirmationToken).toBeUndefined();
       expect(userJson.confirmationTokenExpiry).toBeUndefined();
@@ -121,7 +95,6 @@ describe('User Model - Unit Tests', () => {
 
   describe('Métodos de Instancia', () => {
     it('debería comparar contraseñas correctamente', async () => {
-      // Arrange
       const plainPassword = 'password123';
       const hashedPassword = await bcrypt.hash(plainPassword, 12);
       
@@ -130,12 +103,8 @@ describe('User Model - Unit Tests', () => {
         name: 'Test User',
         passwordHash: hashedPassword
       });
-
-      // Act
       const isMatch = await user.comparePassword(plainPassword);
       const isNotMatch = await user.comparePassword('wrongpassword');
-
-      // Assert
       expect(isMatch).toBe(true);
       expect(isNotMatch).toBe(false);
     });

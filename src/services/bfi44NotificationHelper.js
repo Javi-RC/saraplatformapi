@@ -24,12 +24,12 @@ class BFI44NotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CUSTOM,
-        title: 'Completa tu Perfil de Personalidad',
-        message: `Hola ${userName}, te invitamos a completar el cuestionario BFI-44 para conocer mejor tu perfil de personalidad. Solo te tomará unos minutos.`,
+        title: 'Complete Your Personality Profile',
+        message: `Hi ${userName}, we invite you to complete the BFI-44 questionnaire to better understand your personality profile. It will only take a few minutes.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         actionUrl: '/bfi-44/test',
-        actionText: 'Completar Test',
+        actionText: 'Complete Test',
         metadata: {
           event: 'bfi44_test_pending',
           testType: 'BFI-44'
@@ -48,12 +48,12 @@ class BFI44NotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CUSTOM,
-        title: 'Test BFI-44 Completado',
-        message: `¡Felicidades ${userName}! Has completado exitosamente el cuestionario BFI-44. Tus resultados ya están disponibles.`,
+        title: 'BFI-44 Test Completed',
+        message: `Congratulations ${userName}! You have successfully completed the BFI-44 questionnaire. Your results are now available.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         actionUrl: '/bfi-44/my-profile',
-        actionText: 'Ver Resultados',
+        actionText: 'View Results',
         metadata: {
           event: 'bfi44_test_completed',
           testType: 'BFI-44'
@@ -72,12 +72,12 @@ class BFI44NotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(adminId),
         type: NotificationTypes.CUSTOM,
-        title: 'Empleados sin Test BFI-44',
-        message: `${adminName}, actualmente hay ${employeeCount} empleado(s) en ${organizationName} que aún no han completado el test BFI-44.`,
+        title: 'Employees Without BFI-44 Test',
+        message: `${adminName}, currently there are ${employeeCount} employee(s) in ${organizationName} who have not yet completed the BFI-44 test.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.LOW,
         actionUrl: '/admin/bfi-44/pending',
-        actionText: 'Ver Detalles',
+        actionText: 'View Details',
         metadata: {
           event: 'bfi44_admin_pending_tests',
           employeeCount,
@@ -97,12 +97,12 @@ class BFI44NotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(userId),
         type: NotificationTypes.CUSTOM,
-        title: 'Recordatorio: Test BFI-44 Pendiente',
-        message: `Hola ${userName}, te recordamos que aún tienes pendiente el cuestionario BFI-44. Complétalo para obtener insights sobre tu personalidad profesional.`,
+        title: 'Reminder: Pending BFI-44 Test',
+        message: `Hi ${userName}, we remind you that you still have the BFI-44 questionnaire pending. Complete it to gain insights into your professional personality.`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         actionUrl: '/bfi-44/test',
-        actionText: 'Completar Ahora',
+        actionText: 'Complete Now',
         metadata: {
           event: 'bfi44_test_reminder',
           daysPending,

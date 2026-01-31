@@ -4,10 +4,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET no está definido en las variables de entorno');
+  throw new Error('JWT_SECRET is not defined in environment variables');
 }
 
-// Generar token JWT
 exports.generateToken = (user) => {
   const payload = {
     userId: user._id.toString(),
@@ -21,20 +20,18 @@ exports.generateToken = (user) => {
   });
 };
 
-// Verificar token JWT
 exports.verifyToken = (token) => {
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      throw new Error('Token expirado');
+      throw new Error('Token expired');
     } else {
-      throw new Error('Token inválido');
+      throw new Error('Invalid token');
     }
   }
 };
 
-// Middleware de autenticación
 exports.authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -42,7 +39,7 @@ exports.authMiddleware = (req, res, next) => {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        error: 'Token de acceso requerido'
+        error: 'Access token is required'
       });
     }
 

@@ -1,6 +1,8 @@
-const BFI44Response = require('../models/bfi44.model');
-const User = require('../models/user.model');
 const bfi44NotificationHelper = require('./bfi44NotificationHelper');
+const { toStableBfi44Profile } = require('../utils/bfi44ProfileMapper');
+
+// Import repositories instead of models
+const { bfi44Repository, userRepository } = require('../repositories');
 
 /**
  * BFI-44 Service
@@ -201,17 +203,15 @@ class BFI44Service {
     // Calcular factores
     const results = this.calculateAllFactors(responsesMap);
 
-    // Crear y guardar documento
-    const bfi44Response = new BFI44Response({
-      userId,
+    // Crear y guardar documento usando el repositorio
+    const bfi44Response = await bfi44Repository.create({
+      userId: userId,
       responses: responsesMap,
       results
     });
 
-    await bfi44Response.save();
-
     // Obtener nombre del usuario para la notificación
-    const user = await User.findById(userId).select('name');
+    const user = await userRepository.findById(userId, { select: 'name' });
     const userName = user ? user.name : 'Usuario';
 
     // Enviar notificación de test completado (asíncrono, no bloquea)
@@ -238,8 +238,11 @@ class BFI44Service {
       return null;
     }
 
+    const stable = toStableBfi44Profile(profile.results);
+
     return {
       userId: profile.userId,
+      traits: stable ? stable.traits : null,
       results: profile.results,
       completedAt: profile.completedAt
     };
@@ -252,7 +255,7 @@ class BFI44Service {
    * @returns {Promise<Object>} Resultados recalculados
    */
   static async recalculateProfile(responseId) {
-    const response = await BFI44Response.findById(responseId);
+    const response = await bfi44Repository.findById(responseId);
     
     if (!response) {
       throw new Error('BFI44_RESPONSE_NOT_FOUND');
@@ -266,7 +269,7 @@ class BFI44Service {
     await response.save();
 
     return {
-      userId: response.userId,
+      userId: response.user,
       results: newResults,
       recalculatedAt: new Date()
     };
@@ -278,7 +281,7 @@ class BFI44Service {
    * @returns {Promise<boolean>}
    */
   static async hasProfile(userId) {
-    return await BFI44Response.hasProfile(userId);
+    return await bfi44Repository.userHasCompleted(userId);
   }
 
   /**
@@ -288,14 +291,17 @@ class BFI44Service {
    */
   static async getEmployeesWithoutTest(organizationId) {
     // Obtener todos los empleados de la organización
-    const employees = await User.find({
-      organization: organizationId,
-      role: 'employee'
-    }).select('_id name email');
+    const employees = await userRepository.find(
+      {
+        organization: organizationId,
+        role: 'employee'
+      },
+      { select: '_id name email' }
+    );
 
     // Obtener IDs de empleados con test completado
-    const employeesWithTest = await BFI44Response.distinct('userId', {
-      userId: { $in: employees.map(e => e._id) }
+    const employeesWithTest = await bfi44Repository.distinct('user', {
+      user: { $in: employees.map(e => e._id) }
     });
 
     // Filtrar empleados sin test
@@ -343,18 +349,21 @@ class BFI44Service {
    * @returns {Promise<Object>} Estadísticas
    */
   static async getOrganizationStats(organizationId) {
-    const employees = await User.countDocuments({
+    const employees = await userRepository.count({
       organization: organizationId,
       role: 'employee'
     });
 
-    const employeesWithTest = await BFI44Response.distinct('userId', {
-      userId: {
-        $in: await User.find({
-          organization: organizationId,
-          role: 'employee'
-        }).distinct('_id')
-      }
+    const employeeIds = await userRepository.find(
+      {
+        organization: organizationId,
+        role: 'employee'
+      },
+      { select: '_id' }
+    );
+
+    const employeesWithTest = await bfi44Repository.distinct('user', {
+      user: { $in: employeeIds.map(e => e._id) }
     });
 
     const completedCount = employeesWithTest.length;
@@ -375,7 +384,7 @@ class BFI44Service {
    * @returns {Promise<Object>} Resultado de la verificación
    */
   static async checkAndNotifyUser(userId) {
-    const user = await User.findById(userId).select('name email role');
+    const user = await userRepository.findById(userId, { select: 'name email role' });
     
     if (!user) {
       throw new Error('USER_NOT_FOUND');

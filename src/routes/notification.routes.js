@@ -11,15 +11,11 @@ const isAdmin = (req, res, next) => {
   if (req.user.role !== 'org_admin') {
     return res.status(403).json({
       success: false,
-      error: 'Acceso denegado. Se requieren permisos de administrador.'
+      error: 'Access denied. Administrator permissions are required.'
     });
   }
   next();
 };
-
-// ============================================
-// Rutas públicas para usuarios autenticados
-// ============================================
 
 /**
  * GET /api/notifications
@@ -70,10 +66,6 @@ router.patch('/:id/archive', authMiddleware, notificationController.archive);
  * Elimina una notificación
  */
 router.delete('/:id', authMiddleware, notificationController.delete);
-
-// ============================================
-// Rutas administrativas (solo para org_admin)
-// ============================================
 
 /**
  * POST /api/notifications

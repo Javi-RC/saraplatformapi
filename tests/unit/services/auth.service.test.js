@@ -1,78 +1,98 @@
-const AuthService = require('../../../src/services/auth.service');
-const User = require('../../../src/models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // Mock de dependencias
-jest.mock('../../../src/models/user.model');
 jest.mock('bcryptjs');
-jest.mock('jsonwebtoken');
+jest.mock('../../../src/utils/jwt');
 jest.mock('../../../src/services/email.service');
+jest.mock('../../../src/services/authNotificationHelper');
+jest.mock('../../../src/services/bfi44NotificationHelper');
+jest.mock('../../../src/repositories', () => ({
+  userRepository: {
+    findByEmail: jest.fn(),
+    create: jest.fn(),
+    updateById: jest.fn(),
+    updateLastLogin: jest.fn(),
+    findByIdAndSelect: jest.fn(),
+    incrementLoginAttempts: jest.fn(),
+    lockAccount: jest.fn(),
+    resetLoginAttempts: jest.fn()
+  },
+  bfi44Repository: {
+    hasProfile: jest.fn()
+  }
+}));
 
 describe('AuthService - Unit Tests', () => {
   let authService;
+  let userRepository;
+  let generateToken;
 
   beforeEach(() => {
+    jest.resetModules();
     authService = require('../../../src/services/auth.service');
+    userRepository = require('../../../src/repositories').userRepository;
+    generateToken = require('../../../src/utils/jwt').generateToken;
     jest.clearAllMocks();
     
     // Configurar mocks por defecto
     process.env.BREVO_API_KEY = 'test-api-key';
+    process.env.JWT_SECRET = 'test-secret';
+    
+    // Configurar mock de authNotificationHelper
+    const authNotificationHelper = require('../../../src/services/authNotificationHelper');
+    authNotificationHelper.notifyAccountCreated = jest.fn().mockResolvedValue(undefined);
+    authNotificationHelper.notifyAccountConfirmed = jest.fn().mockResolvedValue(undefined);
   });
 
   describe('register', () => {
     it('debería registrar un usuario exitosamente', async () => {
-      // Arrange
       const userData = {
         email: 'test@example.com',
         name: 'Test User',
         password: 'password123'
       };
 
-      User.findOne.mockResolvedValue(null);
+      userRepository.findByEmail.mockResolvedValue(null);
       bcrypt.hash.mockResolvedValue('hashedPassword123');
       
-const mockSave = jest.fn().mockResolvedValue(true);
-
-      User.mockImplementation((data) => ({
-        ...data,
+      const newUser = {
         _id: '507f1f77bcf86cd799439011',
-        save: mockSave
-      }));
+        email: 'test@example.com',
+        name: 'Test User'
+      };
+      
+      userRepository.create.mockResolvedValue(newUser);
 
       const emailService = require('../../../src/services/email.service');
       emailService.sendConfirmationEmail.mockResolvedValue({ messageId: '123' });
-
-      // Act
+      
       const result = await authService.register(userData);
-
-      // Assert
-      expect(User.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
-      expect(bcrypt.hash).toHaveBeenCalledWith('password123', 12);
-      console.log(result);
+      
+      expect(userRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
       expect(result.user.email).toBe('test@example.com');
     });
 
     it('debería lanzar error si el usuario ya existe', async () => {
-      // Arrange
       const userData = {
         email: 'existing@example.com',
         name: 'Test User',
         password: 'password123'
       };
 
-      User.findOne.mockResolvedValue({ email: 'existing@example.com' });
+      userRepository.findByEmail.mockResolvedValue({
+        email: 'existing@example.com',
+        isConfirmed: true 
+      });
 
-      // Act & Assert
       await expect(authService.register(userData))
         .rejects
-        .toThrow('USER_ALREADY_EXISTS');
+        .toThrow(expect.objectContaining({ code: 'USER_ALREADY_EXISTS' }));
     });
   });
 
   describe('login', () => {
     it('debería hacer login exitosamente con credenciales válidas', async () => {
-      // Arrange
       const credentials = {
         email: 'test@example.com',
         password: 'password123'
@@ -84,40 +104,119 @@ const mockSave = jest.fn().mockResolvedValue(true);
         name: 'Test User',
         role: 'employee',
         isConfirmed: true,
+        loginAttempts: 0,
+        lockUntil: null,
         comparePassword: jest.fn().mockResolvedValue(true),
-        save: jest.fn().mockResolvedValue(true)
+        lastLogin: null
       };
 
-      User.findOne.mockReturnValue({ select: jest.fn().mockResolvedValue(mockUser) });
-      jwt.sign.mockReturnValue('fake-jwt-token');
-
-      // Act
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+      userRepository.updateLastLogin.mockResolvedValue(mockUser);
+      generateToken.mockReturnValue('fake-jwt-token');
+      
       const result = await authService.login(credentials);
-
-      // Assert
+      
       expect(mockUser.comparePassword).toHaveBeenCalledWith('password123');
       expect(result.token).toBe('fake-jwt-token');
       expect(result.user.email).toBe('test@example.com');
     });
 
     it('debería rechazar login con credenciales incorrectas', async () => {
-      // Arrange
       const credentials = {
         email: 'test@example.com',
         password: 'wrongpassword'
       };
 
       const mockUser = {
+        _id: '507f1f77bcf86cd799439011',
         isConfirmed: true,
+        loginAttempts: 0,
+        lockUntil: null,
         comparePassword: jest.fn().mockResolvedValue(false)
       };
 
-      User.findOne.mockReturnValue({ select: jest.fn().mockResolvedValue(mockUser) });
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+      userRepository.incrementLoginAttempts.mockResolvedValue(mockUser);
 
-      // Act & Assert
       await expect(authService.login(credentials))
         .rejects
-        .toThrow('INVALID_CREDENTIALS');
+        .toThrow(expect.objectContaining({ code: 'INVALID_CREDENTIALS' }));
+      
+      expect(userRepository.incrementLoginAttempts).toHaveBeenCalledWith(mockUser._id);
+    });
+
+    it('debería bloquear cuenta después de 3 intentos fallidos', async () => {
+      const credentials = {
+        email: 'test@example.com',
+        password: 'wrongpassword'
+      };
+
+      const mockUser = {
+        _id: '507f1f77bcf86cd799439011',
+        isConfirmed: true,
+        loginAttempts: 2, // Already 2 failed attempts
+        lockUntil: null,
+        comparePassword: jest.fn().mockResolvedValue(false)
+      };
+
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+      userRepository.lockAccount.mockResolvedValue(mockUser);
+
+      await expect(authService.login(credentials))
+        .rejects
+        .toThrow(expect.objectContaining({ code: 'ACCOUNT_LOCKED' }));
+      
+      expect(userRepository.lockAccount).toHaveBeenCalled();
+    });
+
+    it('debería rechazar login si la cuenta está bloqueada', async () => {
+      const credentials = {
+        email: 'test@example.com',
+        password: 'password123'
+      };
+
+      const mockUser = {
+        _id: '507f1f77bcf86cd799439011',
+        isConfirmed: true,
+        loginAttempts: 0,
+        lockUntil: new Date(Date.now() + 10 * 60 * 1000), // Locked for 10 more minutes
+        comparePassword: jest.fn().mockResolvedValue(true)
+      };
+
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+
+      await expect(authService.login(credentials))
+        .rejects
+        .toThrow(expect.objectContaining({ code: 'ACCOUNT_LOCKED' }));
+    });
+
+    it('debería resetear intentos después de login exitoso', async () => {
+      const credentials = {
+        email: 'test@example.com',
+        password: 'password123'
+      };
+
+      const mockUser = {
+        _id: '507f1f77bcf86cd799439011',
+        email: 'test@example.com',
+        name: 'Test User',
+        role: 'employee',
+        isConfirmed: true,
+        loginAttempts: 2, // Had previous failed attempts
+        lockUntil: null,
+        comparePassword: jest.fn().mockResolvedValue(true),
+        lastLogin: null
+      };
+
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+      userRepository.resetLoginAttempts.mockResolvedValue(mockUser);
+      userRepository.updateLastLogin.mockResolvedValue(mockUser);
+      generateToken.mockReturnValue('fake-jwt-token');
+      
+      const result = await authService.login(credentials);
+      
+      expect(userRepository.resetLoginAttempts).toHaveBeenCalledWith(mockUser._id);
+      expect(result.token).toBe('fake-jwt-token');
     });
   });
 });

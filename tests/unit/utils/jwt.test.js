@@ -13,7 +13,6 @@ describe('JWT Utils - Unit Tests', () => {
 
   describe('generateToken', () => {
     it('debería generar token JWT correctamente', () => {
-      // Arrange
       const user = {
         _id: '507f1f77bcf86cd799439011',
         email: 'test@example.com',
@@ -22,11 +21,7 @@ describe('JWT Utils - Unit Tests', () => {
       };
 
       jwt.sign.mockReturnValue('fake-jwt-token');
-
-      // Act
       const token = generateToken(user);
-
-      // Assert
       expect(jwt.sign).toHaveBeenCalledWith(
         {
           userId: user._id,
@@ -43,7 +38,6 @@ describe('JWT Utils - Unit Tests', () => {
 
   describe('verifyToken', () => {
     it('debería verificar token válido', () => {
-      // Arrange
       const validToken = 'valid-token';
       const decodedPayload = {
         userId: '507f1f77bcf86cd799439011',
@@ -51,16 +45,11 @@ describe('JWT Utils - Unit Tests', () => {
       };
 
       jwt.verify.mockReturnValue(decodedPayload);
-
-      // Act
       const result = verifyToken(validToken);
-
-      // Assert
       expect(result).toEqual(decodedPayload);
     });
 
     it('debería lanzar error para token expirado', () => {
-      // Arrange
       const expiredToken = 'expired-token';
       
       const tokenExpiredError = new Error('Token expired');
@@ -70,13 +59,11 @@ describe('JWT Utils - Unit Tests', () => {
         throw tokenExpiredError;
       });
 
-      // Act & Assert
       expect(() => verifyToken(expiredToken))
-        .toThrow('Token expirado');
+        .toThrow('Token expired');
     });
 
     it('debería lanzar error para token inválido', () => {
-      // Arrange
       const invalidToken = 'invalid-token';
       
       const jsonWebTokenError = new Error('Invalid token');
@@ -86,9 +73,8 @@ describe('JWT Utils - Unit Tests', () => {
         throw jsonWebTokenError;
       });
 
-      // Act & Assert
       expect(() => verifyToken(invalidToken))
-        .toThrow('Token inválido');
+        .toThrow('Invalid token');
     });
   });
 });

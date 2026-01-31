@@ -15,7 +15,7 @@ const requireRole = (...allowedRoles) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        error: 'No autenticado'
+        error: 'Not authenticated'
       });
     }
 
@@ -23,7 +23,7 @@ const requireRole = (...allowedRoles) => {
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        error: 'No tienes permisos para acceder a este recurso',
+        error: 'You do not have permission to access this resource',
         requiredRoles: allowedRoles,
         currentRole: req.user.role
       });
@@ -40,14 +40,14 @@ const requireOrgAdmin = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      error: 'No autenticado'
+      error: 'Not authenticated'
     });
   }
 
   if (req.user.role !== 'org_admin') {
     return res.status(403).json({
       success: false,
-      error: 'Debes ser administrador de una organización para acceder a este recurso'
+      error: 'You must be an organization admin to access this resource'
     });
   }
 
@@ -61,14 +61,14 @@ const requireEmployee = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      error: 'No autenticado'
+      error: 'Not authenticated'
     });
   }
 
   if (req.user.role !== 'employee') {
     return res.status(403).json({
       success: false,
-      error: 'Debes ser un empleado para acceder a este recurso'
+      error: 'You must be an employee to access this resource'
     });
   }
 
@@ -82,14 +82,14 @@ const requireCompleteProfile = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      error: 'No autenticado'
+      error: 'Not authenticated'
     });
   }
 
   if (req.user.role === 'unassigned') {
     return res.status(403).json({
       success: false,
-      error: 'Debes completar tu perfil antes de acceder a este recurso',
+      error: 'You must complete your profile before accessing this resource',
       profileComplete: false
     });
   }
@@ -105,7 +105,7 @@ const requireOwnerOrOrgAdmin = async (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      error: 'No autenticado'
+      error: 'Not authenticated'
     });
   }
 
@@ -117,7 +117,6 @@ const requireOwnerOrOrgAdmin = async (req, res, next) => {
     return next();
   }
 
-  // Si es org_admin, verificar que el usuario objetivo pertenece a su organización
   if (req.user.role === 'org_admin') {
     try {
       const Organization = require('../models/organization.model');
@@ -134,7 +133,7 @@ const requireOwnerOrOrgAdmin = async (req, res, next) => {
       if (!organization) {
         return res.status(403).json({
           success: false,
-          error: 'No administras ninguna organización'
+          error: 'You are not managing any organization'
         });
       }
 
@@ -150,14 +149,14 @@ const requireOwnerOrOrgAdmin = async (req, res, next) => {
       console.error('Error verificando permisos:', error);
       return res.status(500).json({
         success: false,
-        error: 'Error verificando permisos'
+        error: 'Error checking permissions'
       });
     }
   }
 
   return res.status(403).json({
     success: false,
-    error: 'No tienes permisos para acceder a este recurso'
+    error: 'You do not have permission to access this resource'
   });
 };
 
@@ -168,7 +167,7 @@ const requireOrganizationAdmin = async (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      error: 'No autenticado'
+      error: 'Not authenticated'
     });
   }
 
@@ -182,7 +181,7 @@ const requireOrganizationAdmin = async (req, res, next) => {
     if (!organization) {
       return res.status(404).json({
         success: false,
-        error: 'Organización no encontrada'
+        error: 'Organization not found'
       });
     }
 
@@ -190,7 +189,7 @@ const requireOrganizationAdmin = async (req, res, next) => {
     if (!organization.isAdmin(userId)) {
       return res.status(403).json({
         success: false,
-        error: 'No eres administrador de esta organización'
+        error: 'You are not an admin of this organization'
       });
     }
 
@@ -201,7 +200,7 @@ const requireOrganizationAdmin = async (req, res, next) => {
     console.error('Error verificando permisos de organización:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error verificando permisos'
+      error: 'Error checking permissions'
     });
   }
 };
@@ -214,7 +213,7 @@ const requireOrganizationMember = async (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      error: 'No autenticado'
+      error: 'Not authenticated'
     });
   }
 
@@ -228,7 +227,7 @@ const requireOrganizationMember = async (req, res, next) => {
     if (!organization) {
       return res.status(404).json({
         success: false,
-        error: 'Organización no encontrada'
+        error: 'Organization not found'
       });
     }
 
@@ -239,7 +238,7 @@ const requireOrganizationMember = async (req, res, next) => {
     if (!isAdmin && !isEmployee) {
       return res.status(403).json({
         success: false,
-        error: 'No eres miembro de esta organización'
+        error: 'You are not a member of this organization'
       });
     }
 
@@ -252,7 +251,7 @@ const requireOrganizationMember = async (req, res, next) => {
     console.error('Error verificando membresía de organización:', error);
     return res.status(500).json({
       success: false,
-      error: 'Error verificando permisos'
+      error: 'Error checking permissions'
     });
   }
 };

@@ -1,0 +1,174 @@
+@startuml project-creation-sequence
+!theme plain
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam maxMessageSize 200
+
+title Diagrama de Secuencia: Creación de Proyecto (Caso Exitoso)
+footer Archivos involucrados en el flujo
+
+actor "Project Manager" as PM
+participant "Express Router\n<<project.routes.js>>" as Router
+participant "Passport JWT\n<<passport.js>>" as Auth
+participant "Express Validator\n<<project.routes.js>>" as Validator
+participant "ProjectController\n<<project.controller.js>>" as Controller
+participant "ProjectService\n<<project.service.js>>" as Service
+participant "OrganizationRepository\n<<organization.repository.js>>" as OrgRepo
+participant "BaseRepository\n<<base.repository.js>>" as BaseRepo
+participant "Organization Model\n<<organization.model.js>>" as OrgModel
+participant "UserRepository\n<<user.repository.js>>" as UserRepo
+participant "ProjectRepository\n<<project.repository.js>>" as ProjRepo
+participant "Project Model\n<<project.model.js>>" as ProjModel
+participant "ProjectNotificationHelper\n<<projectNotificationHelper.js>>" as NotifHelper
+participant "NotificationService\n<<notification.service.js>>" as NotifService
+database "MongoDB" as DB
+
+== Autenticación y Validación ==
+
+PM -> Router: POST /api/projects\n{organizationId, projectName, briefDescription,\nestimatedStartDate, estimatedEndDate, ...}
+activate Router
+
+Router -> Auth: authenticate('jwt', {session: false})
+activate Auth
+Auth -> Auth: Verificar JWT Token
+Auth --> Router: req.user = {id: projectManagerId, ...}
+deactivate Auth
+
+Router -> Validator: validateProjectCreation
+activate Validator
+note right of Validator
+  Validaciones:
+  - organizationId: notEmpty, isMongoId
+  - projectName: notEmpty, trim, length(2-200)
+  - briefDescription: notEmpty, trim, maxLength(2000)
+  - estimatedStartDate: notEmpty, isISO8601
+  - estimatedEndDate: notEmpty, isISO8601
+  - campos opcionales (communication, experience, etc.)
+end note
+Validator --> Router: validation passed
+deactivate Validator
+
+== Controlador ==
+
+Router -> Controller: createProject(req, res)
+activate Controller
+
+Controller -> Controller: validationResult(req)
+note right of Controller
+  Extrae errores de validación
+  (vacío en caso exitoso)
+end note
+
+Controller -> Controller: Extraer projectData, projectManagerId,\norganizationId de req.body y req.user
+
+== Servicio de Proyecto ==
+
+Controller -> Service: createProject(projectData,\nprojectManagerId, organizationId)
+activate Service
+
+== Validación de Organización ==
+
+Service -> OrgRepo: findById(organizationId)
+activate OrgRepo
+OrgRepo -> BaseRepo: findById(organizationId)
+activate BaseRepo
+BaseRepo -> DB: Organization.findById(organizationId)
+DB --> BaseRepo: organizationDocument
+BaseRepo --> OrgRepo: organization
+deactivate BaseRepo
+OrgRepo --> Service: organization
+deactivate OrgRepo
+
+Service -> OrgModel: organization.isProjectManager(projectManagerId)
+activate OrgModel
+note right of OrgModel
+  Verifica si el usuario está en
+  organization.employees con
+  isProjectManager = true
+end note
+OrgModel --> Service: true (es PM)
+deactivate OrgModel
+
+== Validación de Usuario ==
+
+Service -> UserRepo: findById(projectManagerId)
+activate UserRepo
+UserRepo -> BaseRepo: findById(projectManagerId)
+activate BaseRepo
+BaseRepo -> DB: User.findById(projectManagerId)
+DB --> BaseRepo: userDocument
+BaseRepo --> UserRepo: projectManager
+deactivate BaseRepo
+UserRepo --> Service: projectManager
+deactivate UserRepo
+
+== Creación del Proyecto ==
+
+Service -> ProjRepo: create({...projectData,\norganization: organizationId,\nprojectManager: projectManagerId,\nstatus: 'draft',\ncreatedAt: Date.now(),\nlastActivityAt: Date.now()})
+activate ProjRepo
+ProjRepo -> ProjModel: new Project(data)
+activate ProjModel
+ProjModel -> ProjModel: Validar schema\n(mongoose validations)
+ProjModel --> ProjRepo: projectInstance
+deactivate ProjModel
+ProjRepo -> DB: project.save()
+DB --> ProjRepo: savedProject
+ProjRepo --> Service: project
+deactivate ProjRepo
+
+== Población de Relaciones ==
+
+Service -> ProjModel: project.populate('organization', 'name')
+activate ProjModel
+ProjModel -> DB: Populate organization
+DB --> ProjModel: populated
+ProjModel --> Service: project
+deactivate ProjModel
+
+Service -> ProjModel: project.populate('projectManager',\n'name email avatar')
+activate ProjModel
+ProjModel -> DB: Populate projectManager
+DB --> ProjModel: populated
+ProjModel --> Service: project
+deactivate ProjModel
+
+Service -> ProjModel: project.populate('assignedEmployees.user',\n'name email avatar')
+activate ProjModel
+ProjModel -> DB: Populate assignedEmployees\n(vacío en creación)
+DB --> ProjModel: populated
+ProjModel --> Service: project
+deactivate ProjModel
+
+== Notificaciones ==
+
+Service -> NotifHelper: notifyProjectCreated(project, organization)
+activate NotifHelper
+
+NotifHelper -> NotifHelper: _extractId(organization.admin)
+NotifHelper -> NotifHelper: _extractId(organization.additionalAdmins[])
+NotifHelper -> NotifHelper: Filtrar PM de lista de admins
+
+loop Para cada admin (excepto PM)
+    NotifHelper -> NotifService: create({\n  recipientId: adminId,\n  type: PROJECT_CREATED,\n  title: 'New project created',\n  message: 'A new project "X" has been created...',\n  channels: [IN_APP, EMAIL],\n  priority: MEDIUM,\n  metadata: {...},\n  actionUrl: '/projects/:id',\n  actionText: 'View project'\n})
+    activate NotifService
+    NotifService -> DB: Save notification
+    DB --> NotifService: notification
+    NotifService --> NotifHelper: notification
+    deactivate NotifService
+end
+
+NotifHelper --> Service: notifications sent
+deactivate NotifHelper
+
+Service --> Controller: project (populated)
+deactivate Service
+
+== Respuesta ==
+
+Controller --> Router: res.status(201).json({\n  success: true,\n  message: 'Project created successfully',\n  data: project\n})
+deactivate Controller
+
+Router --> PM: HTTP 201 Created\n{\n  success: true,\n  message: 'Project created successfully',\n  data: { _id, projectName, ... }\n}
+deactivate Router
+
+@enduml

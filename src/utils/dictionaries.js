@@ -4,7 +4,6 @@
  */
 
 const dictionaries = {
-  // Secciones comunes en CVs (en español e inglés)
   sectionKeywords: {
     contact: ['contacto', 'contact', 'información personal', 'personal information', 'datos personales', 'información de contacto'],
     education: ['educación', 'education', 'formación académica', 'estudios', 'academic background', 'titulación', 'formación'],
@@ -16,44 +15,37 @@ const dictionaries = {
     achievements: ['logros', 'achievements', 'premios', 'awards', 'publicaciones', 'publications', 'reconocimientos', 'logros y premios']
   },
 
-  // Tecnologías y herramientas comunes
   technologies: {
-    // Lenguajes de programación
     languages: [
       'JavaScript', 'TypeScript', 'Python', 'Java', 'C++', 'C#', 'PHP', 
       'Ruby', 'Go', 'Rust', 'Swift', 'Kotlin', 'Scala', 'R', 'MATLAB',
       'Perl', 'Shell', 'Bash', 'PowerShell', 'HTML', 'CSS', 'SQL'
     ],
     
-    // Frameworks frontend
     frontend: [
       'React', 'Angular', 'Vue', 'Svelte', 'Next.js', 'Nuxt.js', 
       'Gatsby', 'Ember.js', 'Backbone.js', 'jQuery', 'Bootstrap', 
       'Tailwind CSS', 'Material-UI', 'Ant Design'
     ],
     
-    // Frameworks backend
     backend: [
       'Node.js', 'Express', 'Nest.js', 'Django', 'Flask', 'FastAPI',
       'Spring Boot', 'Spring', 'Hibernate', 'ASP.NET', '.NET Core',
       'Laravel', 'Symfony', 'Ruby on Rails', 'Gin', 'Echo'
     ],
     
-    // Bases de datos
     databases: [
       'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'SQLite', 'Oracle',
       'SQL Server', 'MariaDB', 'Cassandra', 'DynamoDB', 'Firebase',
       'Firestore', 'Elasticsearch', 'Neo4j', 'CouchDB'
     ],
     
-    // Cloud y DevOps
     cloud: [
-      'AWS', 'Azure', 'Google Cloud', 'GCP', 'Heroku', 'DigitalOcean',
+      'AWS', 'Amazon Web Services', 'Azure', 'Google Cloud', 'GCP', 'Google Cloud Platform', 'Heroku', 'DigitalOcean',
       'Docker', 'Kubernetes', 'Jenkins', 'GitLab CI', 'GitHub Actions',
       'CircleCI', 'Travis CI', 'Terraform', 'Ansible', 'Chef', 'Puppet'
     ],
     
-    // Herramientas y otros
     tools: [
       'Git', 'GitHub', 'GitLab', 'Bitbucket', 'Jira', 'Confluence',
       'Slack', 'VS Code', 'IntelliJ', 'Eclipse', 'PyCharm', 'Postman',
@@ -62,7 +54,6 @@ const dictionaries = {
     ]
   },
 
-  // Normalizaciones de tecnologías comunes
   technologyNormalizations: {
     'node': 'Node.js',
     'nodejs': 'Node.js',
@@ -85,7 +76,6 @@ const dictionaries = {
     'mssql': 'Microsoft SQL Server'
   },
 
-  // Niveles de idiomas
   languageLevels: {
     spanish: ['nativo', 'nativa', 'lengua materna', 'native'],
     bilingual: ['bilingüe', 'bilingual'],
@@ -95,7 +85,6 @@ const dictionaries = {
     basic: ['básico', 'básica', 'basic', 'a1', 'a2']
   },
 
-  // Idiomas comunes
   commonLanguages: [
     'Español', 'Inglés', 'Francés', 'Alemán', 'Italiano', 'Portugués',
     'Chino', 'Japonés', 'Coreano', 'Árabe', 'Ruso', 'Holandés',
@@ -103,7 +92,6 @@ const dictionaries = {
     'Chinese', 'Japanese', 'Korean', 'Arabic', 'Russian', 'Dutch'
   ],
 
-  // Ciudades principales de España
   cities: {
     spain: [
       'Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Zaragoza', 'Málaga',
@@ -123,7 +111,6 @@ const dictionaries = {
     ]
   },
 
-  // Países
   countries: [
     'España', 'France', 'Germany', 'Italy', 'Portugal', 'United Kingdom',
     'Ireland', 'Netherlands', 'Belgium', 'Switzerland', 'Austria',
@@ -132,7 +119,6 @@ const dictionaries = {
     'India', 'Australia', 'New Zealand'
   ],
 
-  // Palabras clave para experiencia laboral en ingeniería de software
   experienceKeywords: [
     'desarrollador', 'developer', 'engineer', 'ingeniero',
     'software engineer', 'frontend developer', 'backend developer',
@@ -145,7 +131,6 @@ const dictionaries = {
     'híbrido', 'hybrid', 'presencial', 'on-site'
   ],
 
-  // Palabras clave para títulos académicos en tech
   degreeKeywords: [
     'grado', 'licenciatura', 'ingeniería informática', 'ingeniería software',
     'computer science', 'sistemas', 'telecomunicaciones', 'máster', 'master',
@@ -155,7 +140,6 @@ const dictionaries = {
     'data science', 'cybersecurity'
   ],
 
-  // Palabras clave para certificaciones tech
   certificationKeywords: [
     'certified', 'certificado', 'certification', 'certificación',
     'professional', 'profesional', 'associate', 'expert', 'specialist',
@@ -164,7 +148,6 @@ const dictionaries = {
     'terraform', 'docker', 'jenkins', 'scrum', 'agile'
   ],
 
-  // Departamentos comunes en empresas tech
   departments: [
     'Ingeniería de Software',
     'Frontend',
@@ -184,7 +167,6 @@ const dictionaries = {
     'Mobile Development'
   ],
 
-  // Modalidades de trabajo
   workModes: [
     'remoto',
     'remote',
@@ -197,7 +179,6 @@ const dictionaries = {
     'distribuido'
   ],
 
-  // Habilidades blandas para trabajo remoto
   remoteSoftSkills: [
     'comunicación asíncrona',
     'autogestión',

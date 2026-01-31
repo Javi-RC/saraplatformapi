@@ -35,10 +35,20 @@ class InAppChannel extends NotificationChannel {
   }
 
   /**
-   * Valida que el usuario esté activo y confirmado
+   * Valida que el usuario esté activo, confirmado y tenga habilitadas las notificaciones in-app
    */
   async canSend(notification, recipient) {
-    return recipient && recipient.isConfirmed;
+    if (!recipient || !recipient.isConfirmed) {
+      return false;
+    }
+
+    // Verificar preferencias de notificaciones del usuario
+    if (recipient.notificationPreferences) {
+      return recipient.notificationPreferences.inApp !== false;
+    }
+
+    // Por defecto, permitir notificaciones in-app si no hay preferencias configuradas
+    return true;
   }
 
   getChannelType() {

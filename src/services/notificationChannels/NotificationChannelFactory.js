@@ -50,7 +50,7 @@ class NotificationChannelFactory {
       
       case NotificationChannels.EMAIL:
         if (!this.emailService) {
-          throw new Error('EmailService no está configurado en el factory');
+          throw new Error('EmailService is not configured in the factory');
         }
         channel = new EmailChannel(this.emailService);
         break;

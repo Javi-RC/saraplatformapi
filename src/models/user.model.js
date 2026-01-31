@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Email inválido']
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Invalid email']
   },
   name: {
     type: String,
@@ -36,10 +36,9 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['employee', 'org_admin', 'unassigned'], // Nuevo estado
+    enum: ['employee', 'org_admin', 'unassigned'],
     default: 'unassigned'
   },
-  // Organización a la que pertenece (si es empleado)
   organization: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
@@ -55,18 +54,63 @@ const userSchema = new mongoose.Schema({
   confirmationTokenExpiry: Date,
   verificationTokenExpiry: {
     type: Date,
-    default: () => Date.now() + 24 * 60 * 60 * 1000 // 24 horas
+    default: () => Date.now() + 24 * 60 * 60 * 1000
   },
   registrationAttempts: {
     type: Number,
     default: 0
   },
+  
+  // Login attempts tracking for brute force protection
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+  lockUntil: {
+    type: Date,
+    default: null
+  },
+  
   createdAt: {
     type: Date,
     default: Date.now
   },
   lastLogin: Date,
   avatar: String,
+  
+  country: {
+    type: String,
+    trim: true
+  },
+  
+  timezone: {
+    type: String,
+    trim: true
+  },
+  
+  preferredLanguage: {
+    type: String,
+    enum: ['es', 'en'],
+    default: 'es',
+    trim: true
+  },
+  
+  flexibleSchedule: {
+    type: Boolean,
+    default: false
+  },
+  
+  preferredWorkingHours: {
+    start: {
+      type: String,
+      trim: true
+    },
+    end: {
+      type: String,
+      trim: true
+    }
+  },
+  
   notificationPreferences: {
     email: {
       type: Boolean,
@@ -80,16 +124,63 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: false
     }
+  },
+
+  // Historial de colaboraciones con otros empleados
+  // Se actualiza automáticamente al completar proyectos
+  collaborationHistory: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    projectCount: {
+      type: Number,
+      default: 1,
+      min: 1
+    },
+    lastCollaboration: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+
+  cvProcessingConsent: {
+    accepted: {
+      type: Boolean,
+      default: false
+    },
+    acceptedAt: {
+      type: Date
+    },
+    version: {
+      type: String,
+      default: '1.0'
+    },
+    ipAddress: {
+      type: String
+    },
+    details: {
+      aiProcessing: {
+        type: Boolean,
+        default: false
+      },
+      thirdPartySharing: {
+        type: Boolean,
+        default: false
+      },
+      dataRetention: {
+        type: Boolean,
+        default: false
+      }
+    }
   }
 });
 
-// Use a partial index so only documents with both oauthProvider and oauthId
-// (non-null) are indexed. This prevents duplicate-key errors for {null, null}
 userSchema.index(
   { oauthProvider: 1, oauthId: 1 },
   {
     unique: true,
-    // Use $type to avoid unsupported $ne/$not expressions in older/memory MongoDB
     partialFilterExpression: {
       oauthProvider: { $type: 'string' },
       oauthId: { $type: 'string' }
@@ -97,18 +188,21 @@ userSchema.index(
   }
 );
 
-// Índice TTL para eliminar usuarios no verificados después de 48 horas
 userSchema.index(
   { createdAt: 1 },
   { 
-    expireAfterSeconds: 172800, // 48 horas
+    expireAfterSeconds: 172800,
     partialFilterExpression: { isConfirmed: false }
   }
 );
 
-// Método para verificar si el perfil está completo
 userSchema.methods.isProfileComplete = function() {
   return this.role !== 'unassigned';
+};
+
+userSchema.methods.hasCVProcessingConsent = function() {
+  return this.cvProcessingConsent?.accepted === true && 
+         this.cvProcessingConsent?.details?.aiProcessing === true;
 };
 
 userSchema.methods.comparePassword = async function(candidatePassword) {

@@ -32,14 +32,12 @@ const cvSchema = new mongoose.Schema({
     trim: true,
     maxlength: 2000
   },
-  
-  // 1. Información de contacto
   contact: {
     email: {
       type: String,
       lowercase: true,
       trim: true,
-      match: [/[\w.-]+@[\w.-]+\.\w+/, 'Email inválido']
+      match: [/[\w.-]+@[\w.-]+\.\w+/, 'Invalid email']
     },
     phones: [{
       number: String,
@@ -61,8 +59,6 @@ const cvSchema = new mongoose.Schema({
       fullLocation: String
     }
   },
-
-  // 2. Educación
   education: [{
     institution: {
       type: String,
@@ -92,8 +88,6 @@ const cvSchema = new mongoose.Schema({
     },
     achievements: [String]
   }],
-
-  // 3. Experiencia laboral
   experience: [{
     company: {
       type: String,
@@ -121,8 +115,6 @@ const cvSchema = new mongoose.Schema({
     responsibilities: [String],
     technologies: [String]
   }],
-
-  // 4. Habilidades técnicas
   skills: {
     technical: [{
       name: {
@@ -137,19 +129,17 @@ const cvSchema = new mongoose.Schema({
       },
       level: {
         type: String,
-        enum: ['básico', 'intermedio', 'avanzado', 'experto', ''],
+        enum: ['basic', 'intermediate', 'advanced', 'expert', ''],
         default: ''
       },
       category: {
         type: String,
-        enum: ['lenguaje', 'framework', 'herramienta', 'base_datos', 'cloud', 'runtime', 'devops', 'testing', 'mobile', 'frontend', 'backend', 'seguridad', 'ia_ml', 'otro'],
-        default: 'otro'
+        enum: ['language', 'framework', 'tool', 'database', 'cloud', 'runtime', 'devops', 'testing', 'mobile', 'frontend', 'backend', 'security', 'ai_ml', 'other'],
+        default: 'other'
       }
     }],
     soft: [String]
   },
-
-  // 5. Idiomas
   languages: [{
     language: {
       type: String,
@@ -158,12 +148,10 @@ const cvSchema = new mongoose.Schema({
     },
     level: {
       type: String,
-      enum: ['nativo', 'bilingüe', 'fluido', 'avanzado', 'intermedio', 'básico', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+      enum: ['native', 'bilingual', 'fluent', 'advanced', 'intermediate', 'basic', 'A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
       required: true
     }
   }],
-
-  // 6. Proyectos
   projects: [{
     name: {
       type: String,
@@ -177,8 +165,6 @@ const cvSchema = new mongoose.Schema({
     startDate: String,
     endDate: String
   }],
-
-  // 7. Certificaciones
   certifications: [{
     name: {
       type: String,
@@ -194,14 +180,12 @@ const cvSchema = new mongoose.Schema({
     credentialId: String,
     url: String
   }],
-
-  // 8. Publicaciones / Logros / Premios
   achievements: {
     publications: [{
       title: String,
       type: {
         type: String,
-        enum: ['artículo', 'conferencia', 'libro', 'blog', 'otro']
+        enum: ['article', 'conference', 'book', 'blog', 'other']
       },
       date: String,
       url: String
@@ -218,6 +202,125 @@ const cvSchema = new mongoose.Schema({
       date: String,
       description: String
     }]
+  },
+  crossCulturalExperience: {
+    hasExperience: {
+      type: Boolean,
+      default: false
+    },
+    countriesWorkedWith: [{
+      type: String,
+      trim: true
+    }],
+    multiculturalProjects: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    mediationSkills: {
+      type: Boolean,
+      default: false
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 1000
+    }
+  },
+  remoteWorkExperience: {
+    yearsRemote: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    distributedTeamsExperience: {
+      type: Boolean,
+      default: false
+    },
+    timezoneFlexibility: {
+      type: Boolean,
+      default: false
+    },
+    preferredTimezones: [{
+      type: String,
+      trim: true
+    }],
+    remoteWorkTools: [{
+      type: String,
+      trim: true
+    }]
+  },
+  communicationSkills: {
+    knowledgeManagementTools: [{
+      type: String,
+      trim: true
+    }],
+    documentationExperience: {
+      type: Boolean,
+      default: false
+    },
+    asyncCommunicationTools: [{
+      type: String,
+      trim: true
+    }],
+    presentationSkills: {
+      type: Boolean,
+      default: false
+    },
+    technicalWriting: {
+      type: Boolean,
+      default: false
+    }
+  },
+
+  // Availability Information
+  availability: {
+    immediate: {
+      type: Boolean,
+      default: false,
+      description: 'Whether the employee can start immediately'
+    },
+    startDate: {
+      type: Date,
+      description: 'Earliest date the employee can start working'
+    },
+    willingToTravel: {
+      type: Boolean,
+      default: false,
+      description: 'Whether the employee is willing to travel for work'
+    },
+    travelFrequency: {
+      type: String,
+      enum: ['none', 'occasionally', 'frequently', 'always'],
+      default: 'none',
+      description: 'How often the employee is willing to travel'
+    },
+    willingToRelocate: {
+      type: Boolean,
+      default: false,
+      description: 'Whether the employee is willing to relocate'
+    },
+    willingToWorkOffHours: {
+      type: Boolean,
+      default: false,
+      description: 'Whether the employee is willing to work outside regular hours'
+    },
+    overtimeAvailability: {
+      type: String,
+      enum: ['none', 'limited', 'flexible', 'full'],
+      default: 'none',
+      description: 'How much overtime the employee can work'
+    },
+    weekendAvailability: {
+      type: Boolean,
+      default: false,
+      description: 'Whether the employee can work on weekends if needed'
+    },
+    onCallAvailability: {
+      type: Boolean,
+      default: false,
+      description: 'Whether the employee is available for on-call duties'
+    }
   },
 
   // Metadata
@@ -241,7 +344,6 @@ cvSchema.index({ 'experience.technologies': 1 });
 cvSchema.index({ 'languages.language': 1 });
 cvSchema.index({ 'submittedToOrganizationAt': -1 });
 
-// Middleware para actualizar lastUpdated
 cvSchema.pre('save', function(next) {
   this.lastUpdated = new Date();
   next();

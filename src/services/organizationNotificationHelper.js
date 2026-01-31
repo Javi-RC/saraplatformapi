@@ -36,7 +36,6 @@ class OrganizationNotificationHelper {
 
       // Verificar configuración de notificaciones
       if (!organization.settings?.notifyOnCVSubmission) {
-        console.log('Notificaciones de CV deshabilitadas para esta organización');
         return;
       }
 
@@ -45,8 +44,8 @@ class OrganizationNotificationHelper {
         notificationService.create({
           recipientId: adminId,
           type: NotificationTypes.CV_SUBMITTED_TO_ORG,
-          title: 'Nuevo CV recibido',
-          message: `${user.name || user.email} ha enviado su CV a ${organization.name}`,
+          title: 'New CV Received',
+          message: `${user.name || user.email} has submitted their CV to ${organization.name}`,
           channels: [NotificationChannels.IN_APP],
           priority: NotificationPriority.HIGH,
           metadata: {
@@ -59,12 +58,11 @@ class OrganizationNotificationHelper {
             submittedAt: cv.submittedToOrganizationAt || new Date()
           },
           actionUrl: `/organizations/${this._extractId(organization)}/cvs/${this._extractId(cv)}`,
-          actionText: 'Ver CV'
+          actionText: 'View CV'
         })
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Notificaciones de CV enviadas a ${adminIds.length} administradores`);
     } catch (error) {
       console.error('Error al notificar CV enviado:', error);
       // No lanzar error para no interrumpir el flujo principal
@@ -80,17 +78,17 @@ class OrganizationNotificationHelper {
   async notifyCVReviewed(cv, organization, status) {
     try {
       const statusMessages = {
-        reviewed: 'ha sido revisado',
-        accepted: 'ha sido aceptado',
-        rejected: 'ha sido revisado'
+        reviewed: 'has been reviewed',
+        accepted: 'has been accepted',
+        rejected: 'has been reviewed'
       };
 
-      const message = `Tu CV enviado a ${organization.name} ${statusMessages[status] || 'ha sido actualizado'}`;
+      const message = `Your CV submitted to ${organization.name} ${statusMessages[status] || 'has been updated'}`;
 
       await notificationService.create({
         recipientId: this._extractId(cv.userId),
         type: NotificationTypes.CV_REVIEWED,
-        title: 'Actualización de CV',
+        title: 'CV Update',
         message,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
@@ -102,10 +100,9 @@ class OrganizationNotificationHelper {
           reviewedAt: new Date()
         },
         actionUrl: `/my-cvs/${this._extractId(cv)}`,
-        actionText: 'Ver detalles'
+        actionText: 'View details'
       });
 
-      console.log(`Notificación de CV revisado enviada al usuario ${this._extractId(cv.userId)}`);
     } catch (error) {
       console.error('Error al notificar CV revisado:', error);
     }
@@ -121,17 +118,17 @@ class OrganizationNotificationHelper {
   async notifyCVStatusChanged(cv, organization, oldStatus, newStatus) {
     try {
       const statusLabels = {
-        pending: 'Pendiente de revisión',
-        reviewed: 'Revisado',
-        accepted: 'Aceptado',
-        rejected: 'No seleccionado'
+        pending: 'Pending review',
+        reviewed: 'Reviewed',
+        accepted: 'Accepted',
+        rejected: 'Not selected'
       };
 
       await notificationService.create({
         recipientId: this._extractId(cv.userId),
         type: NotificationTypes.CV_STATUS_CHANGED,
-        title: 'Estado de CV actualizado',
-        message: `El estado de tu CV en ${organization.name} ha cambiado a: ${statusLabels[newStatus]}`,
+        title: 'CV Status Updated',
+        message: `The status of your CV at ${organization.name} has changed to: ${statusLabels[newStatus]}`,
         channels: [NotificationChannels.IN_APP],
         priority: newStatus === 'accepted' ? NotificationPriority.HIGH : NotificationPriority.MEDIUM,
         metadata: {
@@ -143,10 +140,9 @@ class OrganizationNotificationHelper {
           statusLabel: statusLabels[newStatus]
         },
         actionUrl: `/my-cvs/${this._extractId(cv)}`,
-        actionText: 'Ver CV'
+        actionText: 'View CV'
       });
 
-      console.log(`Notificación de cambio de estado enviada al usuario ${this._extractId(cv.userId)}`);
     } catch (error) {
       console.error('Error al notificar cambio de estado de CV:', error);
     }
@@ -166,10 +162,10 @@ class OrganizationNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(user),
         type: NotificationTypes.ORG_EMPLOYEE_ADDED,
-        title: requiresApproval ? 'Solicitud de vinculación enviada' : 'Vinculado a organización',
+        title: requiresApproval ? 'Link Request Sent' : 'Linked to Organization',
         message: requiresApproval
-          ? `Tu solicitud para unirte a ${organization.name} está pendiente de aprobación`
-          : `Has sido agregado como empleado de ${organization.name}`,
+          ? `Your request to join ${organization.name} is pending approval`
+          : `You have been added as an employee of ${organization.name}`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         metadata: {
@@ -181,10 +177,9 @@ class OrganizationNotificationHelper {
           requiresApproval
         },
         actionUrl: `/organizations/${this._extractId(organization)}`,
-        actionText: 'Ver organización'
+        actionText: 'View organization'
       });
 
-      console.log(`Notificación de empleado agregado enviada a ${this._extractId(user)}`);
     } catch (error) {
       console.error('Error al notificar empleado agregado:', error);
     }
@@ -199,21 +194,21 @@ class OrganizationNotificationHelper {
   async notifyEmployeeStatusChanged(organization, user, newStatus) {
     try {
       const statusMessages = {
-        active: 'Tu vinculación con',
-        inactive: 'Tu vinculación con',
-        pending: 'Tu solicitud para'
+        active: 'Your link with',
+        inactive: 'Your link with',
+        pending: 'Your request for'
       };
 
       const statusLabels = {
-        active: 'ha sido aprobada',
-        inactive: 'ha sido desactivada',
-        pending: 'está pendiente de aprobación'
+        active: 'has been approved',
+        inactive: 'has been deactivated',
+        pending: 'is pending approval'
       };
 
       await notificationService.create({
         recipientId: this._extractId(user),
         type: NotificationTypes.ORG_EMPLOYEE_STATUS_CHANGED,
-        title: 'Actualización de estado en organización',
+        title: 'Organization Status Update',
         message: `${statusMessages[newStatus]} ${organization.name} ${statusLabels[newStatus]}`,
         channels: [NotificationChannels.IN_APP],
         priority: newStatus === 'active' ? NotificationPriority.HIGH : NotificationPriority.MEDIUM,
@@ -223,10 +218,9 @@ class OrganizationNotificationHelper {
           newStatus
         },
         actionUrl: `/organizations/${this._extractId(organization)}`,
-        actionText: 'Ver detalles'
+        actionText: 'View details'
       });
 
-      console.log(`Notificación de cambio de estado enviada a ${this._extractId(user)}`);
     } catch (error) {
       console.error('Error al notificar cambio de estado de empleado:', error);
     }
@@ -242,8 +236,8 @@ class OrganizationNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(user),
         type: NotificationTypes.ORG_EMPLOYEE_REMOVED,
-        title: 'Vinculación con organización finalizada',
-        message: `Has sido removido de ${organization.name}`,
+        title: 'Organization Link Ended',
+        message: `You have been removed from ${organization.name}`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
         metadata: {
@@ -253,7 +247,6 @@ class OrganizationNotificationHelper {
         }
       });
 
-      console.log(`Notificación de empleado removido enviada a ${this._extractId(user)}`);
     } catch (error) {
       console.error('Error al notificar empleado removido:', error);
     }
@@ -269,8 +262,8 @@ class OrganizationNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(user),
         type: NotificationTypes.ORG_ADMIN_ADDED,
-        title: 'Promovido a administrador',
-        message: `Has sido agregado como administrador de ${organization.name}`,
+        title: 'Promoted to Administrator',
+        message: `You have been added as an administrator of ${organization.name}`,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.HIGH,
         metadata: {
@@ -279,10 +272,9 @@ class OrganizationNotificationHelper {
           promotedAt: new Date()
         },
         actionUrl: `/organizations/${this._extractId(organization)}/admin`,
-        actionText: 'Ir al panel de administración'
+        actionText: 'Go to admin panel'
       });
 
-      console.log(`Notificación de admin agregado enviada a ${this._extractId(user)}`);
     } catch (error) {
       console.error('Error al notificar admin agregado:', error);
     }
@@ -301,10 +293,10 @@ class OrganizationNotificationHelper {
       await notificationService.create({
         recipientId: employeeId,
         type: NotificationTypes.ROLE_CHANGED,
-        title: isProjectManager ? 'Asignado como jefe de proyecto' : 'Rol de jefe de proyecto removido',
+        title: isProjectManager ? 'Assigned as Project Manager' : 'Project Manager Role Removed',
         message: isProjectManager 
-          ? `Has sido asignado como jefe de proyecto en ${organization.name}. Ahora puedes crear y gestionar proyectos.`
-          : `Tu rol de jefe de proyecto ha sido removido en ${organization.name}.`,
+          ? `You have been assigned as a project manager at ${organization.name}. You can now create and manage projects.`
+          : `Your project manager role has been removed at ${organization.name}.`,
         channels: [NotificationChannels.IN_APP, NotificationChannels.EMAIL],
         priority: NotificationPriority.HIGH,
         metadata: {
@@ -314,10 +306,9 @@ class OrganizationNotificationHelper {
           changedAt: new Date()
         },
         actionUrl: `/organizations/${this._extractId(organization)}`,
-        actionText: 'Ver organización'
+        actionText: 'View organization'
       });
 
-      console.log(`Notificación de cambio de rol de jefe de proyecto enviada a ${employee.name || employee.email}`);
     } catch (error) {
       console.error('Error al notificar cambio de rol de jefe de proyecto:', error);
     }
@@ -364,7 +355,6 @@ class OrganizationNotificationHelper {
       );
 
       await Promise.all(notificationPromises);
-      console.log(`Notificación enviada a ${adminIds.length} administradores`);
     } catch (error) {
       console.error('Error al notificar a administradores:', error);
     }

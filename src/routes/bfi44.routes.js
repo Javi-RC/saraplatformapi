@@ -113,4 +113,39 @@ router.get(
   BFI44Controller.getOrganizationStats
 );
 
+/**
+ * GET /api/bfi-44/debug/duplicates/:userId
+ * TEMPORAL: Investigar perfiles duplicados
+ */
+router.get(
+  '/debug/duplicates/:userId',
+  async (req, res) => {
+    try {
+      const BFI44Response = require('../models/bfi44.model');
+      const User = require('../models/user.model');
+      const { userId } = req.params;
+
+      const user = await User.findById(userId);
+      const profiles = await BFI44Response.find({ userId }).sort({ createdAt: 1 });
+
+      res.json({
+        success: true,
+        user: user ? { email: user.email, name: user.name, role: user.role } : null,
+        profileCount: profiles.length,
+        profiles: profiles.map(p => ({
+          _id: p._id.toString(),
+          userId: p.userId.toString(),
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt,
+          hasResults: !!(p.results && Object.keys(p.results).length > 0),
+          results: p.results,
+          responsesCount: p.responses?.length || 0
+        }))
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+);
+
 module.exports = router;

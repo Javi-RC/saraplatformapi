@@ -9,7 +9,7 @@ const organizationSchema = new mongoose.Schema({
   // Información básica de la organización
   name: {
     type: String,
-    required: [true, 'El nombre de la organización es obligatorio'],
+    required: [true, 'Organization name is required'],
     trim: true,
     minlength: [2, 'El nombre debe tener al menos 2 caracteres'],
     maxlength: [100, 'El nombre no puede exceder 100 caracteres'],
@@ -19,7 +19,14 @@ const organizationSchema = new mongoose.Schema({
   description: {
     type: String,
     trim: true,
-    maxlength: [1000, 'La descripción no puede exceder 1000 caracteres']
+    maxlength: [1000, 'Description cannot exceed 1000 characters']
+  },
+  
+  defaultLanguage: {
+    type: String,
+    enum: ['es', 'en'],
+    default: 'es',
+    trim: true
   },
   
   // Identificación fiscal/legal
@@ -35,10 +42,10 @@ const organizationSchema = new mongoose.Schema({
   contact: {
     email: {
       type: String,
-      required: [true, 'El email de contacto es obligatorio'],
+      required: [true, 'Contact email is required'],
       lowercase: true,
       trim: true,
-      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Email inválido']
+      match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Invalid email']
     },
     phone: {
       type: String,
@@ -155,12 +162,12 @@ const organizationSchema = new mongoose.Schema({
     allowPublicCVSubmission: {
       type: Boolean,
       default: true,
-      description: 'Permite que empleados externos envíen CVs'
+      description: 'Allow external employees to submit CVs'
     },
     requireApproval: {
       type: Boolean,
       default: true,
-      description: 'Requiere aprobación del administrador para nuevos empleados'
+      description: 'Requires administrator approval for new employees'
     },
     notifyOnCVSubmission: {
       type: Boolean,
@@ -171,6 +178,128 @@ const organizationSchema = new mongoose.Schema({
       type: Boolean,
       default: true,
       description: 'Procesar automáticamente CVs con IA'
+    }
+  },
+  // Work Mode Policy
+  workModePolicy: {
+    type: String,
+    enum: [
+      'office_mode',        // 100% presencial
+      'office_first',       // Presencial con remoto puntual
+      'office_remote_mix',  // Alternancia libre
+      'remote_first',       // Remoto con presencial excepcional
+      'remote_mode'         // 100% remoto
+    ],
+    default: 'office_mode',
+    description: 'Default work mode policy for the organization'
+  },
+  
+  // Remote Work and Support Configuration
+  remoteWorkConfiguration: {
+    hasRemoteWorkPolicy: {
+      type: Boolean,
+      default: false
+    },
+    policyDocument: {
+      type: String,
+      trim: true
+    },
+    providesTechSupport: {
+      type: Boolean,
+      default: false
+    },
+    remoteWorkTools: [{
+      type: String,
+      trim: true
+    }],
+    vpnAccess: {
+      type: Boolean,
+      default: false
+    },
+    equipmentProvision: {
+      type: Boolean,
+      default: false
+    }
+  },
+  // Process Maturity and Development Practices
+  developmentPractices: {
+    hasOnboarding: {
+      type: Boolean,
+      default: false
+    },
+    onboardingDuration: {
+      type: Number,
+      min: 0
+    },
+    hasVersionControl: {
+      type: Boolean,
+      default: false
+    },
+    versionControlSystems: [{
+      type: String,
+      trim: true
+    }],
+    hasCICD: {
+      type: Boolean,
+      default: false
+    },
+    cicdTools: [{
+      type: String,
+      trim: true
+    }],
+    codeReviewProcess: {
+      type: Boolean,
+      default: false
+    },
+    testingCoverage: {
+      type: String,
+      enum: ['none', 'low', 'medium', 'high'],
+      default: 'none'
+    }
+  },
+  // Knowledge Management
+  knowledgeManagement: {
+    hasKnowledgeBase: {
+      type: Boolean,
+      default: false
+    },
+    knowledgeBaseTools: [{
+      type: String,
+      trim: true
+    }],
+    documentationStandards: {
+      type: Boolean,
+      default: false
+    },
+    hasTemplates: {
+      type: Boolean,
+      default: false
+    }
+  },
+  // Organizational Maturity
+  maturityLevel: {
+    overall: {
+      type: String,
+      enum: ['initial', 'managed', 'defined', 'quantitatively_managed', 'optimizing'],
+      default: 'initial'
+    },
+    processMaturity: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 1
+    },
+    technicalMaturity: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 1
+    },
+    culturalMaturity: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 1
     }
   },
   
@@ -249,12 +378,10 @@ organizationSchema.methods.isAdmin = function(userId) {
   // Manejar caso donde admin está poblado (es un objeto) o no poblado (es ObjectId)
   const adminId = this.admin._id ? this.admin._id.toString() : this.admin.toString();
   
-  // Verificar si es el admin principal
   if (adminId === userIdStr) {
     return true;
   }
   
-  // Verificar si está en additionalAdmins (también puede estar poblado)
   return this.additionalAdmins ? this.additionalAdmins.some(admin => {
     const additionalAdminId = admin._id ? admin._id.toString() : admin.toString();
     return additionalAdminId === userIdStr;
@@ -266,6 +393,9 @@ organizationSchema.methods.isEmployee = function(userId) {
   if (!this.employees) return false;
   const userIdStr = userId.toString();
   return this.employees.some(emp => {
+    // Skip if emp.user is null (deleted user)
+    if (!emp.user) return false;
+    
     // Manejar caso donde emp.user está poblado o no
     const empUserId = emp.user._id ? emp.user._id.toString() : emp.user.toString();
     return empUserId === userIdStr && emp.status === 'active';
@@ -277,6 +407,9 @@ organizationSchema.methods.isProjectManager = function(userId) {
   if (!this.employees) return false;
   const userIdStr = userId.toString();
   const employee = this.employees.find(emp => {
+    // Skip if emp.user is null (deleted user)
+    if (!emp.user) return false;
+    
     const empUserId = emp.user._id ? emp.user._id.toString() : emp.user.toString();
     return empUserId === userIdStr && emp.status === 'active';
   });
@@ -290,13 +423,12 @@ organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
     this.employees = [];
   }
   
-  // Verificar si ya existe
   const existingEmployee = this.employees.find(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (existingEmployee) {
-    throw new Error('El empleado ya está asociado a esta organización');
+    throw new Error('Employee is already associated with this organization');
   }
   
   this.employees.push({
@@ -314,15 +446,15 @@ organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
 // Método: Remover empleado
 organizationSchema.methods.removeEmployee = function(userId) {
   if (!this.employees) {
-    throw new Error('Empleado no encontrado en la organización');
+    throw new Error('Employee not found in the organization');
   }
   
   const index = this.employees.findIndex(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (index === -1) {
-    throw new Error('Empleado no encontrado en la organización');
+    throw new Error('Employee not found in the organization');
   }
   
   this.employees.splice(index, 1);
@@ -333,15 +465,15 @@ organizationSchema.methods.removeEmployee = function(userId) {
 // Método: Actualizar estado de empleado
 organizationSchema.methods.updateEmployeeStatus = function(userId, newStatus) {
   if (!this.employees) {
-    throw new Error('Empleado no encontrado en la organización');
+    throw new Error('Employee not found in the organization');
   }
   
   const employee = this.employees.find(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (!employee) {
-    throw new Error('Empleado no encontrado en la organización');
+    throw new Error('Employee not found in the organization');
   }
   
   employee.status = newStatus;
@@ -352,19 +484,19 @@ organizationSchema.methods.updateEmployeeStatus = function(userId, newStatus) {
 // Método: Asignar/desasignar rol de jefe de proyecto
 organizationSchema.methods.setProjectManagerRole = function(userId, isProjectManager) {
   if (!this.employees) {
-    throw new Error('Empleado no encontrado en la organización');
+    throw new Error('Employee not found in the organization');
   }
   
   const employee = this.employees.find(
-    emp => emp.user.toString() === userId.toString()
+    emp => emp.user && emp.user.toString() === userId.toString()
   );
   
   if (!employee) {
-    throw new Error('Empleado no encontrado en la organización');
+    throw new Error('Employee not found in the organization');
   }
   
   if (employee.status !== 'active') {
-    throw new Error('Solo se puede asignar el rol de jefe de proyecto a empleados activos');
+    throw new Error('Project manager role can only be assigned to active employees');
   }
   
   employee.isProjectManager = isProjectManager;
@@ -377,11 +509,11 @@ organizationSchema.methods.addAdmin = function(userId) {
   const userIdStr = userId.toString();
   
   if (this.admin.toString() === userIdStr) {
-    throw new Error('El usuario ya es el administrador principal');
+    throw new Error('User is already the main administrator');
   }
   
   if (this.additionalAdmins.some(adminId => adminId.toString() === userIdStr)) {
-    throw new Error('El usuario ya es un administrador adicional');
+    throw new Error('User is already an additional administrator');
   }
   
   this.additionalAdmins.push(userId);
@@ -389,13 +521,11 @@ organizationSchema.methods.addAdmin = function(userId) {
   return this.save();
 };
 
-// Middleware: Actualizar timestamp antes de guardar
 organizationSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();
 });
 
-// Middleware: Validar que el admin no esté en la lista de additionalAdmins
 organizationSchema.pre('save', function(next) {
   if (this.admin && this.additionalAdmins.length > 0) {
     const adminStr = this.admin.toString();

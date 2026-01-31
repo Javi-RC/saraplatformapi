@@ -4,7 +4,6 @@ const cvController = require('../controllers/cv.controller');
 const passport = require('passport');
 const multer = require('multer');
 
-// Configurar multer para manejar archivos en memoria
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
@@ -12,26 +11,23 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024 // Límite de 5MB
   },
   fileFilter: (req, file, cb) => {
-    // Aceptar solo PDF y TXT
     if (file.mimetype === 'application/pdf' || file.mimetype === 'text/plain') {
       cb(null, true);
     } else {
-      cb(new Error('Formato de archivo no soportado. Use PDF o TXT'), false);
+      cb(new Error('Unsupported file format. Use PDF or TXT'), false);
     }
   }
 });
 
-// Middleware de autenticación JWT
 const authenticate = passport.authenticate('jwt', { session: false });
 
-// Middleware de autorización para admin
 const isAdmin = (req, res, next) => {
   if (req.user && req.user.role === 'org_admin') {
     return next();
   }
   return res.status(403).json({
     success: false,
-    error: 'Acceso denegado. Se requieren permisos de administrador.'
+    error: 'Access denied. Administrator permissions are required.'
   });
 };
 
@@ -98,18 +94,55 @@ router.get('/admin/all', authenticate, isAdmin, cvController.getAllCVs);
  */
 router.post('/admin/search', authenticate, isAdmin, cvController.searchCVs);
 
-// Manejo de errores de multer
+/**
+ * @route   GET /api/cv/completeness
+ * @desc    Obtiene el estado de completitud del CV del usuario
+ * @access  Private
+ */
+router.get('/completeness', authenticate, cvController.getCompleteness);
+
+/**
+ * @route   GET /api/cv/missing-fields-questions
+ * @desc    Obtiene preguntas dinámicas para completar los campos faltantes del CV
+ * @access  Private
+ * @query   language - Idioma de las preguntas ('en' o 'es', por defecto 'en')
+ * @query   groupByCategory - Si es 'true', agrupa las preguntas por categoría
+ */
+router.get('/missing-fields-questions', authenticate, cvController.getMissingFieldsQuestions);
+
+/**
+ * @route   PATCH /api/cv/complete-fields
+ * @desc    Completa los campos faltantes del CV
+ * @access  Private
+ */
+router.patch('/complete-fields', authenticate, cvController.completeFields);
+
+/**
+ * @route   POST /api/cv/questionnaire/next
+ * @desc    Submit phase responses and get next phase
+ * @access  Private
+ */
+router.post('/questionnaire/next', authenticate, cvController.submitPhaseResponses);
+
+/**
+ * @route   POST /api/cv/questionnaire/submit
+ * @desc    Submit final questionnaire responses
+ * @access  Private
+ */
+router.post('/questionnaire/submit', authenticate, cvController.submitQuestionnaire);
+
+// Error handler middleware
 router.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        error: 'El archivo es demasiado grande. Máximo 5MB.'
+        error: 'File is too large. Maximum size is 5MB.'
       });
     }
     return res.status(400).json({
       success: false,
-      error: `Error al subir archivo: ${error.message}`
+      error: `Error uploading file: ${error.message}`
     });
   } else if (error) {
     return res.status(400).json({

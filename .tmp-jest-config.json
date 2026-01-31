@@ -1,0 +1,186 @@
+{
+  "configs": [
+    {
+      "automock": false,
+      "cache": true,
+      "cacheDirectory": "C:\\Users\\Javier\\AppData\\Local\\Temp\\jest",
+      "clearMocks": false,
+      "collectCoverageFrom": [
+        "src/**/*.js",
+        "!src/server.js",
+        "!**/node_modules/**",
+        "!**/tests/**"
+      ],
+      "coverageDirectory": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\coverage",
+      "coveragePathIgnorePatterns": [
+        "\\\\node_modules\\\\"
+      ],
+      "coverageReporters": [
+        "text",
+        "lcov",
+        "html"
+      ],
+      "cwd": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend",
+      "detectLeaks": false,
+      "detectOpenHandles": false,
+      "errorOnDeprecated": false,
+      "extensionsToTreatAsEsm": [],
+      "fakeTimers": {
+        "enableGlobally": false
+      },
+      "forceCoverageMatch": [],
+      "globalTeardown": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\tests\\setup\\teardown.js",
+      "globals": {},
+      "haste": {
+        "computeSha1": false,
+        "enableSymlinks": false,
+        "forceNodeFilesystemAPI": true,
+        "throwOnModuleCollision": false
+      },
+      "id": "5cd92078b61c655b696d86506105c614",
+      "injectGlobals": true,
+      "moduleDirectories": [
+        "node_modules",
+        "src"
+      ],
+      "moduleFileExtensions": [
+        "js",
+        "mjs",
+        "cjs",
+        "jsx",
+        "ts",
+        "mts",
+        "cts",
+        "tsx",
+        "json",
+        "node"
+      ],
+      "moduleNameMapper": [],
+      "modulePathIgnorePatterns": [],
+      "openHandlesTimeout": 1000,
+      "prettierPath": "prettier",
+      "resetMocks": false,
+      "resetModules": false,
+      "restoreMocks": false,
+      "rootDir": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend",
+      "roots": [
+        "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend"
+      ],
+      "runner": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\node_modules\\jest-runner\\build\\index.js",
+      "sandboxInjectedGlobals": [],
+      "setupFiles": [],
+      "setupFilesAfterEnv": [
+        "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\tests\\setup\\test-setup.js"
+      ],
+      "skipFilter": false,
+      "slowTestThreshold": 5,
+      "snapshotFormat": {
+        "escapeString": false,
+        "printBasicPrototype": false
+      },
+      "snapshotSerializers": [],
+      "testEnvironment": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\node_modules\\jest-environment-node\\build\\index.js",
+      "testEnvironmentOptions": {},
+      "testLocationInResults": false,
+      "testMatch": [
+        "**/tests/**/*.test.js",
+        "**/tests/**/*.spec.js"
+      ],
+      "testPathIgnorePatterns": [
+        "\\\\node_modules\\\\"
+      ],
+      "testRegex": [],
+      "testRunner": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\node_modules\\jest-circus\\build\\runner.js",
+      "testTimeout": 30000,
+      "transform": [
+        [
+          "\\.[jt]sx?$",
+          "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\node_modules\\babel-jest\\build\\index.js",
+          {}
+        ]
+      ],
+      "transformIgnorePatterns": [
+        "\\\\node_modules\\\\",
+        "\\.pnp\\.[^\\\\]+$"
+      ],
+      "waitForUnhandledRejections": false,
+      "watchPathIgnorePatterns": []
+    }
+  ],
+  "globalConfig": {
+    "bail": 0,
+    "changedFilesWithAncestor": false,
+    "ci": false,
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js",
+      "!**/node_modules/**",
+      "!**/tests/**"
+    ],
+    "coverageDirectory": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\coverage",
+    "coverageProvider": "babel",
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 70,
+        "lines": 70,
+        "statements": 70
+      }
+    },
+    "detectLeaks": false,
+    "detectOpenHandles": false,
+    "errorOnDeprecated": false,
+    "expand": false,
+    "findRelatedTests": false,
+    "forceExit": false,
+    "globalTeardown": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\tests\\setup\\teardown.js",
+    "json": false,
+    "lastCommit": false,
+    "listTests": false,
+    "logHeapUsage": false,
+    "maxConcurrency": 5,
+    "maxWorkers": 1,
+    "noStackTrace": false,
+    "nonFlagArgs": [
+      "tests/unit/services"
+    ],
+    "notify": false,
+    "notifyMode": "failure-change",
+    "onlyChanged": false,
+    "onlyFailures": false,
+    "openHandlesTimeout": 1000,
+    "passWithNoTests": false,
+    "projects": [],
+    "rootDir": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend",
+    "runInBand": true,
+    "runTestsByPath": false,
+    "seed": -1025037137,
+    "silent": true,
+    "skipFilter": false,
+    "snapshotFormat": {
+      "escapeString": false,
+      "printBasicPrototype": false
+    },
+    "testFailureExitCode": 1,
+    "testPathPatterns": [
+      "tests/unit/services"
+    ],
+    "testSequencer": "C:\\Users\\Javier\\Documents\\GitHub\\TFGRepos\\Back\\tfg-backend\\node_modules\\@jest\\test-sequencer\\build\\index.js",
+    "testTimeout": 30000,
+    "updateSnapshot": "new",
+    "useStderr": false,
+    "verbose": true,
+    "waitForUnhandledRejections": false,
+    "watch": false,
+    "watchAll": false,
+    "watchman": true,
+    "workerThreads": false
+  },
+  "version": "30.1.3"
+}
