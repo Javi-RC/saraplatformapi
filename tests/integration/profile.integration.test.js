@@ -55,12 +55,12 @@ describe('Profile API Tests', () => {
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.user).toBeDefined();
-      expect(response.body.user.email).toBe('test@example.com');
-      expect(response.body.user.name).toBe('Test User');
-      expect(response.body.user.country).toBe('España');
-      expect(response.body.user.timezone).toBe('Europe/Madrid');
-      expect(response.body.user.passwordHash).toBeUndefined();
+      expect(response.body.data.user).toBeDefined();
+      expect(response.body.data.user.email).toBe('test@example.com');
+      expect(response.body.data.user.name).toBe('Test User');
+      expect(response.body.data.user.country).toBe('España');
+      expect(response.body.data.user.timezone).toBe('Europe/Madrid');
+      expect(response.body.data.user.passwordHash).toBeUndefined();
     });
 
     it('should return 401 without token', async () => {

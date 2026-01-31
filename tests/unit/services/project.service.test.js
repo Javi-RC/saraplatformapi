@@ -285,7 +285,7 @@ describe('ProjectService', () => {
         { _id: 'project-1', projectName: 'Project 1' }
       ];
 
-      projectRepository.find.mockResolvedValue(mockProjects);
+      projectRepository.find.mockResolvedValueOnce(mockProjects);
 
       const result = await projectService.getProjectsByManager(userId);
 

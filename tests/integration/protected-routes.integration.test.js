@@ -34,7 +34,7 @@ describe('Protected Routes - Integration Tests', () => {
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.user.email).toBe('test@example.com');
+      expect(response.body.data.user.email).toBe('test@example.com');
     });
 
     it('debería rechazar acceso sin token', async () => {

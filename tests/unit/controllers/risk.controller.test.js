@@ -36,6 +36,10 @@ describe('Risk Controller - Unit Tests', () => {
     // Default i18n mock
     i18n.getLanguageFromRequest.mockReturnValue('es');
     i18n.translateRiskObject.mockImplementation((risk) => risk);
+    i18n.translateRisksArray = jest.fn().mockImplementation((risks) => {
+      // Ensure we return an array that can be mapped
+      return Promise.resolve(risks || []);
+    });
     
     jest.clearAllMocks();
   });
@@ -53,12 +57,13 @@ describe('Risk Controller - Unit Tests', () => {
 
       await riskController.predictRisks(req, res);
 
-      expect(riskPredictionService.predictProjectRisks).toHaveBeenCalledWith('project123');
+      expect(riskPredictionService.predictProjectRisks).toHaveBeenCalledWith('project123', expect.any(String));
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         message: 'Risk prediction completed successfully',
-        data: mockPrediction
+        data: mockPrediction,
+        language: 'es'
       });
     });
 
@@ -90,7 +95,8 @@ describe('Risk Controller - Unit Tests', () => {
         { _id: 'risk1', type: 'schedule', severity: 'high' },
         { _id: 'risk2', type: 'budget', severity: 'medium' }
       ];
-      riskPredictionService.getProjectRiskPredictions.mockResolvedValue(mockRisks);
+      const mockResult = { risks: mockRisks };
+      riskPredictionService.getProjectRiskPredictions.mockResolvedValue(mockResult);
 
       await riskController.getProjectRisks(req, res);
 
@@ -101,7 +107,10 @@ describe('Risk Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        data: mockRisks
+        data: {
+          risks: mockRisks
+        },
+        language: 'es'
       });
     });
 
@@ -149,7 +158,8 @@ describe('Risk Controller - Unit Tests', () => {
         _id: 'risk123',
         type: 'schedule',
         severity: 'high',
-        populate: jest.fn().mockReturnThis()
+        populate: jest.fn().mockReturnThis(),
+        toObject: jest.fn().mockReturnValue({ _id: 'risk123', type: 'schedule', severity: 'high' })
       };
       Risk.findById.mockReturnValue({
         populate: jest.fn().mockReturnValue({
@@ -165,7 +175,8 @@ describe('Risk Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        data: mockRisk
+        data: { _id: 'risk123', type: 'schedule', severity: 'high' },
+        language: 'es'
       });
     });
 
@@ -208,7 +219,8 @@ describe('Risk Controller - Unit Tests', () => {
       const mockRisk = {
         _id: 'risk123',
         feedback: {},
-        save: jest.fn().mockResolvedValue(true)
+        save: jest.fn().mockResolvedValue(true),
+        toObject: jest.fn().mockReturnValue({ _id: 'risk123', feedback: {} })
       };
       Risk.findById.mockResolvedValue(mockRisk);
 

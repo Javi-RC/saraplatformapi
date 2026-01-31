@@ -67,7 +67,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: mockNotifications,
-        message: 'Notifications obtained successfully'
+        message: 'Notificaciones obtenidas correctamente'
       });
     });
 
@@ -102,7 +102,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error obtaining notifications'
+        error: 'Error al obtener notificaciones'
       });
     });
 
@@ -134,7 +134,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: { count: 5 },
-        message: 'Count obtained successfully'
+        message: 'Conteo obtenido correctamente'
       });
     });
 
@@ -146,7 +146,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error obtaining count'
+        error: 'Error al obtener el conteo'
       });
     });
   });
@@ -163,7 +163,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: mockStats,
-        message: 'Statistics obtained successfully'
+        message: 'Estadísticas obtenidas correctamente'
       });
     });
 
@@ -175,7 +175,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error obtaining statistics'
+        error: 'Error al obtener estadísticas'
       });
     });
   });
@@ -183,7 +183,7 @@ describe('Notification Controller - Unit Tests', () => {
   describe('markAsRead', () => {
     it('should mark notification as read', async () => {
       req.params.id = 'n1';
-      const mockNotification = { id: 'n1', read: true };
+      const mockNotification = { id: 'n1', read: true, priority: undefined };
       notificationService.markAsRead.mockResolvedValue(mockNotification);
 
       await notificationController.markAsRead(req, res);
@@ -193,7 +193,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: mockNotification,
-        message: 'Notification marked as read'
+        message: 'Notificación marcada como leída'
       });
     });
 
@@ -206,7 +206,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Notification not found'
+        error: 'Notificación no encontrada'
       });
     });
 
@@ -219,7 +219,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error marking as read'
+        error: 'Error al marcar como leída'
       });
     });
   });
@@ -233,7 +233,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'An array of notification IDs is required'
+        error: 'Se requiere un array de IDs de notificaciones'
       });
     });
 
@@ -261,7 +261,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error marking notifications'
+        error: 'Error al marcar notificaciones'
       });
     });
   });
@@ -277,7 +277,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: { count: 3 },
-        message: '3 notifications marked as read'
+        message: '3 notificaciones marcadas como leídas'
       });
     });
 
@@ -289,7 +289,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error marking all as read'
+        error: 'Error al marcar todas como leídas'
       });
     });
   });
@@ -297,7 +297,7 @@ describe('Notification Controller - Unit Tests', () => {
   describe('archive', () => {
     it('should archive notification', async () => {
       req.params.id = 'n1';
-      const mockNotification = { id: 'n1', archived: true };
+      const mockNotification = { id: 'n1', archived: true, priority: undefined };
       notificationService.archive.mockResolvedValue(mockNotification);
 
       await notificationController.archive(req, res);
@@ -307,7 +307,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: mockNotification,
-        message: 'Notification archived'
+        message: 'Notificación archivada'
       });
     });
 
@@ -320,7 +320,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Notification not found'
+        error: 'Notificación no encontrada'
       });
     });
 
@@ -333,7 +333,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error archiving notification'
+        error: 'Error al archivar notificación'
       });
     });
   });
@@ -350,7 +350,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: null,
-        message: 'Notification deleted successfully'
+        message: 'Notificación eliminada correctamente'
       });
     });
 
@@ -363,7 +363,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Notification not found'
+        error: 'Notificación no encontrada'
       });
     });
 
@@ -376,7 +376,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error deleting notification'
+        error: 'Error al eliminar notificación'
       });
     });
   });
@@ -390,7 +390,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'recipientId, type, title and message are required'
+        error: 'recipientId, type, title y message son requeridos'
       });
     });
 
@@ -407,7 +407,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Invalid notification type'
+        error: 'Tipo de notificación inválido'
       });
     });
 
@@ -419,7 +419,7 @@ describe('Notification Controller - Unit Tests', () => {
         message: 'World'
       };
 
-      const created = { id: 'n1' };
+      const created = { id: 'n1', priority: undefined };
       notificationService.create.mockResolvedValue(created);
 
       await notificationController.create(req, res);
@@ -437,7 +437,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: created,
-        message: 'Notification created successfully'
+        message: 'Notificación creada correctamente'
       });
     });
 
@@ -456,7 +456,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Recipient user not found'
+        error: 'Usuario receptor no encontrado'
       });
     });
   });
@@ -470,7 +470,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'An array of recipientIds is required'
+        error: 'Se requiere un array de recipientIds'
       });
     });
 
@@ -482,7 +482,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'type, title and message are required'
+        error: 'type, title y message son requeridos'
       });
     });
 
@@ -494,7 +494,7 @@ describe('Notification Controller - Unit Tests', () => {
         message: 'm'
       };
 
-      notificationService.sendBulkNotifications.mockResolvedValue([{ id: 'n1' }, { id: 'n2' }]);
+      notificationService.sendBulkNotifications.mockResolvedValue([{ id: 'n1', priority: undefined }, { id: 'n2', priority: undefined }]);
 
       await notificationController.sendBulk(req, res);
 
@@ -510,8 +510,8 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        data: { count: 2, notifications: [{ id: 'n1' }, { id: 'n2' }] },
-        message: '2 notifications sent successfully'
+        data: { count: 2, notifications: [{ id: 'n1', priority: undefined }, { id: 'n2', priority: undefined }] },
+        message: '2 notificaciones enviadas correctamente'
       });
     });
   });
@@ -525,7 +525,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'role, type, title and message are required'
+        error: 'role, type, title y message son requeridos'
       });
     });
 
@@ -543,7 +543,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: { count: 1 },
-        message: '1 notifications sent to role org_admin'
+        message: '1 notificaciones enviadas al rol org_admin'
       });
     });
   });
@@ -557,7 +557,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'type, title and message are required'
+        error: 'type, title y message son requeridos'
       });
     });
 
@@ -579,7 +579,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         data: { count: 2 },
-        message: '2 notifications sent to all users'
+        message: '2 notificaciones enviadas a todos los usuarios'
       });
     });
   });
