@@ -32,15 +32,15 @@ function getTermsEN() {
 
 ## 1. Identification
 
-This application (the "Platform") is software developed for academic purposes within the scope of a university final project. The Platform provides features related to user management, organizations, projects, notifications, and analysis of professional information.
+This application ("SARA") is software developed for academic purposes within the scope of a university final project. SARA provides features related to user management, organizations, projects, notifications, and analysis of professional information.
 
 ## 2. Acceptance of these terms
 
-By registering, accessing, or using the Platform, you agree to these Terms & Conditions. If you do not agree, you must not use the Platform.
+By registering, accessing, or using SARA, you agree to these Terms & Conditions. If you do not agree, you must not use SARA.
 
 ## 3. Service description
 
-The Platform may include, among others, the following features:
+SARA may include, among others, the following features:
 
 - User registration and login.
 - Organization and project management.
@@ -52,20 +52,20 @@ Features may evolve over time.
 
 ## 4. Age and legal capacity
 
-The Platform is intended for users who have legal capacity to accept these Terms. If you are under the age of majority, you must have authorization from your legal guardian.
+SARA is intended for users who have legal capacity to accept these Terms. If you are under the age of majority, you must have authorization from your legal guardian.
 
 ## 5. User accounts
 
 - You are responsible for the information you provide during registration.
 - You must keep your credentials confidential.
 - You agree to notify any unauthorized use of your account.
-- The Platform may suspend or terminate accounts in case of misuse or violations of these Terms.
+- SARA may suspend or terminate accounts in case of misuse or violations of these Terms.
 
 ## 6. Permitted and prohibited use
 
 ### 6.1 Permitted use
 
-You may use the Platform only for lawful purposes and in accordance with these Terms.
+You may use SARA only for lawful purposes and in accordance with these Terms.
 
 ### 6.2 Prohibited use
 
@@ -74,7 +74,7 @@ You must not:
 - Engage in illegal or fraudulent activities.
 - Attempt to access systems, accounts, or data without authorization.
 - Introduce malware or run harmful scripts, or perform attacks (DoS/DDoS).
-- Interfere with the normal operation of the Platform.
+- Interfere with the normal operation of SARA.
 - Impersonate others or provide false information.
 - Upload content that infringes third-party rights.
 
@@ -88,41 +88,41 @@ You must not:
 
 ### 7.2 Limited license to operate the service
 
-You grant the Platform a limited, non-exclusive, royalty-free license to store, process, and display your content to the extent necessary to provide the service.
+You grant SARA a limited, non-exclusive, royalty-free license to store, process, and display your content to the extent necessary to provide the service.
 
 ## 8. Automated processing and third-party services
 
-The Platform may perform automated processing of content (for example, extracting information from a curriculum). Some features may require third-party services (for example, AI providers).
+SARA may perform automated processing of content (for example, extracting information from a curriculum). Some features may require third-party services (for example, AI providers).
 
-- Where required, the Platform will request your explicit consent before sending information to third parties.
-- The Platform will aim to minimize data sharing to what is strictly necessary.
+- Where required, SARA will request your explicit consent before sending information to third parties.
+- SARA will aim to minimize data sharing to what is strictly necessary.
 
 ## 9. Privacy and personal data
 
-Personal data processing is governed by the Platform's Privacy Policy and applicable regulations. Consent may be requested for specific processing activities (for example, AI-based curriculum analysis).
+Personal data processing is governed by SARA's Privacy Policy and applicable regulations. Consent may be requested for specific processing activities (for example, AI-based curriculum analysis).
 
 ## 10. Availability and maintenance
 
-The Platform is provided "as is" and may be subject to interruptions, maintenance, changes, or discontinuation—especially because it is an academic project.
+SARA is provided "as is" and may be subject to interruptions, maintenance, changes, or discontinuation—especially because it is an academic project.
 
 ## 11. Disclaimer of warranties
 
 To the maximum extent permitted by law:
 
-- The Platform does not guarantee uninterrupted, error-free, or fully secure service.
+- SARA does not guarantee uninterrupted, error-free, or fully secure service.
 - Any analysis, predictions, or recommendations are informational and do not constitute professional advice.
 
 ## 12. Limitation of liability
 
-To the maximum extent permitted by law, the Platform will not be liable for:
+To the maximum extent permitted by law, SARA will not be liable for:
 
 - Indirect damages, data loss, loss of profits, or service interruptions.
-- Decisions made by users based on Platform outputs.
+- Decisions made by users based on SARA outputs.
 - Incidents arising from third-party service usage.
 
 ## 13. Suspension and termination
 
-The Platform may suspend or terminate access if it detects use contrary to these Terms or for technical/operational reasons.
+SARA may suspend or terminate access if it detects use contrary to these Terms or for technical/operational reasons.
 
 ## 14. Changes to these terms
 
@@ -134,7 +134,7 @@ These Terms are governed by the laws applicable in the location where the projec
 
 ## 16. Contact
 
-For questions related to these Terms, use the contact channels provided in the Platform or the project documentation.
+For questions related to these Terms, use the contact channels provided in SARA or the project documentation.
 `;
 }
 
@@ -151,15 +151,15 @@ function getTermsES() {
 
 ## 1. Identificación
 
-Esta aplicación (la "Plataforma") es un software desarrollado con fines académicos en el marco de un Trabajo de Fin de Grado universitario. La Plataforma ofrece funcionalidades relacionadas con la gestión de usuarios, organizaciones, proyectos, notificaciones y análisis de información profesional.
+Esta aplicación ("SARA") es un software desarrollado con fines académicos en el marco de un Trabajo de Fin de Grado universitario. SARA ofrece funcionalidades relacionadas con la gestión de usuarios, organizaciones, proyectos, notificaciones y análisis de información profesional.
 
 ## 2. Aceptación de estos términos
 
-Al registrarse, acceder o utilizar la Plataforma, usted acepta estos Términos y Condiciones. Si no está de acuerdo, no debe utilizar la Plataforma.
+Al registrarse, acceder o utilizar SARA, usted acepta estos Términos y Condiciones. Si no está de acuerdo, no debe utilizar SARA.
 
 ## 3. Descripción del servicio
 
-La Plataforma puede incluir, entre otras, las siguientes funcionalidades:
+SARA puede incluir, entre otras, las siguientes funcionalidades:
 
 - Registro e inicio de sesión de usuarios.
 - Gestión de organizaciones y proyectos.
@@ -171,20 +171,20 @@ Las funcionalidades pueden evolucionar con el tiempo.
 
 ## 4. Edad y capacidad legal
 
-La Plataforma está destinada a usuarios que tengan capacidad legal para aceptar estos Términos. Si usted es menor de edad, debe contar con la autorización de su tutor legal.
+SARA está destinada a usuarios que tengan capacidad legal para aceptar estos Términos. Si usted es menor de edad, debe contar con la autorización de su tutor legal.
 
 ## 5. Cuentas de usuario
 
 - Usted es responsable de la información que proporciona durante el registro.
 - Debe mantener sus credenciales de acceso de forma confidencial.
 - Se compromete a notificar cualquier uso no autorizado de su cuenta.
-- La Plataforma podrá suspender o cancelar cuentas en caso de uso indebido o incumplimiento de estos Términos.
+- SARA podrá suspender o cancelar cuentas en caso de uso indebido o incumplimiento de estos Términos.
 
 ## 6. Uso permitido y prohibido
 
 ### 6.1 Uso permitido
 
-Solo podrá utilizar la Plataforma con fines lícitos y de acuerdo con estos Términos.
+Solo podrá utilizar SARA con fines lícitos y de acuerdo con estos Términos.
 
 ### 6.2 Uso prohibido
 
@@ -193,7 +193,7 @@ No deberá:
 - Realizar actividades ilegales o fraudulentas.
 - Intentar acceder a sistemas, cuentas o datos sin autorización.
 - Introducir malware, ejecutar scripts dañinos o realizar ataques (DoS/DDoS).
-- Interferir con el funcionamiento normal de la Plataforma.
+- Interferir con el funcionamiento normal de SARA.
 - Suplantar la identidad de otros o proporcionar información falsa.
 - Subir contenido que infrinja derechos de terceros.
 
@@ -207,41 +207,41 @@ No deberá:
 
 ### 7.2 Licencia limitada para operar el servicio
 
-Usted otorga a la Plataforma una licencia limitada, no exclusiva y gratuita para almacenar, procesar y mostrar su contenido en la medida necesaria para prestar el servicio.
+Usted otorga a SARA una licencia limitada, no exclusiva y gratuita para almacenar, procesar y mostrar su contenido en la medida necesaria para prestar el servicio.
 
 ## 8. Procesamiento automatizado y servicios de terceros
 
-La Plataforma puede realizar un procesamiento automatizado del contenido (por ejemplo, extraer información de un currículo). Algunas funcionalidades pueden requerir servicios de terceros (por ejemplo, proveedores de IA).
+SARA puede realizar un procesamiento automatizado del contenido (por ejemplo, extraer información de un currículo). Algunas funcionalidades pueden requerir servicios de terceros (por ejemplo, proveedores de IA).
 
-- Cuando sea necesario, la Plataforma solicitará su consentimiento explícito antes de enviar información a terceros.
-- La Plataforma procurará minimizar el intercambio de datos a lo estrictamente necesario.
+- Cuando sea necesario, SARA solicitará su consentimiento explícito antes de enviar información a terceros.
+- SARA procurará minimizar el intercambio de datos a lo estrictamente necesario.
 
 ## 9. Privacidad y datos personales
 
-El tratamiento de datos personales se rige por la Política de Privacidad de la Plataforma y la normativa aplicable. Se podrá solicitar consentimiento para actividades de tratamiento específicas (por ejemplo, análisis de currículos basado en IA).
+El tratamiento de datos personales se rige por la Política de Privacidad de SARA y la normativa aplicable. Se podrá solicitar consentimiento para actividades de tratamiento específicas (por ejemplo, análisis de currículos basado en IA).
 
 ## 10. Disponibilidad y mantenimiento
 
-La Plataforma se proporciona "tal cual" y puede estar sujeta a interrupciones, mantenimiento, cambios o discontinuación, especialmente al tratarse de un proyecto académico.
+SARA se proporciona "tal cual" y puede estar sujeta a interrupciones, mantenimiento, cambios o discontinuación, especialmente al tratarse de un proyecto académico.
 
 ## 11. Exclusión de garantías
 
 En la máxima medida permitida por la ley:
 
-- La Plataforma no garantiza un servicio ininterrumpido, libre de errores o completamente seguro.
+- SARA no garantiza un servicio ininterrumpido, libre de errores o completamente seguro.
 - Cualquier análisis, predicción o recomendación tiene carácter informativo y no constituye asesoramiento profesional.
 
 ## 12. Limitación de responsabilidad
 
-En la máxima medida permitida por la ley, la Plataforma no será responsable de:
+En la máxima medida permitida por la ley, SARA no será responsable de:
 
 - Daños indirectos, pérdida de datos, lucro cesante o interrupciones del servicio.
-- Decisiones tomadas por los usuarios basándose en los resultados de la Plataforma.
+- Decisiones tomadas por los usuarios basándose en los resultados de SARA.
 - Incidentes derivados del uso de servicios de terceros.
 
 ## 13. Suspensión y terminación
 
-La Plataforma podrá suspender o cancelar el acceso si detecta un uso contrario a estos Términos o por motivos técnicos u operativos.
+SARA podrá suspender o cancelar el acceso si detecta un uso contrario a estos Términos o por motivos técnicos u operativos.
 
 ## 14. Modificaciones de estos términos
 
@@ -253,7 +253,7 @@ Estos Términos se rigen por la legislación aplicable en el lugar donde se oper
 
 ## 16. Contacto
 
-Para consultas relacionadas con estos Términos, utilice los canales de contacto proporcionados en la Plataforma o en la documentación del proyecto.
+Para consultas relacionadas con estos Términos, utilice los canales de contacto proporcionados en SARA o en la documentación del proyecto.
 `;
 }
 
