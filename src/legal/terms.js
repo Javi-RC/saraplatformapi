@@ -6,16 +6,25 @@
 const TERMS_VERSION = '1.0';
 const TERMS_LAST_UPDATED = '2026-01-03';
 
-/**
- * Get terms and conditions content
- * @param {string} locale - Language locale (currently only 'en' supported)
- * @returns {Object} Document metadata and content
- */
-function getTermsAndConditions(locale = 'en') {
-  // Normalize locale and fallback to English
-  const normalizedLocale = (locale.split(/[-_]/)[0] || 'en') === 'en' ? 'en' : 'en';
+const SUPPORTED_LOCALES = ['en', 'es'];
+const DEFAULT_LOCALE = 'es';
 
-  const contentMarkdown = `# Terms & Conditions (v${TERMS_VERSION})
+/**
+ * Normalize and resolve locale with fallback
+ * @param {string} locale - Raw locale string
+ * @returns {string} Resolved locale code
+ */
+function resolveLocale(locale) {
+  const base = (locale || '').split(/[-_]/)[0].toLowerCase();
+  return SUPPORTED_LOCALES.includes(base) ? base : DEFAULT_LOCALE;
+}
+
+/**
+ * Get terms content in English
+ * @returns {string} Markdown content
+ */
+function getTermsEN() {
+  return `# Terms & Conditions (v${TERMS_VERSION})
 
 **Last updated:** ${TERMS_LAST_UPDATED}
 
@@ -127,6 +136,140 @@ These Terms are governed by the laws applicable in the location where the projec
 
 For questions related to these Terms, use the contact channels provided in the Platform or the project documentation.
 `;
+}
+
+/**
+ * Get terms content in Spanish
+ * @returns {string} Markdown content
+ */
+function getTermsES() {
+  return `# Términos y Condiciones (v${TERMS_VERSION})
+
+**Última actualización:** ${TERMS_LAST_UPDATED}
+
+> Aviso: este es un texto genérico para un proyecto académico (Trabajo de Fin de Grado / TFG) y no constituye asesoramiento legal.
+
+## 1. Identificación
+
+Esta aplicación (la "Plataforma") es un software desarrollado con fines académicos en el marco de un Trabajo de Fin de Grado universitario. La Plataforma ofrece funcionalidades relacionadas con la gestión de usuarios, organizaciones, proyectos, notificaciones y análisis de información profesional.
+
+## 2. Aceptación de estos términos
+
+Al registrarse, acceder o utilizar la Plataforma, usted acepta estos Términos y Condiciones. Si no está de acuerdo, no debe utilizar la Plataforma.
+
+## 3. Descripción del servicio
+
+La Plataforma puede incluir, entre otras, las siguientes funcionalidades:
+
+- Registro e inicio de sesión de usuarios.
+- Gestión de organizaciones y proyectos.
+- Gestión y visualización de notificaciones.
+- Carga y procesamiento de currículos para extraer información estructurada.
+- Servicios de apoyo a la toma de decisiones basados en reglas y/o modelos.
+
+Las funcionalidades pueden evolucionar con el tiempo.
+
+## 4. Edad y capacidad legal
+
+La Plataforma está destinada a usuarios que tengan capacidad legal para aceptar estos Términos. Si usted es menor de edad, debe contar con la autorización de su tutor legal.
+
+## 5. Cuentas de usuario
+
+- Usted es responsable de la información que proporciona durante el registro.
+- Debe mantener sus credenciales de acceso de forma confidencial.
+- Se compromete a notificar cualquier uso no autorizado de su cuenta.
+- La Plataforma podrá suspender o cancelar cuentas en caso de uso indebido o incumplimiento de estos Términos.
+
+## 6. Uso permitido y prohibido
+
+### 6.1 Uso permitido
+
+Solo podrá utilizar la Plataforma con fines lícitos y de acuerdo con estos Términos.
+
+### 6.2 Uso prohibido
+
+No deberá:
+
+- Realizar actividades ilegales o fraudulentas.
+- Intentar acceder a sistemas, cuentas o datos sin autorización.
+- Introducir malware, ejecutar scripts dañinos o realizar ataques (DoS/DDoS).
+- Interferir con el funcionamiento normal de la Plataforma.
+- Suplantar la identidad de otros o proporcionar información falsa.
+- Subir contenido que infrinja derechos de terceros.
+
+## 7. Contenido del usuario (incluidos currículos)
+
+### 7.1 Propiedad y responsabilidad
+
+- El contenido que suba (por ejemplo, currículos, textos, archivos) sigue siendo suyo o pertenece al titular de los derechos.
+- Usted confirma que tiene derecho a subir dicho contenido.
+- Usted es responsable de la exactitud y legalidad del contenido.
+
+### 7.2 Licencia limitada para operar el servicio
+
+Usted otorga a la Plataforma una licencia limitada, no exclusiva y gratuita para almacenar, procesar y mostrar su contenido en la medida necesaria para prestar el servicio.
+
+## 8. Procesamiento automatizado y servicios de terceros
+
+La Plataforma puede realizar un procesamiento automatizado del contenido (por ejemplo, extraer información de un currículo). Algunas funcionalidades pueden requerir servicios de terceros (por ejemplo, proveedores de IA).
+
+- Cuando sea necesario, la Plataforma solicitará su consentimiento explícito antes de enviar información a terceros.
+- La Plataforma procurará minimizar el intercambio de datos a lo estrictamente necesario.
+
+## 9. Privacidad y datos personales
+
+El tratamiento de datos personales se rige por la Política de Privacidad de la Plataforma y la normativa aplicable. Se podrá solicitar consentimiento para actividades de tratamiento específicas (por ejemplo, análisis de currículos basado en IA).
+
+## 10. Disponibilidad y mantenimiento
+
+La Plataforma se proporciona "tal cual" y puede estar sujeta a interrupciones, mantenimiento, cambios o discontinuación, especialmente al tratarse de un proyecto académico.
+
+## 11. Exclusión de garantías
+
+En la máxima medida permitida por la ley:
+
+- La Plataforma no garantiza un servicio ininterrumpido, libre de errores o completamente seguro.
+- Cualquier análisis, predicción o recomendación tiene carácter informativo y no constituye asesoramiento profesional.
+
+## 12. Limitación de responsabilidad
+
+En la máxima medida permitida por la ley, la Plataforma no será responsable de:
+
+- Daños indirectos, pérdida de datos, lucro cesante o interrupciones del servicio.
+- Decisiones tomadas por los usuarios basándose en los resultados de la Plataforma.
+- Incidentes derivados del uso de servicios de terceros.
+
+## 13. Suspensión y terminación
+
+La Plataforma podrá suspender o cancelar el acceso si detecta un uso contrario a estos Términos o por motivos técnicos u operativos.
+
+## 14. Modificaciones de estos términos
+
+Estos Términos podrán ser actualizados. La versión vigente se publicará a través de este endpoint junto con su fecha de actualización.
+
+## 15. Legislación aplicable y jurisdicción
+
+Estos Términos se rigen por la legislación aplicable en el lugar donde se opera el proyecto. En caso de controversias, las partes intentarán una resolución amistosa antes de acudir a los tribunales.
+
+## 16. Contacto
+
+Para consultas relacionadas con estos Términos, utilice los canales de contacto proporcionados en la Plataforma o en la documentación del proyecto.
+`;
+}
+
+const TERMS_CONTENT = {
+  en: getTermsEN,
+  es: getTermsES
+};
+
+/**
+ * Get terms and conditions content
+ * @param {string} locale - Language locale ('en' or 'es', defaults to 'es')
+ * @returns {Object} Document metadata and content
+ */
+function getTermsAndConditions(locale = 'es') {
+  const normalizedLocale = resolveLocale(locale);
+  const contentMarkdown = TERMS_CONTENT[normalizedLocale]();
 
   return {
     version: TERMS_VERSION,
