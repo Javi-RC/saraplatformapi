@@ -1,0 +1,112 @@
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+  console.warn
+    MongoDB disconnected. Attempting to reconnect...
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     mongoose[33m.[39mconnection[33m.[39mon([32m'disconnected'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m       console[33m.[39mwarn([32m'MongoDB disconnected. Attempting to reconnect...'[39m)[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 28 |[39m     })[33m;[39m
+     [90m 29 |[39m
+     [90m 30 |[39m     mongoose[33m.[39mconnection[33m.[39mon([32m'reconnected'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at NativeConnection.warn (src/config/db.js:27:15)
+      at NativeConnection.set (node_modules/mongoose/lib/connection.js:149:12)
+      at NativeConnection.onClose (node_modules/mongoose/lib/connection.js:1319:19)
+      at NativeConnection._close (node_modules/mongoose/lib/connection.js:1268:12)
+          at async Promise.all (index 0)
+      at Mongoose.disconnect (node_modules/mongoose/lib/mongoose.js:471:3)
+      at Object.disconnect (tests/setup/mongodb-helper.js:64:7)
+      at Object.<anonymous> (tests/integration/protected-routes.integration.test.js:14:5)
+
+FAIL tests/integration/protected-routes.integration.test.js (34.11 s)
+  Protected Routes - Integration Tests
+    GET /api/profile
+      ├ù deber├¡a permitir acceso con token v├ílido (30278 ms)
+      ÔêÜ deber├¡a rechazar acceso sin token (444 ms)
+      ÔêÜ deber├¡a rechazar acceso con token inv├ílido (40 ms)
+    Rutas de Health Check
+      ÔêÜ deber├¡a responder en la ruta de health check (34 ms)
+      ÔêÜ deber├¡a responder en la ruta ra├¡z (35 ms)
+
+  ÔùÅ Protected Routes - Integration Tests ÔÇ║ GET /api/profile ÔÇ║ deber├¡a permitir acceso con token v├ílido
+
+    thrown: "Exceeded timeout of 30000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      20 |
+      21 |   describe('GET /api/profile', () => {
+    > 22 |     it('deber├¡a permitir acceso con token v├ílido', async () => {
+         |     ^
+      23 |       const user = await User.create({
+      24 |         email: 'test@example.com',
+      25 |         name: 'Test User',
+
+      at it (tests/integration/protected-routes.integration.test.js:22:5)
+      at describe (tests/integration/protected-routes.integration.test.js:21:3)
+      at Object.describe (tests/integration/protected-routes.integration.test.js:8:1)
+
+  ÔùÅ Protected Routes - Integration Tests ÔÇ║ GET /api/profile ÔÇ║ deber├¡a permitir acceso con token v├ílido
+
+    MongooseError: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+
+       8 |
+       9 |   try {
+    > 10 |     await mongoose.connect(uri, {
+         |                    ^
+      11 |       serverSelectionTimeoutMS: 5000,
+      12 |       socketTimeoutMS: 45000,
+      13 |       maxPoolSize: 10,
+
+      at NativeConnection.createClient (node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js:251:13)
+      at NativeConnection.openUri (node_modules/mongoose/lib/connection.js:1075:34)
+      at Mongoose.connect (node_modules/mongoose/lib/mongoose.js:450:15)
+      at connect (src/config/db.js:10:20)
+      at connectDB (src/app.js:94:11)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:91:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at jsonParser (node_modules/body-parser/lib/types/json.js:113:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at next (src/app.js:82:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at hpp (node_modules/hpp/lib/index.js:146:9)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/express-mongo-sanitize/index.js:122:5
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/express-rate-limit/dist/index.cjs:942:7
+      at node_modules/express-rate-limit/dist/index.cjs:825:5
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 4 passed, 5 total
+Snapshots:   0 total
+Time:        34.246 s
+Ran all test suites matching tests/integration/protected-routes.integration.test.js.
+Ô£ô MongoDB test server closed successfully
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.

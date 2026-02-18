@@ -410,7 +410,7 @@ class ProjectNotificationHelper {
         `The project "${project.projectName}" requires ${metadata.requestedSize} employees but only ${metadata.selectedSize} are available.`,
         `${metadata.shortage} team member(s) are missing.`,
         metadata.employeesWithAcceptedCV < metadata.allEmployeesInOrg 
-          ? `There are ${metadata.allEmployeesInOrg - metadata.employeesWithAcceptedCV} employee(s) in the organization without accepted CV.`
+          ? `There are ${metadata.allEmployeesInOrg - metadata.employeesWithAcceptedCV} employee(s) in the organization without accepted curriculum.`
           : null,
         summary.skillsGaps && summary.skillsGaps.length > 0
           ? `Technologies not covered: ${summary.skillsGaps.join(', ')}`
@@ -421,7 +421,7 @@ class ProjectNotificationHelper {
         '• Consider hiring new employees',
         '• Reduce project scope',
         '• Extend delivery timelines',
-        '• Review pending CV approvals',
+        '• Review pending curriculum approvals',
         '• Evaluate employee availability in other projects'
       ].join('\n');
 

@@ -2,8 +2,8 @@ const BaseRepository = require('./base.repository');
 const CV = require('../models/cv.model');
 
 /**
- * CV Repository
- * Handles all database operations for CV model
+ * Curriculum Repository
+ * Handles all database operations for Curriculum model
  */
 class CVRepository extends BaseRepository {
   constructor() {
@@ -11,7 +11,7 @@ class CVRepository extends BaseRepository {
   }
 
   /**
-   * Find CV by user
+   * Find curriculum by user
    * @param {string} userId - User ID
    * @param {Object} options - Query options
    * @returns {Promise<Object|null>}
@@ -21,7 +21,7 @@ class CVRepository extends BaseRepository {
   }
 
   /**
-   * Find CVs by user IDs
+   * Find curricula by user IDs
    * @param {Array<string>} userIds - Array of user IDs
    * @param {Object} options - Query options
    * @returns {Promise<Array>}
@@ -31,7 +31,7 @@ class CVRepository extends BaseRepository {
   }
 
   /**
-   * Find CVs by organization
+   * Find curricula by organization
    * @param {string} organizationId - Organization ID
    * @param {Object} options - Query options
    * @returns {Promise<Array>}
@@ -41,8 +41,8 @@ class CVRepository extends BaseRepository {
   }
 
   /**
-   * Update CV completeness status
-   * @param {string} cvId - CV ID
+   * Update curriculum completeness status
+   * @param {string} cvId - Curriculum ID
    * @param {boolean} isComplete - Completeness status
    * @param {Object} options - Query options
    * @returns {Promise<Object|null>}
@@ -52,7 +52,7 @@ class CVRepository extends BaseRepository {
   }
 
   /**
-   * Check if user has CV
+   * Check if user has curriculum
    * @param {string} userId - User ID
    * @returns {Promise<boolean>}
    */
@@ -61,7 +61,7 @@ class CVRepository extends BaseRepository {
   }
 
   /**
-   * Count CVs by organization
+   * Count curricula by organization
    * @param {string} organizationId - Organization ID
    * @returns {Promise<number>}
    */
@@ -70,7 +70,7 @@ class CVRepository extends BaseRepository {
   }
 
   /**
-   * Find complete CVs by organization
+   * Find complete curricula by organization
    * @param {string} organizationId - Organization ID
    * @param {Object} options - Query options
    * @returns {Promise<Array>}

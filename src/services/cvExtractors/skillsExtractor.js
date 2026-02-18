@@ -2,7 +2,7 @@ const cvUtils = require('../../utils/cvUtils');
 
 /**
  * Extractor de habilidades técnicas
- * Responsabilidad única: extraer skills del CV
+ * Responsabilidad única: extraer skills del currículo
  */
 class SkillsExtractor {
   /**

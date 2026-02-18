@@ -85,6 +85,17 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: process.env.URLENCODED_BODY_LIMIT || '1mb' }));
 
+// Serverless DB connection (Vercel)
+const connectDB = require('./config/db');
+const mongoose = require('mongoose');
+
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    await connectDB();
+  }
+  next();
+});
+
 // Rutas
 const indexRoutes = require('./routes/index.routes');
 const authRoutes = require('./routes/auth.routes');

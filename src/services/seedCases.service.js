@@ -15,8 +15,8 @@ const SEED_CASES = [
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Multi-Region Software Development',
-      briefDescription: 'Software project with team distributed across 3+ time zones',
+      projectName: 'Genérico: Desarrollo de software multirregional',
+      briefDescription: 'Proyecto de software con el equipo distribuido en 3+ zonas horarias',
       estimatedDuration: { value: 6, unit: 'months' },
       features: {
         coordination: {
@@ -65,18 +65,18 @@ const SEED_CASES = [
         {
           type: 'communication_breakdown',
           severity: 'high',
-          description: 'Time zone differences caused delays in decision-making and problem resolution',
+          description: 'Las diferencias horarias provocaron retrasos en la toma de decisiones y en la resolución de problemas',
           impact: 'schedule',
-          rootCause: 'Insufficient overlap hours and lack of async-first protocols',
+          rootCause: 'Pocas horas de solapamiento y ausencia de protocolos "async-first"',
           actualImpact: {qualityImpact: 'medium'
           }
         },
         {
           type: 'process_mismatch',
           severity: 'medium',
-          description: 'Scrum ceremonies were inefficient with distributed team',
+          description: 'Las ceremonias de Scrum fueron ineficientes con un equipo distribuido',
           impact: 'productivity',
-          rootCause: 'Traditional Scrum not adapted for remote/distributed context',
+          rootCause: 'Scrum tradicional sin adaptar al contexto remoto/distribuido',
           actualImpact: {qualityImpact: 'low'
           }
         }
@@ -92,39 +92,39 @@ const SEED_CASES = [
     },
     result: {
       lessonsLearned: [
-        'Async-first communication protocols are essential for distributed teams',
-        'Daily written updates reduce need for synchronous meetings',
-        'Clear documentation reduces misunderstandings across time zones'
+        'Los protocolos de comunicación "async-first" son esenciales para equipos distribuidos',
+        'Las actualizaciones diarias por escrito reducen la necesidad de reuniones síncronas',
+        'La documentación clara reduce malentendidos entre zonas horarias'
       ],
       successfulPractices: [
         {
-          practice: 'Established 4-hour core overlap hours',
-          impact: 'Improved synchronous collaboration when needed',
+          practice: 'Establecer 4 horas de solapamiento central',
+          impact: 'Mejoró la colaboración síncrona cuando era necesario',
           replicable: true
         },
         {
-          practice: 'Used shared documentation extensively',
-          impact: 'Reduced communication gaps',
+          practice: 'Uso intensivo de documentación compartida',
+          impact: 'Redujo los huecos de comunicación',
           replicable: true
         }
       ],
       unsuccessfulPractices: [
         {
-          practice: 'Daily standup meetings at fixed time',
-          impact: 'Low participation from some regions',
-          reason: 'Time zone conflicts'
+          practice: 'Daily standup a una hora fija',
+          impact: 'Baja participación de algunas regiones',
+          reason: 'Conflictos de zona horaria'
         }
       ],
       recommendations: [
-        'Start with async-first approach from day 1',
-        'Establish clear escalation protocols',
-        'Invest in comprehensive documentation'
+        'Empezar con un enfoque "async-first" desde el día 1',
+        'Establecer protocolos de escalado claros',
+        'Invertir en documentación completa'
       ]
     },
     metadata: {
       confidence: 0.5,
       isGeneric: true,
-      basedOn: 'PMI PMBOK Guide - distributed team studies',
+      basedOn: 'Guía PMI PMBOK - estudios sobre equipos distribuidos',
       tags: ['distributed', 'communication', 'high-complexity']
     }
   },
@@ -133,8 +133,8 @@ const SEED_CASES = [
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: New Framework Adoption',
-      briefDescription: 'Project using unfamiliar technology stack',
+      projectName: 'Genérico: Adopción de un nuevo framework',
+      briefDescription: 'Proyecto con un stack tecnológico poco familiar',
       estimatedDuration: { value: 4, unit: 'months' },
       features: {
         coordination: {
@@ -183,19 +183,10 @@ const SEED_CASES = [
         {
           type: 'skill_gap',
           severity: 'high',
-          description: 'Team learning curve steeper than expected',
+          description: 'La curva de aprendizaje del equipo fue mayor de lo esperado',
           impact: 'schedule',
-          rootCause: 'Insufficient training and lack of expert guidance',
+          rootCause: 'Formación insuficiente y falta de guía experta',
           actualImpact: {qualityImpact: 'medium'
-          }
-        },
-        {
-          type: 'technical_infrastructure',
-          severity: 'medium',
-          description: 'New tooling setup took longer than planned',
-          impact: 'schedule',
-          rootCause: 'Underestimated complexity of new platform',
-          actualImpact: {qualityImpact: 'low'
           }
         }
       ],
@@ -210,39 +201,39 @@ const SEED_CASES = [
     },
     result: {
       lessonsLearned: [
-        'Invest in upfront training when using new technologies',
-        'Pair programming accelerates knowledge transfer',
-        'Allow extra time for learning curve in estimates'
+        'Invertir en formación inicial cuando se usan nuevas tecnologías',
+        'La programación en pareja acelera la transferencia de conocimiento',
+        'Incluir tiempo extra por curva de aprendizaje en las estimaciones'
       ],
       successfulPractices: [
         {
-          practice: 'Weekly knowledge sharing sessions',
-          impact: 'Team competency improved faster',
+          practice: 'Sesiones semanales de intercambio de conocimiento',
+          impact: 'La competencia del equipo mejoró más rápido',
           replicable: true
         },
         {
-          practice: 'Brought in external consultant for first 3 weeks',
-          impact: 'Reduced costly mistakes',
+          practice: 'Incorporar un consultor externo durante las primeras 3 semanas',
+          impact: 'Redujo errores costosos',
           replicable: true
         }
       ],
       unsuccessfulPractices: [
         {
-          practice: 'Expected team to learn on-the-job without structure',
-          impact: 'Slow progress in first month',
-          reason: 'No formal learning plan'
+          practice: 'Esperar que el equipo aprendiera “sobre la marcha” sin estructura',
+          impact: 'Progreso lento durante el primer mes',
+          reason: 'No había un plan de aprendizaje formal'
         }
       ],
       recommendations: [
-        'Budget 2-3 weeks for intensive training',
-        'Consider external expertise for first phase',
-        'Increase estimates by 30-40% for new tech adoption'
+        'Reservar 2-3 semanas para formación intensiva',
+        'Considerar apoyo externo en la primera fase',
+        'Aumentar las estimaciones un 30-40% al adoptar tecnología nueva'
       ]
     },
     metadata: {
       confidence: 0.5,
       isGeneric: true,
-      basedOn: 'Standish Group Chaos Report - technology adoption studies',
+      basedOn: 'Informe Chaos del Standish Group - estudios sobre adopción tecnológica',
       tags: ['skill-gap', 'new-technology', 'training']
     }
   },
@@ -251,8 +242,8 @@ const SEED_CASES = [
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Multi-Project Resource Allocation',
-      briefDescription: 'Team members spread across multiple concurrent projects',
+      projectName: 'Genérico: Asignación de recursos en multiproyecto',
+      briefDescription: 'Miembros del equipo repartidos entre varios proyectos concurrentes',
       estimatedDuration: { value: 5, unit: 'months' },
       features: {
         coordination: {
@@ -301,19 +292,10 @@ const SEED_CASES = [
         {
           type: 'team_overload',
           severity: 'high',
-          description: 'Team burnout due to excessive workload across multiple projects',
+          description: 'Agotamiento del equipo por carga excesiva entre varios proyectos',
           impact: 'schedule',
-          rootCause: 'Poor resource allocation and unrealistic expectations',
+          rootCause: 'Mala asignación de recursos y expectativas poco realistas',
           actualImpact: {qualityImpact: 'high'
-          }
-        },
-        {
-          type: 'quality_degradation',
-          severity: 'medium',
-          description: 'Quality suffered due to rushed work and fatigue',
-          impact: 'quality',
-          rootCause: 'Team trying to meet impossible deadlines',
-          actualImpact: {qualityImpact: 'medium'
           }
         }
       ],
@@ -328,40 +310,40 @@ const SEED_CASES = [
     },
     result: {
       lessonsLearned: [
-        'Context switching between projects kills productivity',
-        'Team morale directly impacts quality and schedule',
-        'Burnout is expensive - prevention is critical'
+        'El cambio de contexto entre proyectos destruye la productividad',
+        'La moral del equipo impacta directamente en la calidad y en los plazos',
+        'El burnout es caro: prevenirlo es crítico'
       ],
       successfulPractices: [
         {
-          practice: 'Eventually reduced scope and extended timeline',
-          impact: 'Team recovered and delivered quality work',
+          practice: 'Reducir alcance y ampliar el plazo',
+          impact: 'El equipo se recuperó y entregó trabajo de calidad',
           replicable: true
         }
       ],
       unsuccessfulPractices: [
         {
-          practice: 'Pushed team to work overtime consistently',
-          impact: 'Decreased productivity and increased errors',
-          reason: 'Unsustainable pace'
+          practice: 'Forzar horas extra de forma continuada',
+          impact: 'Bajó la productividad y aumentaron los errores',
+          reason: 'Ritmo insostenible'
         },
         {
-          practice: 'Spread team across too many projects',
-          impact: 'High context switching overhead',
-          reason: 'Poor resource planning'
+          practice: 'Repartir el equipo entre demasiados proyectos',
+          impact: 'Alto coste por cambio de contexto',
+          reason: 'Mala planificación de recursos'
         }
       ],
       recommendations: [
-        'Limit concurrent projects per person to 2 maximum',
-        'Monitor team workload weekly',
-        'Have contingency resources available',
-        'Reduce scope rather than push team beyond limits'
+        'Limitar los proyectos concurrentes por persona a un máximo de 2',
+        'Monitorizar la carga de trabajo semanalmente',
+        'Disponer de recursos de contingencia',
+        'Reducir alcance en vez de forzar al equipo más allá de sus límites'
       ]
     },
     metadata: {
       confidence: 0.5,
       isGeneric: true,
-      basedOn: 'Multiple industry surveys on developer burnout',
+      basedOn: 'Encuestas del sector sobre burnout en desarrollo',
       tags: ['overload', 'burnout', 'resource-allocation']
     }
   },
@@ -370,8 +352,8 @@ const SEED_CASES = [
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Evolving Requirements Project',
-      briefDescription: 'Project with initially vague requirements',
+      projectName: 'Genérico: Proyecto con requisitos cambiantes',
+      briefDescription: 'Proyecto con requisitos inicialmente vagos',
       estimatedDuration: { value: 3, unit: 'months' },
       features: {
         coordination: {
@@ -420,9 +402,9 @@ const SEED_CASES = [
         {
           type: 'scope_creep',
           severity: 'high',
-          description: 'Scope grew by approximately 50% during project',
+          description: 'El alcance creció aproximadamente un 50% durante el proyecto',
           impact: 'schedule',
-          rootCause: 'Vague initial requirements and no change control',
+          rootCause: 'Requisitos iniciales vagos y ausencia de control de cambios',
           actualImpact: {qualityImpact: 'medium'
           }
         }
@@ -438,35 +420,35 @@ const SEED_CASES = [
     },
     result: {
       lessonsLearned: [
-        'Clear requirements upfront save massive time later',
-        'Change control process is not optional',
-        'Frequent stakeholder alignment prevents surprises'
+        'Aclarar requisitos al inicio ahorra muchísimo tiempo después',
+        'El control de cambios no es opcional',
+        'Alinear con stakeholders con frecuencia evita sorpresas'
       ],
       successfulPractices: [
         {
-          practice: 'Eventually implemented change control board',
-          impact: 'Stopped uncontrolled scope growth',
+          practice: 'Implantar un comité de control de cambios',
+          impact: 'Detuvo el crecimiento incontrolado del alcance',
           replicable: true
         }
       ],
       unsuccessfulPractices: [
         {
-          practice: 'Accepted all feature requests without prioritization',
-          impact: 'Project timeline became meaningless',
-          reason: 'No formal change process'
+          practice: 'Aceptar todas las peticiones sin priorización',
+          impact: 'El cronograma dejó de tener sentido',
+          reason: 'No había un proceso formal de cambios'
         }
       ],
       recommendations: [
-        'Invest 2-3 weeks in detailed requirements workshop',
-        'Implement change control from day 1',
-        'Define MVP clearly and stick to it',
-        'Each new feature = something removed or timeline extended'
+        'Invertir 2-3 semanas en un taller detallado de requisitos',
+        'Implantar control de cambios desde el día 1',
+        'Definir claramente el MVP y ceñirse a él',
+        'Cada funcionalidad nueva implica quitar otra o ampliar plazos'
       ]
     },
     metadata: {
       confidence: 0.5,
       isGeneric: true,
-      basedOn: 'PMI Pulse of the Profession - scope management',
+      basedOn: 'PMI Pulse of the Profession - gestión del alcance',
       tags: ['scope-creep', 'requirements', 'change-management']
     }
   },
@@ -475,8 +457,8 @@ const SEED_CASES = [
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Cross-Team Integration Project',
-      briefDescription: 'Project requiring integration with multiple external teams',
+      projectName: 'Genérico: Integración entre equipos',
+      briefDescription: 'Proyecto que requiere integración con varios equipos externos',
       estimatedDuration: { value: 6, unit: 'months' },
       features: {
         coordination: {
@@ -525,9 +507,9 @@ const SEED_CASES = [
         {
           type: 'dependency_blockage',
           severity: 'high',
-          description: 'Frequent blocks waiting for other teams',
+          description: 'Bloqueos frecuentes esperando a otros equipos',
           impact: 'schedule',
-          rootCause: 'Unclear dependencies and conflicting priorities',
+          rootCause: 'Dependencias poco claras y prioridades en conflicto',
           actualImpact: {qualityImpact: 'medium'
           }
         }
@@ -543,70 +525,52 @@ const SEED_CASES = [
     },
     result: {
       lessonsLearned: [
-        'Dependencies are often underestimated',
-        'Weekly cross-team syncs are essential',
-        'Mock services enable parallel development'
+        'Las dependencias suelen subestimarse',
+        'Las sincronizaciones semanales entre equipos son esenciales',
+        'Los servicios mock permiten desarrollo en paralelo'
       ],
       successfulPractices: [
         {
-          practice: 'Implemented formal SLAs between teams',
-          impact: 'Improved accountability and reduced blocks',
+          practice: 'Implantar SLAs formales entre equipos',
+          impact: 'Mejoró la responsabilidad y redujo bloqueos',
           replicable: true
         },
         {
-          practice: 'Created mock services for critical dependencies',
-          impact: 'Team could work in parallel',
+          practice: 'Crear servicios mock para dependencias críticas',
+          impact: 'El equipo pudo trabajar en paralelo',
           replicable: true
         }
       ],
       unsuccessfulPractices: [
         {
-          practice: 'Assumed other teams would deliver on time',
-          impact: 'Cascade delays',
-          reason: 'No formal tracking'
+          practice: 'Asumir que otros equipos entregarían a tiempo',
+          impact: 'Retrasos en cascada',
+          reason: 'Sin seguimiento formal'
         }
       ],
       recommendations: [
-        'Map all dependencies in detail upfront',
-        'Establish SLAs with dependent teams',
-        'Build buffer time for integration (30%+)',
-        'Use mock services for parallel development'
+        'Mapear todas las dependencias en detalle desde el inicio',
+        'Establecer SLAs con equipos dependientes',
+        'Incluir colchón de tiempo para integración (30%+)',
+        'Usar servicios mock para desarrollo en paralelo'
       ]
     },
     metadata: {
       confidence: 0.5,
       isGeneric: true,
-      basedOn: 'Enterprise project management case studies',
+      basedOn: 'Casos de estudio de gestión de proyectos en entornos enterprise',
       tags: ['dependencies', 'integration', 'cross-team']
     }
   },
   
   // Additional 20 cases for Phase 3 testing (reaching 25+ cases)
+
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Microservices Migration',
-      briefDescription: 'Legacy monolith to microservices migration',
-      estimatedDuration: { value: 8, unit: 'months' },
-      features: {
-        coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 3, culturalDiversity: 'low', realTimeCommunicationLevel: 'medium' },
-        technical: { mainTechnologies: ['Java', 'Spring Boot', 'Docker', 'Kubernetes'], experienceLevel: 'senior', systemComplexity: 'very_high', documentationLevel: 'partial', requiresSpecializedTools: true, sharedInfrastructureDependency: 'high' },
-        team: { size: 15, weeklyHours: 40, distributedExperience: 'high', requiredLanguages: ['English'], languageProficiency: 'C1' },
-        management: { methodology: 'scrum', hasOnboarding: 'yes', hasCICD: 'partial', toolsFragmentation: 'medium', clarityOfRequirements: 'low' },
-        organizational: { involvedTeams: 4, criticalDependencies: 12, informationFlow: 'bidirectional', stakeholdersCount: 6 }
-      }
-    },
-    solution: { completed: true, qualityScore: 3.8, clientSatisfaction: 4.0, teamMorale: 3.5, actualRisks: [{ type: 'technical_debt', severity: 'high', description: 'Legacy code dependencies slowed migration', impact: 'schedule', rootCause: 'Insufficient technical analysis', actualImpact: { qualityImpact: 'high' } }], metrics: { avgVelocity: 28, bugRate: 0.22, meetingEfficiency: 3.5, teamMoraleProgression: [4.0, 3.8, 3.5, 3.5], deploymentFrequency: 'bi-weekly', codeReviewTimeAvg: 3.0 } },
-    result: { lessonsLearned: ['Proper architecture analysis is critical', 'Incremental migration reduces risk'], successfulPractices: [{ practice: 'Strangler pattern implementation', impact: 'Gradual migration', replicable: true }], unsuccessfulPractices: [{ practice: 'Big bang approach initially attempted', impact: 'Delays and rollbacks', reason: 'Too risky' }], recommendations: ['Use strangler pattern', 'Invest in comprehensive testing'] },
-    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Migration case studies', tags: ['migration', 'architecture', 'technical'] }
-  },
-  {
-    type: 'seed',
-    source: 'literature',
-    problem: {
-      projectName: 'Generic: Mobile App Development - Startup',
-      briefDescription: 'MVP mobile app for startup with tight deadlines',
+      projectName: 'Genérico: Desarrollo de app móvil - startup',
+      briefDescription: 'App móvil MVP para una startup con plazos muy ajustados',
       estimatedDuration: { value: 3, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 5, culturalDiversity: 'low', realTimeCommunicationLevel: 'high' },
@@ -616,16 +580,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 1, criticalDependencies: 2, informationFlow: 'unidirectional', stakeholdersCount: 3 }
       }
     },
-    solution: { completed: true, qualityScore: 3.2, clientSatisfaction: 3.5, teamMorale: 2.8, actualRisks: [{ type: 'scope_creep', severity: 'high', description: 'Constant requirement changes', impact: 'scope', rootCause: 'Startup pivot mentality', actualImpact: { qualityImpact: 'medium' } }, { type: 'team_burnout', severity: 'medium', description: 'Extended hours caused fatigue', impact: 'quality', rootCause: 'Unrealistic deadlines', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 40, bugRate: 0.28, meetingEfficiency: 2.5, teamMoraleProgression: [3.5, 3.0, 2.8, 2.5], deploymentFrequency: 'daily', codeReviewTimeAvg: 1.0 } },
-    result: { lessonsLearned: ['MVP scope discipline critical', 'Burnout impacts quality'], successfulPractices: [{ practice: 'Feature flags for incremental releases', impact: 'Faster feedback', replicable: true }], unsuccessfulPractices: [{ practice: 'Working 50+ hours weekly', impact: 'Team burnout', reason: 'Unsustainable' }], recommendations: ['Protect MVP scope', 'Limit overtime', 'Use feature flags'] },
-    metadata: { confidence: 0.6, isGeneric: true, basedOn: 'Startup project analysis', tags: ['mobile', 'mvp', 'startup'] }
+    solution: { completed: true, qualityScore: 3.2, clientSatisfaction: 3.5, teamMorale: 2.8, actualRisks: [{ type: 'scope_creep', severity: 'high', description: 'Cambios constantes de requisitos', impact: 'scope', rootCause: 'Mentalidad de pivote en startups', actualImpact: { qualityImpact: 'medium' } }, { type: 'team_burnout', severity: 'medium', description: 'Las jornadas largas causaron fatiga', impact: 'quality', rootCause: 'Plazos poco realistas', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 40, bugRate: 0.28, meetingEfficiency: 2.5, teamMoraleProgression: [3.5, 3.0, 2.8, 2.5], deploymentFrequency: 'daily', codeReviewTimeAvg: 1.0 } },
+    result: { lessonsLearned: ['La disciplina de alcance en el MVP es crítica', 'El burnout impacta la calidad'], successfulPractices: [{ practice: 'Feature flags para releases incrementales', impact: 'Feedback más rápido', replicable: true }], unsuccessfulPractices: [{ practice: 'Trabajar 50+ horas semanales', impact: 'Burnout del equipo', reason: 'Insostenible' }], recommendations: ['Proteger el alcance del MVP', 'Limitar las horas extra', 'Usar feature flags'] },
+    metadata: { confidence: 0.6, isGeneric: true, basedOn: 'Análisis de proyectos de startups', tags: ['mobile', 'mvp', 'startup'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Data Platform - Enterprise',
-      briefDescription: 'Enterprise data lake and analytics platform',
+      projectName: 'Genérico: Plataforma de datos - enterprise',
+      briefDescription: 'Data lake y plataforma de analítica para una empresa',
       estimatedDuration: { value: 12, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America', 'Asia'], timeOverlap: 3, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'high', realTimeCommunicationLevel: 'low' },
@@ -635,35 +599,17 @@ const SEED_CASES = [
         organizational: { involvedTeams: 6, criticalDependencies: 10, informationFlow: 'multidirectional', stakeholdersCount: 12 }
       }
     },
-    solution: { completed: true, qualityScore: 4.2, clientSatisfaction: 4.5, teamMorale: 4.0, actualRisks: [{ type: 'knowledge_gaps', severity: 'medium', description: 'Learning curve for new tech stack', impact: 'schedule', rootCause: 'Emerging technologies', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 35, bugRate: 0.12, meetingEfficiency: 4.0, teamMoraleProgression: [3.8, 4.0, 4.0, 4.2], deploymentFrequency: 'bi-weekly', codeReviewTimeAvg: 2.5 } },
-    result: { lessonsLearned: ['Good documentation prevents issues', 'Async communication works at scale'], successfulPractices: [{ practice: 'Comprehensive documentation', impact: 'Smooth knowledge transfer', replicable: true }, { practice: 'Async-first communication', impact: 'Productive across timezones', replicable: true }], unsuccessfulPractices: [], recommendations: ['Invest in documentation', 'Use async patterns for distributed teams'] },
-    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Enterprise data projects', tags: ['data', 'enterprise', 'distributed'] }
+    solution: { completed: true, qualityScore: 4.2, clientSatisfaction: 4.5, teamMorale: 4.0, actualRisks: [{ type: 'knowledge_gaps', severity: 'medium', description: 'Curva de aprendizaje con el nuevo stack tecnológico', impact: 'schedule', rootCause: 'Tecnologías emergentes', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 35, bugRate: 0.12, meetingEfficiency: 4.0, teamMoraleProgression: [3.8, 4.0, 4.0, 4.2], deploymentFrequency: 'bi-weekly', codeReviewTimeAvg: 2.5 } },
+    result: { lessonsLearned: ['Una buena documentación evita problemas', 'La comunicación asíncrona funciona a escala'], successfulPractices: [{ practice: 'Documentación exhaustiva', impact: 'Transferencia de conocimiento fluida', replicable: true }, { practice: 'Comunicación "async-first"', impact: 'Productividad entre zonas horarias', replicable: true }], unsuccessfulPractices: [], recommendations: ['Invertir en documentación', 'Usar patrones asíncronos para equipos distribuidos'] },
+    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Proyectos enterprise de datos', tags: ['data', 'enterprise', 'distributed'] }
   },
+
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Legacy System Upgrade',
-      briefDescription: 'Major version upgrade of critical business system',
-      estimatedDuration: { value: 5, unit: 'months' },
-      features: {
-        coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'low', realTimeCommunicationLevel: 'low' },
-        technical: { mainTechnologies: ['.NET', 'SQL Server'], experienceLevel: 'senior', systemComplexity: 'high', documentationLevel: 'minimal', requiresSpecializedTools: false, sharedInfrastructureDependency: 'high' },
-        team: { size: 8, weeklyHours: 35, distributedExperience: 'medium', requiredLanguages: ['English'], languageProficiency: 'B2' },
-        management: { methodology: 'waterfall', hasOnboarding: 'partial', hasCICD: 'no', toolsFragmentation: 'high', clarityOfRequirements: 'medium' },
-        organizational: { involvedTeams: 3, criticalDependencies: 15, informationFlow: 'unidirectional', stakeholdersCount: 8 }
-      }
-    },
-    solution: { completed: true, qualityScore: 3.0, clientSatisfaction: 3.2, teamMorale: 3.0, actualRisks: [{ type: 'technical_debt', severity: 'very_high', description: 'Undocumented dependencies caused issues', impact: 'schedule', rootCause: 'Poor legacy documentation', actualImpact: { qualityImpact: 'high' } }, { type: 'resistance_to_change', severity: 'medium', description: 'Users resisted new interface', impact: 'adoption', rootCause: 'Insufficient change management', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 22, bugRate: 0.35, meetingEfficiency: 2.8, teamMoraleProgression: [3.5, 3.2, 3.0, 2.8], deploymentFrequency: 'monthly', codeReviewTimeAvg: 4.0 } },
-    result: { lessonsLearned: ['Legacy analysis phase critical', 'Change management essential'], successfulPractices: [{ practice: 'Extensive testing in staging', impact: 'Caught major issues early', replicable: true }], unsuccessfulPractices: [{ practice: 'Minimal user training', impact: 'Adoption resistance', reason: 'Budget constraints' }], recommendations: ['Dedicate time for legacy analysis', 'Invest in change management and training'] },
-    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Legacy upgrade projects', tags: ['legacy', 'upgrade', 'technical-debt'] }
-  },
-  {
-    type: 'seed',
-    source: 'literature',
-    problem: {
-      projectName: 'Generic: IoT Platform Development',
-      briefDescription: 'IoT data collection and monitoring platform',
+      projectName: 'Genérico: Desarrollo de plataforma IoT',
+      briefDescription: 'Plataforma de recopilación y monitorización de datos IoT',
       estimatedDuration: { value: 10, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['Europe', 'Asia'], timeOverlap: 4, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 3, culturalDiversity: 'high', realTimeCommunicationLevel: 'medium' },
@@ -673,16 +619,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 5, criticalDependencies: 8, informationFlow: 'bidirectional', stakeholdersCount: 7 }
       }
     },
-    solution: { completed: true, qualityScore: 4.0, clientSatisfaction: 4.2, teamMorale: 3.8, actualRisks: [{ type: 'third_party_dependency', severity: 'medium', description: 'Hardware vendor delays impacted timeline', impact: 'schedule', rootCause: 'External dependency', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 30, bugRate: 0.15, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.8, 3.8, 4.0], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.0 } },
-    result: { lessonsLearned: ['Hardware dependencies need buffers', 'Simulator development accelerates testing'], successfulPractices: [{ practice: 'Built hardware simulators', impact: 'Parallel development possible', replicable: true }], unsuccessfulPractices: [{ practice: 'Waited for hardware delivery', impact: 'Initial delays', reason: 'No simulation strategy' }], recommendations: ['Build simulators for hardware dependencies', 'Add 30% buffer for vendor delays'] },
-    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'IoT project studies', tags: ['iot', 'hardware', 'real-time'] }
+    solution: { completed: true, qualityScore: 4.0, clientSatisfaction: 4.2, teamMorale: 3.8, actualRisks: [{ type: 'dependency_blockage', severity: 'medium', description: 'Retrasos del proveedor de hardware impactaron el cronograma', impact: 'schedule', rootCause: 'Dependencia externa', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 30, bugRate: 0.15, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.8, 3.8, 4.0], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.0 } },
+    result: { lessonsLearned: ['Las dependencias de hardware necesitan colchones', 'Los simuladores aceleran las pruebas'], successfulPractices: [{ practice: 'Construir simuladores de hardware', impact: 'Permitió desarrollo en paralelo', replicable: true }], unsuccessfulPractices: [{ practice: 'Esperar a la entrega del hardware', impact: 'Retrasos iniciales', reason: 'Sin estrategia de simulación' }], recommendations: ['Construir simuladores para dependencias de hardware', 'Añadir un 30% de colchón por retrasos de proveedores'] },
+    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Estudios de proyectos IoT', tags: ['iot', 'hardware', 'real-time'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: API Gateway Implementation',
-      briefDescription: 'Central API gateway for microservices ecosystem',
+      projectName: 'Genérico: Implementación de API Gateway',
+      briefDescription: 'API Gateway central para un ecosistema de microservicios',
       estimatedDuration: { value: 4, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 4, culturalDiversity: 'low', realTimeCommunicationLevel: 'high' },
@@ -693,15 +639,15 @@ const SEED_CASES = [
       }
     },
     solution: { completed: true, qualityScore: 4.5, clientSatisfaction: 4.7, teamMorale: 4.2, actualRisks: [], metrics: { avgVelocity: 38, bugRate: 0.08, meetingEfficiency: 4.5, teamMoraleProgression: [4.0, 4.2, 4.2, 4.5], deploymentFrequency: 'daily', codeReviewTimeAvg: 1.5 } },
-    result: { lessonsLearned: ['Clear requirements prevent issues', 'Good team sync critical for shared infrastructure'], successfulPractices: [{ practice: 'Regular sync with consuming teams', impact: 'Alignment and early feedback', replicable: true }, { practice: 'Comprehensive API documentation', impact: 'Smooth adoption', replicable: true }], unsuccessfulPractices: [], recommendations: ['Maintain clear communication with all dependent teams', 'Invest heavily in documentation and examples'] },
-    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'API gateway implementations', tags: ['api', 'infrastructure', 'integration'] }
+    result: { lessonsLearned: ['Los requisitos claros evitan problemas', 'Una buena sincronización del equipo es crítica con infraestructura compartida'], successfulPractices: [{ practice: 'Sincronización periódica con equipos consumidores', impact: 'Alineación y feedback temprano', replicable: true }, { practice: 'Documentación de API exhaustiva', impact: 'Adopción fluida', replicable: true }], unsuccessfulPractices: [], recommendations: ['Mantener comunicación clara con todos los equipos dependientes', 'Invertir mucho en documentación y ejemplos'] },
+    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'Implementaciones de API Gateway', tags: ['api', 'infrastructure', 'integration'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Machine Learning Pipeline',
-      briefDescription: 'ML model training and deployment pipeline',
+      projectName: 'Genérico: Pipeline de Machine Learning',
+      briefDescription: 'Pipeline de entrenamiento y despliegue de modelos ML',
       estimatedDuration: { value: 7, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America', 'Europe'], timeOverlap: 5, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'medium', realTimeCommunicationLevel: 'low' },
@@ -711,16 +657,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 3, criticalDependencies: 6, informationFlow: 'bidirectional', stakeholdersCount: 5 }
       }
     },
-    solution: { completed: true, qualityScore: 3.8, clientSatisfaction: 4.0, teamMorale: 3.5, actualRisks: [{ type: 'unclear_requirements', severity: 'high', description: 'Model performance criteria evolved', impact: 'scope', rootCause: 'ML project uncertainty', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 25, bugRate: 0.18, meetingEfficiency: 3.5, teamMoraleProgression: [3.8, 3.5, 3.5, 3.8], deploymentFrequency: 'weekly', codeReviewTimeAvg: 3.0 } },
-    result: { lessonsLearned: ['ML requirements are inherently uncertain', 'Iterative approach essential'], successfulPractices: [{ practice: 'Regular model performance reviews with stakeholders', impact: 'Aligned expectations', replicable: true }], unsuccessfulPractices: [{ practice: 'Fixed accuracy target upfront', impact: 'Unrealistic expectations', reason: 'ML nature' }], recommendations: ['Accept uncertainty in ML projects', 'Use iterative approach with regular reviews', 'Define performance criteria ranges, not fixed targets'] },
-    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'ML project patterns', tags: ['ml', 'ai', 'data-science'] }
+    solution: { completed: true, qualityScore: 3.8, clientSatisfaction: 4.0, teamMorale: 3.5, actualRisks: [{ type: 'scope_creep', severity: 'high', description: 'Los criterios de rendimiento del modelo fueron cambiando', impact: 'scope', rootCause: 'Incertidumbre en proyectos ML', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 25, bugRate: 0.18, meetingEfficiency: 3.5, teamMoraleProgression: [3.8, 3.5, 3.5, 3.8], deploymentFrequency: 'weekly', codeReviewTimeAvg: 3.0 } },
+    result: { lessonsLearned: ['Los requisitos en ML son inherentemente inciertos', 'El enfoque iterativo es esencial'], successfulPractices: [{ practice: 'Revisiones periódicas del rendimiento con stakeholders', impact: 'Alineó expectativas', replicable: true }], unsuccessfulPractices: [{ practice: 'Fijar un objetivo de precisión desde el inicio', impact: 'Expectativas poco realistas', reason: 'Naturaleza de ML' }], recommendations: ['Aceptar la incertidumbre en proyectos ML', 'Usar enfoque iterativo con revisiones periódicas', 'Definir rangos de rendimiento, no objetivos fijos'] },
+    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Patrones de proyectos ML', tags: ['ml', 'ai', 'data-science'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Security Hardening Initiative',
-      briefDescription: 'Application security audit and remediation',
+      projectName: 'Genérico: Endurecimiento de seguridad',
+      briefDescription: 'Auditoría de seguridad y remediación de la aplicación',
       estimatedDuration: { value: 4, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 3, culturalDiversity: 'low', realTimeCommunicationLevel: 'medium' },
@@ -730,16 +676,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 10, criticalDependencies: 15, informationFlow: 'multidirectional', stakeholdersCount: 20 }
       }
     },
-    solution: { completed: true, qualityScore: 4.5, clientSatisfaction: 4.8, teamMorale: 4.0, actualRisks: [{ type: 'dependency_blockage', severity: 'medium', description: 'Waiting for teams to implement fixes', impact: 'schedule', rootCause: 'Multiple team dependencies', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 35, bugRate: 0.10, meetingEfficiency: 4.0, teamMoraleProgression: [3.8, 4.0, 4.0, 4.2], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.0 } },
-    result: { lessonsLearned: ['Security needs buy-in from all teams', 'Prioritization framework critical'], successfulPractices: [{ practice: 'Risk-based prioritization', impact: 'Focused on critical issues', replicable: true }], unsuccessfulPractices: [{ practice: 'Fixed all findings equally', impact: 'Resource waste initially', reason: 'Wrong prioritization' }], recommendations: ['Use risk-based prioritization', 'Get executive sponsorship for security initiatives'] },
-    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Security initiative studies', tags: ['security', 'audit', 'cross-team'] }
+    solution: { completed: true, qualityScore: 4.5, clientSatisfaction: 4.8, teamMorale: 4.0, actualRisks: [{ type: 'dependency_blockage', severity: 'medium', description: 'Esperas a que otros equipos implementaran correcciones', impact: 'schedule', rootCause: 'Dependencias con múltiples equipos', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 35, bugRate: 0.10, meetingEfficiency: 4.0, teamMoraleProgression: [3.8, 4.0, 4.0, 4.2], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.0 } },
+    result: { lessonsLearned: ['La seguridad requiere apoyo de todos los equipos', 'Es crítico un marco de priorización'], successfulPractices: [{ practice: 'Priorización basada en riesgo', impact: 'Enfocó en problemas críticos', replicable: true }], unsuccessfulPractices: [{ practice: 'Tratar todos los hallazgos por igual', impact: 'Desperdicio de recursos al inicio', reason: 'Priorización incorrecta' }], recommendations: ['Usar priorización basada en riesgo', 'Conseguir sponsorship ejecutivo para iniciativas de seguridad'] },
+    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Estudios de iniciativas de seguridad', tags: ['security', 'audit', 'cross-team'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: DevOps Transformation',
-      briefDescription: 'CI/CD pipeline and infrastructure as code implementation',
+      projectName: 'Genérico: Transformación DevOps',
+      briefDescription: 'Implementación de CI/CD e infraestructura como código',
       estimatedDuration: { value: 6, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 4, culturalDiversity: 'low', realTimeCommunicationLevel: 'high' },
@@ -749,35 +695,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 12, criticalDependencies: 18, informationFlow: 'multidirectional', stakeholdersCount: 15 }
       }
     },
-    solution: { completed: true, qualityScore: 3.7, clientSatisfaction: 3.9, teamMorale: 3.3, actualRisks: [{ type: 'resistance_to_change', severity: 'high', description: 'Development teams resistant to new processes', impact: 'adoption', rootCause: 'Cultural change management', actualImpact: { qualityImpact: 'medium' } }, { type: 'knowledge_gaps', severity: 'medium', description: 'Team learning curve for new tools', impact: 'schedule', rootCause: 'New technology stack', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 28, bugRate: 0.20, meetingEfficiency: 3.2, teamMoraleProgression: [3.5, 3.3, 3.2, 3.5], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.8 } },
-    result: { lessonsLearned: ['Cultural change as important as technical', 'Training investment pays off'], successfulPractices: [{ practice: 'Champions program in each team', impact: 'Grassroots adoption', replicable: true }], unsuccessfulPractices: [{ practice: 'Top-down mandate without training', impact: 'Initial resistance', reason: 'Poor change management' }], recommendations: ['Invest in training and workshops', 'Use champion model for adoption', 'Start with pilot teams'] },
-    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'DevOps transformation studies', tags: ['devops', 'transformation', 'culture'] }
+    solution: { completed: true, qualityScore: 3.7, clientSatisfaction: 3.9, teamMorale: 3.3, actualRisks: [{ type: 'resistance_to_change', severity: 'high', description: 'Los equipos de desarrollo se resistieron a los nuevos procesos', impact: 'adoption', rootCause: 'Gestión del cambio cultural', actualImpact: { qualityImpact: 'medium' } }, { type: 'knowledge_gaps', severity: 'medium', description: 'Curva de aprendizaje del equipo con nuevas herramientas', impact: 'schedule', rootCause: 'Nuevo stack tecnológico', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 28, bugRate: 0.20, meetingEfficiency: 3.2, teamMoraleProgression: [3.5, 3.3, 3.2, 3.5], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.8 } },
+    result: { lessonsLearned: ['El cambio cultural es tan importante como el técnico', 'Invertir en formación compensa'], successfulPractices: [{ practice: 'Programa de champions en cada equipo', impact: 'Adopción desde la base', replicable: true }], unsuccessfulPractices: [{ practice: 'Mandato de arriba abajo sin formación', impact: 'Resistencia inicial', reason: 'Mala gestión del cambio' }], recommendations: ['Invertir en formación y workshops', 'Usar un modelo de champions para la adopción', 'Empezar con equipos piloto'] },
+    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Estudios de transformación DevOps', tags: ['devops', 'transformation', 'culture'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Cloud Native Refactoring',
-      briefDescription: 'Refactor legacy app for cloud-native deployment',
-      estimatedDuration: { value: 9, unit: 'months' },
-      features: {
-        coordination: { involvedCountries: ['Asia', 'Europe'], timeOverlap: 2, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'high', realTimeCommunicationLevel: 'low' },
-        technical: { mainTechnologies: ['Java', 'Spring Cloud', 'Kubernetes', 'Redis'], experienceLevel: 'senior', systemComplexity: 'very_high', documentationLevel: 'minimal', requiresSpecializedTools: true, sharedInfrastructureDependency: 'medium' },
-        team: { size: 14, weeklyHours: 40, distributedExperience: 'high', requiredLanguages: ['English'], languageProficiency: 'B2' },
-        management: { methodology: 'scrum', hasOnboarding: 'yes', hasCICD: 'yes', toolsFragmentation: 'medium', clarityOfRequirements: 'medium' },
-        organizational: { involvedTeams: 4, criticalDependencies: 10, informationFlow: 'bidirectional', stakeholdersCount: 8 }
-      }
-    },
-    solution: { completed: true, qualityScore: 3.5, clientSatisfaction: 3.7, teamMorale: 3.2, actualRisks: [{ type: 'technical_debt', severity: 'very_high', description: 'Significant refactoring needed for cloud patterns', impact: 'schedule', rootCause: 'Legacy architecture assumptions', actualImpact: { qualityImpact: 'high' } }, { type: 'communication_breakdown', severity: 'medium', description: 'Timezone challenges with 2h overlap', impact: 'coordination', rootCause: 'Insufficient async processes', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 24, bugRate: 0.25, meetingEfficiency: 2.8, teamMoraleProgression: [3.5, 3.2, 3.0, 3.2], deploymentFrequency: 'bi-weekly', codeReviewTimeAvg: 3.5 } },
-    result: { lessonsLearned: ['Cloud-native requires architectural mindset change', 'Async communication essential with minimal overlap'], successfulPractices: [{ practice: 'Architecture decision records (ADRs)', impact: 'Clear documentation of decisions', replicable: true }], unsuccessfulPractices: [{ practice: 'Synchronous decision-making with 2h overlap', impact: 'Bottlenecks', reason: 'Wrong communication model' }], recommendations: ['Establish async-first culture', 'Use ADRs for architecture decisions', 'Increase overlap or accept slower pace'] },
-    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Cloud migration projects', tags: ['cloud', 'refactoring', 'distributed'] }
-  },
-  {
-    type: 'seed',
-    source: 'literature',
-    problem: {
-      projectName: 'Generic: Real-Time Analytics Dashboard',
-      briefDescription: 'Business intelligence dashboard with real-time data',
+      projectName: 'Genérico: Dashboard de analítica en tiempo real',
+      briefDescription: 'Dashboard de business intelligence con datos en tiempo real',
       estimatedDuration: { value: 5, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 3, culturalDiversity: 'low', realTimeCommunicationLevel: 'high' },
@@ -787,16 +714,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 2, criticalDependencies: 5, informationFlow: 'unidirectional', stakeholdersCount: 10 }
       }
     },
-    solution: { completed: true, qualityScore: 3.9, clientSatisfaction: 4.1, teamMorale: 3.7, actualRisks: [{ type: 'scope_creep', severity: 'high', description: 'Constant new widget requests', impact: 'scope', rootCause: 'Unclear initial requirements', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 33, bugRate: 0.16, meetingEfficiency: 3.5, teamMoraleProgression: [3.5, 3.7, 3.7, 3.9], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.2 } },
-    result: { lessonsLearned: ['BI requirements evolve - plan for it', 'Stakeholder demos drive clarity'], successfulPractices: [{ practice: 'Weekly demos with stakeholders', impact: 'Early feedback prevented waste', replicable: true }], unsuccessfulPractices: [{ practice: 'Build everything upfront', impact: 'Wasted effort on unused features', reason: 'Wrong approach' }], recommendations: ['Use iterative approach with frequent demos', 'Build core framework first, add widgets incrementally'] },
-    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'BI project studies', tags: ['bi', 'analytics', 'frontend'] }
+    solution: { completed: true, qualityScore: 3.9, clientSatisfaction: 4.1, teamMorale: 3.7, actualRisks: [{ type: 'scope_creep', severity: 'high', description: 'Solicitudes constantes de nuevos widgets', impact: 'scope', rootCause: 'Requisitos iniciales poco claros', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 33, bugRate: 0.16, meetingEfficiency: 3.5, teamMoraleProgression: [3.5, 3.7, 3.7, 3.9], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.2 } },
+    result: { lessonsLearned: ['Los requisitos de BI evolucionan: hay que planificarlo', 'Las demos a stakeholders aportan claridad'], successfulPractices: [{ practice: 'Demos semanales con stakeholders', impact: 'Feedback temprano evitó desperdicio', replicable: true }], unsuccessfulPractices: [{ practice: 'Construir todo desde el inicio', impact: 'Esfuerzo desperdiciado en funcionalidades no usadas', reason: 'Enfoque incorrecto' }], recommendations: ['Usar un enfoque iterativo con demos frecuentes', 'Construir primero el framework base y añadir widgets incrementalmente'] },
+    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Estudios de proyectos BI', tags: ['bi', 'analytics', 'frontend'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Payment Gateway Integration',
-      briefDescription: 'Multi-provider payment processing integration',
+      projectName: 'Genérico: Integración de pasarela de pago',
+      briefDescription: 'Integración de pagos con múltiples proveedores',
       estimatedDuration: { value: 4, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 4, culturalDiversity: 'low', realTimeCommunicationLevel: 'high' },
@@ -806,16 +733,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 3, criticalDependencies: 8, informationFlow: 'bidirectional', stakeholdersCount: 6 }
       }
     },
-    solution: { completed: true, qualityScore: 4.3, clientSatisfaction: 4.6, teamMorale: 4.1, actualRisks: [{ type: 'third_party_dependency', severity: 'low', description: 'Minor API changes by providers', impact: 'maintenance', rootCause: 'External service evolution', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 36, bugRate: 0.09, meetingEfficiency: 4.2, teamMoraleProgression: [4.0, 4.1, 4.1, 4.3], deploymentFrequency: 'weekly', codeReviewTimeAvg: 1.8 } },
-    result: { lessonsLearned: ['Abstraction layer critical for multi-provider', 'Extensive testing crucial for payment systems'], successfulPractices: [{ practice: 'Provider abstraction layer', impact: 'Easy to add/switch providers', replicable: true }, { practice: 'Comprehensive test suite', impact: 'Zero payment bugs in production', replicable: true }], unsuccessfulPractices: [], recommendations: ['Build abstraction layer from day one', 'Invest heavily in automated testing', 'Use sandbox environments extensively'] },
-    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'Payment integration projects', tags: ['payment', 'integration', 'third-party'] }
+    solution: { completed: true, qualityScore: 4.3, clientSatisfaction: 4.6, teamMorale: 4.1, actualRisks: [{ type: 'dependency_blockage', severity: 'low', description: 'Cambios menores en APIs de proveedores', impact: 'maintenance', rootCause: 'Evolución de servicios externos', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 36, bugRate: 0.09, meetingEfficiency: 4.2, teamMoraleProgression: [4.0, 4.1, 4.1, 4.3], deploymentFrequency: 'weekly', codeReviewTimeAvg: 1.8 } },
+    result: { lessonsLearned: ['La capa de abstracción es crítica con múltiples proveedores', 'Las pruebas extensivas son clave en sistemas de pago'], successfulPractices: [{ practice: 'Capa de abstracción de proveedores', impact: 'Fácil añadir/cambiar proveedores', replicable: true }, { practice: 'Suite de pruebas exhaustiva', impact: 'Cero bugs de pago en producción', replicable: true }], unsuccessfulPractices: [], recommendations: ['Construir la capa de abstracción desde el día uno', 'Invertir fuerte en testing automatizado', 'Usar entornos sandbox de forma intensiva'] },
+    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'Proyectos de integración de pagos', tags: ['payment', 'integration', 'third-party'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Multi-Tenant SaaS Platform',
-      briefDescription: 'Build multi-tenant SaaS from existing single-tenant app',
+      projectName: 'Genérico: Plataforma SaaS multi-tenant',
+      briefDescription: 'Construir un SaaS multi-tenant a partir de una app single-tenant',
       estimatedDuration: { value: 8, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 5, culturalDiversity: 'low', realTimeCommunicationLevel: 'high' },
@@ -825,16 +752,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 4, criticalDependencies: 12, informationFlow: 'bidirectional', stakeholdersCount: 8 }
       }
     },
-    solution: { completed: true, qualityScore: 3.6, clientSatisfaction: 3.8, teamMorale: 3.3, actualRisks: [{ type: 'technical_complexity', severity: 'very_high', description: 'Data isolation challenges', impact: 'quality', rootCause: 'Multi-tenancy complexity underestimated', actualImpact: { qualityImpact: 'high' } }, { type: 'scope_underestimation', severity: 'high', description: 'Tenant management features grew scope', impact: 'schedule', rootCause: 'Incomplete requirements', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 26, bugRate: 0.23, meetingEfficiency: 3.3, teamMoraleProgression: [3.5, 3.3, 3.2, 3.5], deploymentFrequency: 'weekly', codeReviewTimeAvg: 3.2 } },
-    result: { lessonsLearned: ['Multi-tenancy more complex than expected', 'Data isolation patterns need careful design'], successfulPractices: [{ practice: 'Schema-based tenant isolation', impact: 'Clear separation and security', replicable: true }], unsuccessfulPractices: [{ practice: 'Underestimated tenant management features', impact: 'Scope creep', reason: 'Incomplete analysis' }], recommendations: ['Design data isolation strategy upfront', 'Include tenant management in initial scope', 'Add 40% buffer for multi-tenant complexity'] },
-    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'SaaS transformation projects', tags: ['saas', 'multi-tenant', 'architecture'] }
+    solution: { completed: true, qualityScore: 3.6, clientSatisfaction: 3.8, teamMorale: 3.3, actualRisks: [{ type: 'technical_complexity', severity: 'very_high', description: 'Retos de aislamiento de datos', impact: 'quality', rootCause: 'Se subestimó la complejidad del multi-tenancy', actualImpact: { qualityImpact: 'high' } }, { type: 'scope_underestimation', severity: 'high', description: 'Las funcionalidades de gestión de tenants aumentaron el alcance', impact: 'schedule', rootCause: 'Requisitos incompletos', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 26, bugRate: 0.23, meetingEfficiency: 3.3, teamMoraleProgression: [3.5, 3.3, 3.2, 3.5], deploymentFrequency: 'weekly', codeReviewTimeAvg: 3.2 } },
+    result: { lessonsLearned: ['El multi-tenancy fue más complejo de lo esperado', 'Los patrones de aislamiento de datos requieren diseño cuidadoso'], successfulPractices: [{ practice: 'Aislamiento por esquema (schema-based)', impact: 'Separación clara y seguridad', replicable: true }], unsuccessfulPractices: [{ practice: 'Subestimar la gestión de tenants', impact: 'Scope creep', reason: 'Análisis incompleto' }], recommendations: ['Diseñar la estrategia de aislamiento desde el principio', 'Incluir la gestión de tenants en el alcance inicial', 'Añadir un 40% de colchón por complejidad multi-tenant'] },
+    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Proyectos de transformación SaaS', tags: ['saas', 'multi-tenant', 'architecture'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Compliance & GDPR Implementation',
-      briefDescription: 'GDPR compliance updates across application',
+      projectName: 'Genérico: Implementación de cumplimiento (GDPR)',
+      briefDescription: 'Cambios de cumplimiento GDPR en toda la aplicación',
       estimatedDuration: { value: 6, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 3, culturalDiversity: 'low', realTimeCommunicationLevel: 'medium' },
@@ -844,16 +771,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 15, criticalDependencies: 25, informationFlow: 'multidirectional', stakeholdersCount: 20 }
       }
     },
-    solution: { completed: true, qualityScore: 4.2, clientSatisfaction: 4.5, teamMorale: 3.5, actualRisks: [{ type: 'dependency_blockage', severity: 'high', description: 'Waiting for legal reviews and approvals', impact: 'schedule', rootCause: 'Legal process bottlenecks', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 30, bugRate: 0.11, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.5, 3.4, 3.5], deploymentFrequency: 'bi-weekly', codeReviewTimeAvg: 2.5 } },
-    result: { lessonsLearned: ['Legal review time needs buffer', 'Compliance projects need cross-team coordination'], successfulPractices: [{ practice: 'Central compliance committee', impact: 'Consistent approach across teams', replicable: true }], unsuccessfulPractices: [{ practice: 'Each team interpreted requirements independently', impact: 'Inconsistencies initially', reason: 'Lack of coordination' }], recommendations: ['Establish central compliance authority', 'Add significant buffer for legal reviews', 'Document all compliance decisions centrally'] },
-    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Compliance project studies', tags: ['compliance', 'gdpr', 'legal'] }
+    solution: { completed: true, qualityScore: 4.2, clientSatisfaction: 4.5, teamMorale: 3.5, actualRisks: [{ type: 'dependency_blockage', severity: 'high', description: 'Esperas a revisiones y aprobaciones legales', impact: 'schedule', rootCause: 'Cuellos de botella del proceso legal', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 30, bugRate: 0.11, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.5, 3.4, 3.5], deploymentFrequency: 'bi-weekly', codeReviewTimeAvg: 2.5 } },
+    result: { lessonsLearned: ['Las revisiones legales necesitan colchón', 'Los proyectos de cumplimiento requieren coordinación entre equipos'], successfulPractices: [{ practice: 'Comité central de compliance', impact: 'Enfoque consistente entre equipos', replicable: true }], unsuccessfulPractices: [{ practice: 'Cada equipo interpretó requisitos por su cuenta', impact: 'Inconsistencias al inicio', reason: 'Falta de coordinación' }], recommendations: ['Establecer una autoridad central de compliance', 'Añadir colchón significativo para revisiones legales', 'Documentar centralmente todas las decisiones de cumplimiento'] },
+    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Estudios de proyectos de cumplimiento', tags: ['compliance', 'gdpr', 'legal'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Performance Optimization Initiative',
-      briefDescription: 'Application-wide performance improvements',
+      projectName: 'Genérico: Iniciativa de optimización de rendimiento',
+      briefDescription: 'Mejoras de rendimiento a nivel de aplicación',
       estimatedDuration: { value: 3, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America'], timeOverlap: 8, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'low', realTimeCommunicationLevel: 'low' },
@@ -864,15 +791,15 @@ const SEED_CASES = [
       }
     },
     solution: { completed: true, qualityScore: 4.5, clientSatisfaction: 4.8, teamMorale: 4.3, actualRisks: [], metrics: { avgVelocity: 40, bugRate: 0.07, meetingEfficiency: 4.5, teamMoraleProgression: [4.0, 4.2, 4.3, 4.5], deploymentFrequency: 'daily', codeReviewTimeAvg: 1.5 } },
-    result: { lessonsLearned: ['Data-driven optimization prevents waste', 'Low-hanging fruit should go first'], successfulPractices: [{ practice: 'Performance budgets per page', impact: 'Clear targets and accountability', replicable: true }, { practice: 'Profiling before optimization', impact: 'Focused on actual bottlenecks', replicable: true }], unsuccessfulPractices: [], recommendations: ['Always profile first', 'Set performance budgets', 'Prioritize by impact/effort ratio', 'Automate performance testing'] },
-    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'Performance optimization studies', tags: ['performance', 'optimization', 'technical'] }
+    result: { lessonsLearned: ['La optimización basada en datos evita desperdicio', 'Lo fácil (low-hanging fruit) debe ir primero'], successfulPractices: [{ practice: 'Presupuestos de rendimiento por página', impact: 'Objetivos claros y accountability', replicable: true }, { practice: 'Perfilar antes de optimizar', impact: 'Enfocado en cuellos de botella reales', replicable: true }], unsuccessfulPractices: [], recommendations: ['Perfilar siempre primero', 'Definir presupuestos de rendimiento', 'Priorizar por ratio impacto/esfuerzo', 'Automatizar pruebas de rendimiento'] },
+    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'Estudios de optimización de rendimiento', tags: ['performance', 'optimization', 'technical'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Accessibility Compliance (WCAG)',
-      briefDescription: 'Bring application to WCAG 2.1 AA compliance',
+      projectName: 'Genérico: Cumplimiento de accesibilidad (WCAG)',
+      briefDescription: 'Llevar la aplicación al cumplimiento WCAG 2.1 AA',
       estimatedDuration: { value: 5, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'low', realTimeCommunicationLevel: 'low' },
@@ -882,16 +809,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 2, criticalDependencies: 3, informationFlow: 'unidirectional', stakeholdersCount: 4 }
       }
     },
-    solution: { completed: true, qualityScore: 4.3, clientSatisfaction: 4.6, teamMorale: 4.0, actualRisks: [{ type: 'knowledge_gaps', severity: 'medium', description: 'Team learning curve for WCAG standards', impact: 'schedule', rootCause: 'New domain knowledge', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 32, bugRate: 0.13, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.8, 4.0, 4.2], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.3 } },
-    result: { lessonsLearned: ['Accessibility is easier when built-in from start', 'Automated testing catches most issues'], successfulPractices: [{ practice: 'Automated accessibility testing in CI/CD', impact: 'Caught regressions early', replicable: true }, { practice: 'User testing with assistive tech users', impact: 'Found real-world issues', replicable: true }], unsuccessfulPractices: [{ practice: 'Manual testing only', impact: 'Missed many issues initially', reason: 'Not scalable' }], recommendations: ['Integrate accessibility testing in CI/CD', 'Train team on WCAG standards', 'Include users with disabilities in testing'] },
-    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Accessibility projects', tags: ['accessibility', 'wcag', 'frontend'] }
+    solution: { completed: true, qualityScore: 4.3, clientSatisfaction: 4.6, teamMorale: 4.0, actualRisks: [{ type: 'knowledge_gaps', severity: 'medium', description: 'Curva de aprendizaje del equipo con estándares WCAG', impact: 'schedule', rootCause: 'Nuevo conocimiento de dominio', actualImpact: { qualityImpact: 'low' } }], metrics: { avgVelocity: 32, bugRate: 0.13, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.8, 4.0, 4.2], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.3 } },
+    result: { lessonsLearned: ['La accesibilidad es más fácil si se integra desde el inicio', 'El testing automatizado captura la mayoría de problemas'], successfulPractices: [{ practice: 'Pruebas automatizadas de accesibilidad en CI/CD', impact: 'Detectó regresiones pronto', replicable: true }, { practice: 'Pruebas con usuarios y tecnología asistiva', impact: 'Encontró problemas reales', replicable: true }], unsuccessfulPractices: [{ practice: 'Solo pruebas manuales', impact: 'Se escaparon muchos problemas al inicio', reason: 'No escala' }], recommendations: ['Integrar pruebas de accesibilidad en CI/CD', 'Formar al equipo en estándares WCAG', 'Incluir usuarios con discapacidad en las pruebas'] },
+    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Proyectos de accesibilidad', tags: ['accessibility', 'wcag', 'frontend'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Chatbot & NLP Integration',
-      briefDescription: 'Customer service chatbot with NLP',
+      projectName: 'Genérico: Integración de chatbot y NLP',
+      briefDescription: 'Chatbot de atención al cliente con NLP',
       estimatedDuration: { value: 6, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America', 'Asia'], timeOverlap: 4, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 3, culturalDiversity: 'high', realTimeCommunicationLevel: 'medium' },
@@ -901,16 +828,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 4, criticalDependencies: 6, informationFlow: 'bidirectional', stakeholdersCount: 8 }
       }
     },
-    solution: { completed: true, qualityScore: 3.5, clientSatisfaction: 3.7, teamMorale: 3.4, actualRisks: [{ type: 'unclear_requirements', severity: 'high', description: 'NLP accuracy expectations unclear', impact: 'scope', rootCause: 'AI project uncertainty', actualImpact: { qualityImpact: 'high' } }, { type: 'third_party_dependency', severity: 'medium', description: 'NLP service limitations discovered late', impact: 'features', rootCause: 'Insufficient evaluation', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 27, bugRate: 0.21, meetingEfficiency: 3.2, teamMoraleProgression: [3.5, 3.4, 3.3, 3.5], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.8 } },
-    result: { lessonsLearned: ['AI project expectations need management', 'Fallback to human essential'], successfulPractices: [{ practice: 'Human escalation path', impact: 'User satisfaction maintained', replicable: true }], unsuccessfulPractices: [{ practice: 'Promised 95% accuracy upfront', impact: 'Unrealistic expectations', reason: 'AI uncertainty' }], recommendations: ['Set realistic AI expectations', 'Build human fallback from day one', 'Use confidence thresholds for escalation'] },
-    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Chatbot project studies', tags: ['chatbot', 'nlp', 'ai'] }
+    solution: { completed: true, qualityScore: 3.5, clientSatisfaction: 3.7, teamMorale: 3.4, actualRisks: [{ type: 'scope_creep', severity: 'high', description: 'Expectativas de precisión de NLP poco claras', impact: 'scope', rootCause: 'Incertidumbre en proyectos de IA', actualImpact: { qualityImpact: 'high' } }, { type: 'dependency_blockage', severity: 'medium', description: 'Limitaciones del servicio NLP descubiertas tarde', impact: 'features', rootCause: 'Evaluación insuficiente', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 27, bugRate: 0.21, meetingEfficiency: 3.2, teamMoraleProgression: [3.5, 3.4, 3.3, 3.5], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.8 } },
+    result: { lessonsLearned: ['Las expectativas en proyectos de IA requieren gestión', 'Es esencial un fallback a humano'], successfulPractices: [{ practice: 'Ruta de escalado a humano', impact: 'Se mantuvo la satisfacción del usuario', replicable: true }], unsuccessfulPractices: [{ practice: 'Prometer 95% de precisión desde el inicio', impact: 'Expectativas poco realistas', reason: 'Incertidumbre de IA' }], recommendations: ['Definir expectativas realistas de IA', 'Construir fallback humano desde el día uno', 'Usar umbrales de confianza para escalar'] },
+    metadata: { confidence: 0.7, isGeneric: true, basedOn: 'Estudios de proyectos de chatbots', tags: ['chatbot', 'nlp', 'ai'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Blockchain Integration POC',
-      briefDescription: 'Proof of concept for blockchain-based feature',
+      projectName: 'Genérico: POC de integración blockchain',
+      briefDescription: 'Prueba de concepto de una funcionalidad basada en blockchain',
       estimatedDuration: { value: 4, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'yes', weeklyMeetings: 4, culturalDiversity: 'low', realTimeCommunicationLevel: 'high' },
@@ -920,16 +847,16 @@ const SEED_CASES = [
         organizational: { involvedTeams: 2, criticalDependencies: 4, informationFlow: 'unidirectional', stakeholdersCount: 5 }
       }
     },
-    solution: { completed: true, qualityScore: 3.2, clientSatisfaction: 3.4, teamMorale: 3.8, actualRisks: [{ type: 'knowledge_gaps', severity: 'very_high', description: 'Steep blockchain learning curve', impact: 'schedule', rootCause: 'New technology domain', actualImpact: { qualityImpact: 'high' } }, { type: 'technical_complexity', severity: 'high', description: 'Smart contract bugs difficult to fix', impact: 'quality', rootCause: 'Immutable nature of blockchain', actualImpact: { qualityImpact: 'high' } }], metrics: { avgVelocity: 20, bugRate: 0.30, meetingEfficiency: 3.5, teamMoraleProgression: [3.2, 3.5, 3.8, 3.8], deploymentFrequency: 'monthly', codeReviewTimeAvg: 4.5 } },
-    result: { lessonsLearned: ['Blockchain has significant learning curve', 'Testing strategies different from traditional apps'], successfulPractices: [{ practice: 'Extensive testing on test networks', impact: 'Caught critical bugs', replicable: true }], unsuccessfulPractices: [{ practice: 'Rushed to mainnet deployment', impact: 'Bug discovered in production', reason: 'Insufficient testing' }], recommendations: ['Allow extra time for learning', 'Use test networks extensively', 'Audit smart contracts before mainnet', 'Consider if blockchain truly needed'] },
-    metadata: { confidence: 0.6, isGeneric: true, basedOn: 'Blockchain POC studies', tags: ['blockchain', 'poc', 'emerging-tech'] }
+    solution: { completed: true, qualityScore: 3.2, clientSatisfaction: 3.4, teamMorale: 3.8, actualRisks: [{ type: 'knowledge_gaps', severity: 'very_high', description: 'Curva de aprendizaje pronunciada con blockchain', impact: 'schedule', rootCause: 'Nuevo dominio tecnológico', actualImpact: { qualityImpact: 'high' } }, { type: 'technical_complexity', severity: 'high', description: 'Bugs en smart contracts difíciles de corregir', impact: 'quality', rootCause: 'Naturaleza inmutable de blockchain', actualImpact: { qualityImpact: 'high' } }], metrics: { avgVelocity: 20, bugRate: 0.30, meetingEfficiency: 3.5, teamMoraleProgression: [3.2, 3.5, 3.8, 3.8], deploymentFrequency: 'monthly', codeReviewTimeAvg: 4.5 } },
+    result: { lessonsLearned: ['Blockchain tiene una curva de aprendizaje importante', 'Las estrategias de testing difieren de apps tradicionales'], successfulPractices: [{ practice: 'Pruebas extensivas en redes de test', impact: 'Detectó bugs críticos', replicable: true }], unsuccessfulPractices: [{ practice: 'Ir con prisa a producción (mainnet)', impact: 'Bug descubierto en producción', reason: 'Pruebas insuficientes' }], recommendations: ['Dar tiempo extra para aprendizaje', 'Usar redes de test de forma intensiva', 'Auditar smart contracts antes de mainnet', 'Valorar si blockchain es realmente necesario'] },
+    metadata: { confidence: 0.6, isGeneric: true, basedOn: 'Estudios de POCs blockchain', tags: ['blockchain', 'poc', 'emerging-tech'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Observability Platform Setup',
-      briefDescription: 'Implement monitoring, logging, and tracing',
+      projectName: 'Genérico: Implementación de observabilidad',
+      briefDescription: 'Implementar monitorización, logging y trazas',
       estimatedDuration: { value: 4, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['North America'], timeOverlap: 8, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'low', realTimeCommunicationLevel: 'low' },
@@ -940,15 +867,15 @@ const SEED_CASES = [
       }
     },
     solution: { completed: true, qualityScore: 4.6, clientSatisfaction: 4.8, teamMorale: 4.4, actualRisks: [], metrics: { avgVelocity: 38, bugRate: 0.06, meetingEfficiency: 4.3, teamMoraleProgression: [4.0, 4.2, 4.4, 4.6], deploymentFrequency: 'weekly', codeReviewTimeAvg: 1.8 } },
-    result: { lessonsLearned: ['Observability pays dividends quickly', 'Start with golden signals'], successfulPractices: [{ practice: 'Focus on SLIs/SLOs/SLAs first', impact: 'Clear metrics for success', replicable: true }, { practice: 'Dashboards for each team', impact: 'Team ownership of metrics', replicable: true }], unsuccessfulPractices: [], recommendations: ['Start with golden signals (latency, traffic, errors, saturation)', 'Define SLOs with teams', 'Make dashboards accessible to all', 'Automate alert management'] },
-    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'Observability implementation projects', tags: ['observability', 'monitoring', 'devops'] }
+    result: { lessonsLearned: ['La observabilidad da retorno rápidamente', 'Empezar por las señales de oro'], successfulPractices: [{ practice: 'Priorizar SLIs/SLOs/SLAs primero', impact: 'Métricas claras de éxito', replicable: true }, { practice: 'Dashboards por equipo', impact: 'Ownership del equipo sobre métricas', replicable: true }], unsuccessfulPractices: [], recommendations: ['Empezar por señales de oro (latencia, tráfico, errores, saturación)', 'Definir SLOs con los equipos', 'Hacer dashboards accesibles a todos', 'Automatizar la gestión de alertas'] },
+    metadata: { confidence: 0.9, isGeneric: true, basedOn: 'Proyectos de implementación de observabilidad', tags: ['observability', 'monitoring', 'devops'] }
   },
   {
     type: 'seed',
     source: 'literature',
     problem: {
-      projectName: 'Generic: Technical Documentation Overhaul',
-      briefDescription: 'Comprehensive technical documentation project',
+      projectName: 'Genérico: Revisión de documentación técnica',
+      briefDescription: 'Proyecto integral de documentación técnica',
       estimatedDuration: { value: 4, unit: 'months' },
       features: {
         coordination: { involvedCountries: ['Europe'], timeOverlap: 8, requiresSyncComm: 'only_critical_moments', weeklyMeetings: 2, culturalDiversity: 'low', realTimeCommunicationLevel: 'low' },
@@ -958,9 +885,9 @@ const SEED_CASES = [
         organizational: { involvedTeams: 10, criticalDependencies: 5, informationFlow: 'unidirectional', stakeholdersCount: 15 }
       }
     },
-    solution: { completed: true, qualityScore: 4.4, clientSatisfaction: 4.7, teamMorale: 3.9, actualRisks: [{ type: 'knowledge_silos', severity: 'medium', description: 'Information scattered across teams', impact: 'schedule', rootCause: 'No central knowledge repository', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 35, bugRate: 0.05, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.7, 3.9, 4.1], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.0 } },
-    result: { lessonsLearned: ['Documentation as code works well', 'Team contributions need incentives'], successfulPractices: [{ practice: 'Docs-as-code with version control', impact: 'Easy maintenance and review', replicable: true }, { practice: 'Quarterly docs review sessions', impact: 'Kept docs up to date', replicable: true }], unsuccessfulPractices: [{ practice: 'Relying on volunteers for contributions', impact: 'Slow progress', reason: 'No accountability' }], recommendations: ['Treat documentation as first-class deliverable', 'Use docs-as-code approach', 'Make documentation part of definition of done', 'Schedule regular review sessions'] },
-    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Documentation project studies', tags: ['documentation', 'knowledge', 'process'] }
+    solution: { completed: true, qualityScore: 4.4, clientSatisfaction: 4.7, teamMorale: 3.9, actualRisks: [{ type: 'knowledge_silos', severity: 'medium', description: 'Información dispersa entre equipos', impact: 'schedule', rootCause: 'No existía un repositorio central de conocimiento', actualImpact: { qualityImpact: 'medium' } }], metrics: { avgVelocity: 35, bugRate: 0.05, meetingEfficiency: 3.8, teamMoraleProgression: [3.5, 3.7, 3.9, 4.1], deploymentFrequency: 'weekly', codeReviewTimeAvg: 2.0 } },
+    result: { lessonsLearned: ['El enfoque “documentation as code” funciona bien', 'Las contribuciones del equipo necesitan incentivos'], successfulPractices: [{ practice: 'Docs-as-code con control de versiones', impact: 'Mantenimiento y revisión sencillos', replicable: true }, { practice: 'Sesiones trimestrales de revisión de docs', impact: 'Mantuvo la documentación al día', replicable: true }], unsuccessfulPractices: [{ practice: 'Depender de voluntarios para contribuir', impact: 'Progreso lento', reason: 'Sin responsabilidad clara' }], recommendations: ['Tratar la documentación como un entregable de primera clase', 'Usar un enfoque docs-as-code', 'Hacer la documentación parte de la Definition of Done', 'Planificar sesiones regulares de revisión'] },
+    metadata: { confidence: 0.8, isGeneric: true, basedOn: 'Estudios de proyectos de documentación', tags: ['documentation', 'knowledge', 'process'] }
   }
 ];
 

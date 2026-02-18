@@ -2,7 +2,7 @@ const cvUtils = require('../../utils/cvUtils');
 
 /**
  * Extractor de certificaciones
- * Responsabilidad única: extraer certificaciones del CV
+ * Responsabilidad única: extraer certificaciones del currículo
  */
 class CertificationsExtractor {
   /**

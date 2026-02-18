@@ -2,7 +2,7 @@ const cvUtils = require('../../utils/cvUtils');
 
 /**
  * Extractor de idiomas
- * Responsabilidad única: extraer idiomas y sus niveles del CV
+ * Responsabilidad única: extraer idiomas y sus niveles del currículo
  */
 class LanguagesExtractor {
   /**

@@ -857,18 +857,6 @@ class TeamSynergyService {
   }
 
   /**
-   * Helper: Get previous collaborations message
-   * @private
-   */
-  _getPreviousCollaborationsMessage(score, collaborationPercentage) {
-    if (score >= 80) return `Excellent collaboration history - ${collaborationPercentage}% of pairs have worked together`;
-    if (score >= 60) return `Good collaboration history - ${collaborationPercentage}% of pairs have worked together`;
-    if (score >= 40) return `Moderate collaboration history - ${collaborationPercentage}% of pairs have worked together`;
-    if (score > 0) return `Limited collaboration history - only ${collaborationPercentage}% of pairs have worked together`;
-    return 'No previous collaborations detected - this is a new team';
-  }
-
-  /**
    * Explain team synergy in human-readable format
    * @param {Array} teamMembers - Team members
    * @param {Object} projectRequirements - Project requirements

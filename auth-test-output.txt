@@ -1,0 +1,452 @@
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+  console.error
+    Controller Error: AppError: Invalid email format
+        at Function.badRequest (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\AppError.js:20:12)
+        at Validators.badRequest [as validateRegistrationData] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\validators.js:19:22)
+        at validateRegistrationData (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\auth.controller.js:9:16)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\route.js:149:13)
+        at Route.dispatch (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\route.js:119:3)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:284:15
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:175:3)
+        at router (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:646:15
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:265:14)
+        at Function.handle (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:175:3)
+        at router (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\app.js:97:3)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at urlencodedParser (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\body-parser\lib\types\urlencoded.js:82:7)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\body-parser\lib\read.js:137:5
+        at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+        at invokeCallback (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:238:16)
+        at done (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:227:7)
+        at IncomingMessage.onEnd (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:287:7)
+        at IncomingMessage.emit (node:events:519:28)
+        at endReadableNT (node:internal/streams/readable:1696:12)
+        at processTicksAndRejections (node:internal/process/task_queues:82:21) {
+      code: 'INVALID_EMAIL_FORMAT',
+      status: 400,
+      details: undefined
+    }
+
+    [0m [90m 36 |[39m     [36mreturn[39m[33m;[39m
+     [90m 37 |[39m   }
+    [31m[1m>[22m[39m[90m 38 |[39m   originalConsole[33m.[39merror([33m...[39margs)[33m;[39m
+     [90m    |[39m                   [31m[1m^[22m[39m
+     [90m 39 |[39m }[33m;[39m
+     [90m 40 |[39m
+     [90m 41 |[39m [90m// Timeout global para tests[39m[0m
+
+      at console.error (tests/setup/test-setup.js:38:19)
+      at ResponseHandler.error [as handleError] (src/utils/responseHandler.js:5:13)
+      at handleError (src/controllers/auth.controller.js:19:28)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/express/lib/router/index.js:646:15
+      at next (node_modules/express/lib/router/index.js:265:14)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at next (src/app.js:97:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:82:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/body-parser/lib/read.js:137:5
+      at invokeCallback (node_modules/raw-body/index.js:238:16)
+      at done (node_modules/raw-body/index.js:227:7)
+      at IncomingMessage.onEnd (node_modules/raw-body/index.js:287:7)
+
+  console.error
+    Controller Error: AppError: All fields are required
+        at Function.badRequest (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\AppError.js:20:12)
+        at Validators.badRequest [as validateRegistrationData] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\validators.js:15:22)
+        at validateRegistrationData (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\auth.controller.js:9:16)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\route.js:149:13)
+        at Route.dispatch (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\route.js:119:3)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:284:15
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:175:3)
+        at router (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:646:15
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:265:14)
+        at Function.handle (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:175:3)
+        at router (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\app.js:97:3)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at urlencodedParser (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\body-parser\lib\types\urlencoded.js:82:7)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\body-parser\lib\read.js:137:5
+        at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+        at invokeCallback (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:238:16)
+        at done (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:227:7)
+        at IncomingMessage.onEnd (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:287:7)
+        at IncomingMessage.emit (node:events:519:28)
+        at endReadableNT (node:internal/streams/readable:1696:12)
+        at processTicksAndRejections (node:internal/process/task_queues:82:21) {
+      code: 'MISSING_REQUIRED_FIELDS',
+      status: 400,
+      details: undefined
+    }
+
+    [0m [90m 36 |[39m     [36mreturn[39m[33m;[39m
+     [90m 37 |[39m   }
+    [31m[1m>[22m[39m[90m 38 |[39m   originalConsole[33m.[39merror([33m...[39margs)[33m;[39m
+     [90m    |[39m                   [31m[1m^[22m[39m
+     [90m 39 |[39m }[33m;[39m
+     [90m 40 |[39m
+     [90m 41 |[39m [90m// Timeout global para tests[39m[0m
+
+      at console.error (tests/setup/test-setup.js:38:19)
+      at ResponseHandler.error [as handleError] (src/utils/responseHandler.js:5:13)
+      at handleError (src/controllers/auth.controller.js:19:28)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/express/lib/router/index.js:646:15
+      at next (node_modules/express/lib/router/index.js:265:14)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at next (src/app.js:97:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:82:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/body-parser/lib/read.js:137:5
+      at invokeCallback (node_modules/raw-body/index.js:238:16)
+      at done (node_modules/raw-body/index.js:227:7)
+      at IncomingMessage.onEnd (node_modules/raw-body/index.js:287:7)
+
+  console.error
+    Controller Error: AppError: All fields are required
+        at Function.badRequest (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\AppError.js:20:12)
+        at Validators.badRequest [as validateRegistrationData] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\validators.js:15:22)
+        at validateRegistrationData (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\auth.controller.js:9:16)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\route.js:149:13)
+        at Route.dispatch (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\route.js:119:3)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:284:15
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at Function.handle (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:175:3)
+        at router (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:646:15
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:265:14)
+        at Function.handle (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:175:3)
+        at router (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:47:12)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\app.js:97:3)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at urlencodedParser (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\body-parser\lib\types\urlencoded.js:82:7)
+        at Layer.handle [as handle_request] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\layer.js:95:5)
+        at trim_prefix (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:328:13)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:286:9
+        at Function.process_params (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:346:12)
+        at next (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\express\lib\router\index.js:280:10)
+        at C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\body-parser\lib\read.js:137:5
+        at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+        at invokeCallback (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:238:16)
+        at done (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:227:7)
+        at IncomingMessage.onEnd (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\node_modules\raw-body\index.js:287:7)
+        at IncomingMessage.emit (node:events:519:28)
+        at endReadableNT (node:internal/streams/readable:1696:12)
+        at processTicksAndRejections (node:internal/process/task_queues:82:21) {
+      code: 'MISSING_REQUIRED_FIELDS',
+      status: 400,
+      details: undefined
+    }
+
+    [0m [90m 36 |[39m     [36mreturn[39m[33m;[39m
+     [90m 37 |[39m   }
+    [31m[1m>[22m[39m[90m 38 |[39m   originalConsole[33m.[39merror([33m...[39margs)[33m;[39m
+     [90m    |[39m                   [31m[1m^[22m[39m
+     [90m 39 |[39m }[33m;[39m
+     [90m 40 |[39m
+     [90m 41 |[39m [90m// Timeout global para tests[39m[0m
+
+      at console.error (tests/setup/test-setup.js:38:19)
+      at ResponseHandler.error [as handleError] (src/utils/responseHandler.js:5:13)
+      at handleError (src/controllers/auth.controller.js:19:28)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at next (node_modules/express/lib/router/route.js:149:13)
+      at Route.dispatch (node_modules/express/lib/router/route.js:119:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at node_modules/express/lib/router/index.js:284:15
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/express/lib/router/index.js:646:15
+      at next (node_modules/express/lib/router/index.js:265:14)
+      at Function.handle (node_modules/express/lib/router/index.js:175:3)
+      at router (node_modules/express/lib/router/index.js:47:12)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at next (src/app.js:97:3)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:82:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/body-parser/lib/read.js:137:5
+      at invokeCallback (node_modules/raw-body/index.js:238:16)
+      at done (node_modules/raw-body/index.js:227:7)
+      at IncomingMessage.onEnd (node_modules/raw-body/index.js:287:7)
+
+  console.error
+    Controller Error: AppError: Invalid credentials. 2 attempt(s) remaining
+        at Function.unauthorized (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\AppError.js:24:12)
+        at AuthService.unauthorized [as login] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\auth.service.js:156:22)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at exports.login (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\auth.controller.js:65:20) {
+      code: 'INVALID_CREDENTIALS',
+      status: 401,
+      details: undefined
+    }
+
+    [0m [90m 36 |[39m     [36mreturn[39m[33m;[39m
+     [90m 37 |[39m   }
+    [31m[1m>[22m[39m[90m 38 |[39m   originalConsole[33m.[39merror([33m...[39margs)[33m;[39m
+     [90m    |[39m                   [31m[1m^[22m[39m
+     [90m 39 |[39m }[33m;[39m
+     [90m 40 |[39m
+     [90m 41 |[39m [90m// Timeout global para tests[39m[0m
+
+      at console.error (tests/setup/test-setup.js:38:19)
+      at ResponseHandler.error [as handleError] (src/utils/responseHandler.js:5:13)
+      at handleError (src/controllers/auth.controller.js:74:28)
+
+  console.error
+    Error confirmAccount: AppError: Invalid or expired token
+        at Function.badRequest (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\AppError.js:20:12)
+        at AuthService.badRequest [as confirmAccount] (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\auth.service.js:192:22)
+        at processTicksAndRejections (node:internal/process/task_queues:95:5)
+        at exports.confirmAccount (C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\auth.controller.js:48:5) {
+      code: 'INVALID_OR_EXPIRED_TOKEN',
+      status: 400,
+      details: undefined
+    }
+
+    [0m [90m 36 |[39m     [36mreturn[39m[33m;[39m
+     [90m 37 |[39m   }
+    [31m[1m>[22m[39m[90m 38 |[39m   originalConsole[33m.[39merror([33m...[39margs)[33m;[39m
+     [90m    |[39m                   [31m[1m^[22m[39m
+     [90m 39 |[39m }[33m;[39m
+     [90m 40 |[39m
+     [90m 41 |[39m [90m// Timeout global para tests[39m[0m
+
+      at console.error (tests/setup/test-setup.js:38:19)
+      at error (src/controllers/auth.controller.js:54:13)
+
+  console.warn
+    MongoDB disconnected. Attempting to reconnect...
+
+    [0m [90m 25 |[39m
+     [90m 26 |[39m     mongoose[33m.[39mconnection[33m.[39mon([32m'disconnected'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m 27 |[39m       console[33m.[39mwarn([32m'MongoDB disconnected. Attempting to reconnect...'[39m)[33m;[39m
+     [90m    |[39m               [31m[1m^[22m[39m
+     [90m 28 |[39m     })[33m;[39m
+     [90m 29 |[39m
+     [90m 30 |[39m     mongoose[33m.[39mconnection[33m.[39mon([32m'reconnected'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at NativeConnection.warn (src/config/db.js:27:15)
+      at NativeConnection.set (node_modules/mongoose/lib/connection.js:149:12)
+      at NativeConnection.onClose (node_modules/mongoose/lib/connection.js:1319:19)
+      at NativeConnection._close (node_modules/mongoose/lib/connection.js:1268:12)
+          at async Promise.all (index 0)
+      at Mongoose.disconnect (node_modules/mongoose/lib/mongoose.js:471:3)
+      at Object.disconnect (tests/setup/mongodb-helper.js:64:7)
+      at Object.<anonymous> (tests/integration/auth.integration.test.js:18:5)
+
+FAIL tests/integration/auth.integration.test.js (34.116 s)
+  Auth - Integration Tests
+    POST /auth/register
+      ├ù deber├¡a registrar un usuario exitosamente (30299 ms)
+      ÔêÜ deber├¡a rechazar registro con email duplicado (931 ms)
+      ÔêÜ deber├¡a rechazar datos inv├ílidos (102 ms)
+    POST /auth/login
+      ÔêÜ deber├¡a hacer login exitosamente con usuario confirmado (128 ms)
+      ÔêÜ deber├¡a rechazar login con contrase├▒a incorrecta (121 ms)
+    GET /auth/confirm
+      ÔêÜ deber├¡a confirmar cuenta con token v├ílido (145 ms)
+      ÔêÜ deber├¡a rechazar token inv├ílido con redirecci├│n (65 ms)
+    POST /auth/send-confirmation
+      ÔêÜ deber├¡a reenviar email de confirmaci├│n exitosamente (117 ms)
+
+  ÔùÅ Auth - Integration Tests ÔÇ║ POST /auth/register ÔÇ║ deber├¡a registrar un usuario exitosamente
+
+    thrown: "Exceeded timeout of 30000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      25 |
+      26 |   describe('POST /auth/register', () => {
+    > 27 |     it('deber├¡a registrar un usuario exitosamente', async () => {
+         |     ^
+      28 |       const userData = {
+      29 |         email: 'test@example.com',
+      30 |         name: 'Test User',
+
+      at it (tests/integration/auth.integration.test.js:27:5)
+      at describe (tests/integration/auth.integration.test.js:26:3)
+      at Object.describe (tests/integration/auth.integration.test.js:12:1)
+
+  ÔùÅ Auth - Integration Tests ÔÇ║ POST /auth/register ÔÇ║ deber├¡a registrar un usuario exitosamente
+
+    MongooseError: Can't call `openUri()` on an active connection with different connection strings. Make sure you aren't calling `mongoose.connect()` multiple times. See: https://mongoosejs.com/docs/connections.html#multiple_connections
+
+       8 |
+       9 |   try {
+    > 10 |     await mongoose.connect(uri, {
+         |                    ^
+      11 |       serverSelectionTimeoutMS: 5000,
+      12 |       socketTimeoutMS: 45000,
+      13 |       maxPoolSize: 10,
+
+      at NativeConnection.createClient (node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js:251:13)
+      at NativeConnection.openUri (node_modules/mongoose/lib/connection.js:1075:34)
+      at Mongoose.connect (node_modules/mongoose/lib/mongoose.js:450:15)
+      at connect (src/config/db.js:10:20)
+      at connectDB (src/app.js:94:11)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at urlencodedParser (node_modules/body-parser/lib/types/urlencoded.js:82:7)
+      at Layer.handle [as handle_request] (node_modules/express/lib/router/layer.js:95:5)
+      at trim_prefix (node_modules/express/lib/router/index.js:328:13)
+      at node_modules/express/lib/router/index.js:286:9
+      at Function.process_params (node_modules/express/lib/router/index.js:346:12)
+      at next (node_modules/express/lib/router/index.js:280:10)
+      at node_modules/body-parser/lib/read.js:137:5
+      at invokeCallback (node_modules/raw-body/index.js:238:16)
+      at done (node_modules/raw-body/index.js:227:7)
+      at IncomingMessage.onEnd (node_modules/raw-body/index.js:287:7)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 7 passed, 8 total
+Snapshots:   0 total
+Time:        34.19 s, estimated 38 s
+Ran all test suites matching tests/integration/auth.integration.test.js.
+Ô£ô MongoDB test server closed successfully
+Jest did not exit one second after the test run has completed.
+
+'This usually means that there are asynchronous operations that weren't stopped in your tests. Consider running Jest with `--detectOpenHandles` to troubleshoot this issue.

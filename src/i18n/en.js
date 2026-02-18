@@ -8,7 +8,7 @@ module.exports = {
     // Communication Risks
     communication_breakdown: {
       title: 'Communication Breakdown',
-      description: 'Communication problems that prevent effective team coordination',
+      description: 'If the team is distributed across time zones with little overlap, communication failures may arise that delay deliveries and cause misunderstandings',
       indicators: {
         delays: 'Response delays',
         infoNotShared: 'Information not shared',
@@ -16,7 +16,6 @@ module.exports = {
       },
       recommendations: {
         asyncUpdates: 'Implement daily asynchronous updates',
-        escalationProtocols: 'Define clear escalation protocols',
         asyncTools: 'Use effective asynchronous communication tools',
         communicationNorms: 'Establish communication norms'
       }
@@ -24,107 +23,103 @@ module.exports = {
 
     communication_tools_missing: {
       title: 'Inadequate Communication Tools',
-      description: 'Lack of appropriate communication tools according to time overlap between countries',
+      description: 'If the project involves multiple countries and no communication tools have been defined, serious coordination problems will arise due to lack of adequate channels',
       indicators: {
         limitedOverlap: 'Limited time overlap',
         insufficientTools: 'Insufficient tools for coordination'
       },
       recommendations: {
-        asyncUpdates: 'Implement daily asynchronous updates',
-        escalationProtocols: 'Define clear escalation protocols',
-        asyncTools: 'Use effective asynchronous communication tools',
-        communicationNorms: 'Establish communication norms'
+        syncAsyncTools: 'Implement both synchronous and asynchronous communication tools',
+        communicationNorms: 'Establish clear communication norms'
       }
     },
 
     // Cultural & Linguistic Risks
     cultural_distance_risk: {
-      title: 'High Cultural Distance',
-      description: 'High cultural distance between team countries according to Hofstede dimensions',
+      title: 'High Socio-Cultural Distance',
+      description: 'If there are people from different cultures in the project, misunderstandings derived from socio-cultural distance may arise and cause delivery delays',
       indicators: {
         culturalDistance: 'Cultural distance between team countries',
         differentValues: 'Different values in Hofstede dimensions',
         culturalMisunderstandings: 'Potential cultural misunderstandings'
       },
       recommendations: {
-        culturalTraining: 'Implement cross-cultural training for the team',
+        culturalTraining: 'Implement socio-cultural training',
         sensitiveCommunication: 'Establish culturally sensitive communication norms',
-        culturalMediators: 'Assign cultural mediators in the team'
+        culturalMediators: 'Assign cultural mediators'
       }
     },
 
     linguistic_distance_risk: {
-      title: 'Linguistic Distance',
-      description: 'Partial language barrier - not all countries speak the common language',
+      title: 'Socio-Cultural Linguistic Distance',
+      description: 'If the team is multicultural and not all countries speak the common project language, socio-cultural distance problems may arise that hinder understanding',
       indicators: {
         differentLanguages: 'Different official languages in team countries',
         notAllSpeakCommon: 'Not all members speak the common language'
       },
       recommendations: {
         languageTraining: 'Provide training in the common language',
-        translationServices: 'Use translation services if necessary',
-        documentInCommon: 'Document in common language',
+        translationServices: 'Use translation services',
+        documentInCommon: 'Document in the same language',
         bilingualFacilitators: 'Assign bilingual facilitators'
       }
     },
 
     linguistic_distance_no_common_language: {
       title: 'No Common Language Defined',
-      description: 'No common language defined for the multicultural team',
+      description: 'If the multicultural team has no common project language defined, the lack of a shared language will cause constant misunderstandings and delays',
       indicators: {
         multiculturalNoCommon: 'Multicultural team without common language',
         highMisunderstandingRisk: 'High risk of misunderstandings'
       },
       recommendations: {
-        defineCommon: 'Define common language for the project',
-        languageTraining: 'Provide training in the common language',
-        translationServices: 'Use translation services if necessary',
-        documentInCommon: 'Document in common language'
+        defineCommon: 'Define a common project language',
+        languageTraining: 'Provide linguistic training',
+        translationServices: 'Use translation services',
+        documentInCommon: 'Document everything in that language'
       }
     },
 
     // Project Requirements Risks
     team_autonomy_risk: {
       title: 'Team Autonomy Risk',
-      description: 'Team autonomy level does not meet project requirements',
+      description: 'If the project requires a high level of team autonomy, problems may arise if the team is not prepared to work with that degree of independence',
       indicators: {
         autonomyMismatch: 'Required vs available autonomy level',
         constantSupervision: 'Need for constant supervision'
       },
       recommendations: {
-        evaluateAutonomy: 'Evaluate if team can work with required autonomy',
-        training: 'Provide training if necessary',
-        adjustSupervision: 'Adjust supervision structure',
-        assignLeaders: 'Assign technical leaders if high autonomy required'
+        evaluateAutonomy: 'Evaluate the team\'s actual capacity',
+        training: 'Provide training',
+        adjustSupervision: 'Adjust supervision structure'
       }
     },
 
     schedule_flexibility_risk: {
       title: 'Schedule Flexibility Risk',
-      description: 'Team schedule flexibility does not meet project requirements',
+      description: 'If the project requires high schedule flexibility, coordination and availability problems may arise',
       indicators: {
         flexibilityMismatch: 'Required vs available schedule flexibility',
         timezoneCoordination: 'Coordination across different time zones'
       },
       recommendations: {
-        evaluateFlexibility: 'Evaluate team schedule flexibility',
-        coreHours: 'Establish core hours if necessary',
-        asyncTools: 'Use asynchronous tools',
+        evaluateFlexibility: 'Evaluate team flexibility',
+        coreHours: 'Establish core hours',
         availabilityWindows: 'Define availability windows'
       }
     },
 
     travel_availability_risk: {
       title: 'Travel Availability Risk',
-      description: 'Team travel availability does not meet project requirements',
+      description: 'If the project requires high travel availability, logistical and cost problems may arise',
       indicators: {
         travelMismatch: 'Required vs available travel availability',
         inPersonMeetings: 'Need for in-person meetings'
       },
       recommendations: {
-        evaluateTravel: 'Evaluate team travel availability',
+        evaluateTravel: 'Evaluate team availability',
         planAhead: 'Plan travel in advance',
-        virtualMeetings: 'Use virtual meetings when possible',
+        virtualMeetings: 'Prioritize virtual meetings',
         budgetTravel: 'Budget travel costs'
       }
     },
@@ -132,7 +127,7 @@ module.exports = {
     // Technical Risks
     skill_gap: {
       title: 'Skill Gap',
-      description: 'Lack of necessary technical skills in the team',
+      description: 'If the team lacks several project technologies or technology coverage is below 50%, a skill gap will arise affecting quality and development speed',
       indicators: {
         lowTechMatch: 'Technical match <50%',
         missingTechnologies: '≥3 missing technologies',
@@ -140,88 +135,55 @@ module.exports = {
       },
       recommendations: {
         hireSpecialists: 'Hire specialists in critical technologies',
-        intensiveTraining: 'Intensive training program',
-        addSenior: 'Add a senior for training or mentoring tasks'
-      }
-    },
-
-    technical_infrastructure: {
-      title: 'Technical Infrastructure Issues',
-      description: 'Inadequate technical infrastructure for the project',
-      indicators: {
-        insufficientInfra: 'Insufficient infrastructure',
-        inadequateTools: 'Inadequate tools'
-      },
-      recommendations: {
-        improveInfra: 'Evaluate and improve infrastructure',
-        investTools: 'Invest in adequate tools',
-        cloudServices: 'Contract cloud services if necessary'
-      }
-    },
-
-    quality_degradation: {
-      title: 'Quality Degradation',
-      description: 'Risk of decrease in product quality',
-      indicators: {
-        lowConscientiousness: 'Low team conscientiousness',
-        overloaded: 'Overloaded team',
-        juniorTeam: 'Junior team',
-        noCICD: 'No CI/CD',
-        minimalDocs: 'Minimal documentation'
-      },
-      recommendations: {
-        automatedTesting: 'Automated testing',
-        specificDoD: 'Very specific Definition of Done',
-        pairProgramming: 'Mandatory pair programming',
-        reviews: 'Reviews'
+        intensiveTraining: 'Implement a training program',
+        addSenior: 'Add a senior profile for mentoring'
       }
     },
 
     tool_fragmentation: {
       title: 'Tool Fragmentation',
-      description: 'Excessive or disorganized use of technical tools',
+      description: 'If the project uses several tools without integration, tool fragmentation will arise causing confusion and productivity loss',
       indicators: {
         tooManyTools: '>5 main tools'
       },
       recommendations: {
-        limitTools: 'Maximum 3-4 main tools'
+        limitTools: 'Limit the number of tools and ensure their integration'
       }
     },
 
     // Team Risks
     team_overload: {
       title: 'Team Overload',
-      description: 'Team with excessive workload',
+      description: 'If team members work on more than two concurrent projects, exceed 45 weekly hours, or show high stress tendency, work overload may arise',
       indicators: {
         highHours: '>45h/week average',
         concurrentProjects: '≥3 concurrent projects',
         multipleOverloaded: 'Multiple overloaded members'
       },
       recommendations: {
-        redistributeOrHire: 'Redistribute workload or hire resources',
-        reduceConcurrency: 'Reduce concurrency or extend deadlines',
-        extendDeadline: 'Extend completion date'
+        redistributeOrHire: 'Redistribute workload or hire more resources',
+        reduceConcurrency: 'Reduce project concurrency or extend deadlines'
       }
     },
 
     team_conflicts: {
       title: 'Team Conflicts',
-      description: 'Interpersonal conflicts within the team',
+      description: 'If personality clashes or poor communication exist among team members, conflicts may arise affecting productivity and work environment',
       indicators: {
         tensions: 'Interpersonal tensions',
         poorCommunication: 'Deteriorated communication',
         lowMorale: 'Low morale'
       },
       recommendations: {
-        mediation: 'Conflict mediation',
-        teamBuilding: 'Team building',
+        mediation: 'Apply conflict mediation',
+        teamBuilding: 'Conduct team building activities',
         clarifyRoles: 'Clarify roles and responsibilities'
       }
     },
 
     burnout_susceptibility: {
       title: 'Burnout Susceptibility',
-      description: 'Risk of professional burnout in the team',
+      description: 'If the team shows high neuroticism, high workload, and requires synchronous communication with low time overlap, burnout may arise',
       indicators: {
         highNeuroticism: 'High neuroticism',
         highWorkload: 'High workload',
@@ -229,13 +191,15 @@ module.exports = {
         sustainedPressure: 'Sustained pressure'
       },
       recommendations: {
-        hourLimits: 'Define workload limits (hour caps) Strengthen company wellness and work-life balance policies'
+        workloadLimits: 'Define clear workload limits',
+        hourCaps: 'Establish hour caps',
+        wellnessPolicies: 'Promote wellness and work-life balance policies'
       }
     },
 
     social_isolation: {
       title: 'Social Isolation',
-      description: 'Lack of social interaction in remote teams',
+      description: 'If remote work exceeds 70%, there are no annual in-person meetings, no prior joint experience, and no team building activities, social isolation may occur',
       indicators: {
         highRemote: '>70% remote work',
         noPriorFaceToFace: 'Team formed by people without prior face-to-face communication',
@@ -243,30 +207,30 @@ module.exports = {
         noTeamBuilding: 'No team building activities'
       },
       recommendations: {
-        socialChannels: 'Encourage use of social communication channels (not just work)',
-        teamBuildingActivities: 'Remote or in-person team building activities',
-        workVisibility: 'Visibility of everyone\'s work'
+        socialChannels: 'Foster social communication channels',
+        teamBuildingActivities: 'Organize remote and in-person team building activities',
+        workVisibility: 'Give visibility to each member\'s work'
       }
     },
 
     conflict_escalation_risk: {
       title: 'Conflict Escalation Risk',
-      description: 'Minor conflicts can escalate without adequate resolution',
+      description: 'If the team has low agreeableness, high cultural diversity, and multiple teams involved, conflict risk may arise',
       indicators: {
         lowAgreeableness: 'Low average agreeableness (<3)',
-        highPressure: 'High pressure (Review article for high-pressure situations)',
+        highCulturalDiversity: 'High cultural diversity',
         conflictivePersonalities: 'Conflictive personalities'
       },
       recommendations: {
-        communicationProtocols: 'Establish communication protocols (tone, response times, escalation)',
-        conflictProcess: 'Define explicit conflict resolution process (1:1 → mediation → escalation)',
-        clarifyOwnership: 'Ensure role and ownership clarity'
+        communicationProtocols: 'Establish clear communication protocols',
+        conflictProcess: 'Define an explicit conflict resolution process',
+        clarifyOwnership: 'Ensure role and responsibility clarity'
       }
     },
 
     onboarding_issues: {
       title: 'Onboarding Issues',
-      description: 'Difficulties in integrating new members',
+      description: 'If the team is composed of new members, there is no mentoring program or onboarding documentation, onboarding problems may arise',
       indicators: {
         manyNewMembers: '>30% new members',
         inadequateOnboarding: 'Inadequate onboarding',
@@ -274,59 +238,58 @@ module.exports = {
         remoteWork: 'Remote work'
       },
       recommendations: {
-        mentoring: 'Implement mentoring program',
-        welcomePack: 'Create welcome pack with videos, documentation and key contacts'
+        mentoring: 'Implement a mentoring program',
+        welcomePack: 'Create a welcome pack with documentation and key contacts',
+        introMeetings: 'Schedule introductory meetings'
       }
     },
 
     digital_fatigue: {
       title: 'Digital Fatigue',
-      description: 'Exhaustion from excessive use of digital tools',
+      description: 'If work is fully remote, there is a high number of meetings and no disconnection policy, digital fatigue may arise',
       indicators: {
         highRemote: 'High percentage of remote work',
         manyTools: 'Multiple digital tools',
         screenTime: 'Extended screen time'
       },
       recommendations: {
-        breakTime: 'Establish regular breaks',
-        limitMeetings: 'Limit virtual meetings',
-        asynchronous: 'Prioritize asynchronous communication'
+        breakTime: 'Establish meeting-free days',
+        limitMeetings: 'Promote breaks',
+        asynchronous: 'Use asynchronous alternatives'
       }
     },
 
     work_life_boundary_blur: {
       title: 'Work-Life Boundary Blur',
-      description: 'Difficulty separating work and personal life in remote settings',
+      description: 'If work mode is remote, there is no disconnection policy or defined schedule and deadlines are tight, burnout may arise',
       indicators: {
         alwaysOnCulture: 'Always-on culture',
         noWorkSchedule: 'No defined schedules',
         homeOffice: 'Work from home without boundaries'
       },
       recommendations: {
-        clearSchedules: 'Establish clear schedules',
-        respectOffTime: 'Respect off-work time',
-        boundaries: 'Encourage healthy boundaries'
+        clearSchedules: 'Define clear disconnection policies',
+        respectOffTime: 'Respect off-work hours'
       }
     },
 
     meeting_fatigue: {
       title: 'Meeting Fatigue',
-      description: 'Exhaustion from excessive virtual meetings',
+      description: 'If there is an excessive number of meetings, multiple distributed teams, burnout may arise',
       indicators: {
         manyMeetings: 'More than 5 daily meetings',
         longMeetings: 'Meetings longer than 1 hour',
         noBreaks: 'Consecutive meetings without breaks'
       },
       recommendations: {
-        limitMeetings: 'Reduce number of meetings',
-        shorterMeetings: 'Make meetings shorter (25-50 min)',
-        meetingFreeTime: 'Establish meeting-free blocks'
+        limitMeetings: 'Limit meeting duration',
+        shorterMeetings: 'Prioritize asynchronous communication'
       }
     },
 
       timezone_scheduling_gap: {
         title: 'Timezone Scheduling Gap',
-        description: 'Coordination difficulties due to time zone differences',
+        description: 'If the project has low time overlap, three or more different time zones, and frequent meetings, gaps will arise making team synchronization difficult',
         indicators: {
           lowOverlap: 'Low time overlap (<3h)',
           manyTimezones: '≥3 time zones',
@@ -335,43 +298,42 @@ module.exports = {
         recommendations: {
           sharedHours: 'Set shared working hours for the whole team',
           rotateMeetings: 'Rotate meeting times fairly',
-          asyncCommunication: 'Asynchronous communication',
+          asyncCommunication: 'Use asynchronous communication',
           recordMeetings: 'Record important meetings',
-          flexibleStaff: 'Assign team members with schedule flexibility when possible',
-          sharedDocs: 'Shared documentation repositories for all teams'
+          flexibleStaff: 'Assign team members with schedule flexibility'
         }
       },
 
       role_clarity_gap: {
         title: 'Role Clarity Gap',
-        description: 'Roles and responsibilities are not clearly defined',
+        description: 'If the team exceeds eight members and roles are not clearly defined, lack of clarity may arise',
         indicators: {
           largeTeam: 'Large team (>8)',
           noOrgChart: 'No org chart',
           multipleTeams: 'Multiple teams'
         },
         recommendations: {
-          defineRoles: 'Define clear roles and responsibilities',
-          reviewRoles: 'Review roles at project start with the team'
+          defineRoles: 'Define roles and responsibilities',
+          reviewRoles: 'Review roles at project start with the whole team'
         }
       },
 
       knowledge_management_gap: {
         title: 'Knowledge Management Gap',
-        description: 'Lack of systems to capture and share knowledge',
+        description: 'If the team is large, there are no knowledge management tools and documentation is minimal, a knowledge management gap may arise',
         indicators: {
           oversizedTeam: 'Team too large >5 people'
         },
         recommendations: {
-          knowledgeSystem: 'Implement a knowledge management system (Confluence, Notion, SharePoint)',
-          updatedWiki: 'Keep the project wiki up to date',
-          dailyDocs: 'Daily documentation of tasks and issues resolved (knowledge management)'
+          knowledgeSystem: 'Implement a knowledge management system',
+          updatedWiki: 'Maintain an up-to-date wiki',
+          dailyDocs: 'Document work continuously'
         }
       },
 
       remote_work_support_gap: {
         title: 'Remote Work Support Gap',
-        description: 'Inadequate organizational support for remote work',
+        description: 'If work mode is not in-person and no policies exist, there will be a lack of remote work support',
         indicators: {
           highRemote: '>50% remote work',
           noPolicies: 'No remote work policies',
@@ -379,45 +341,30 @@ module.exports = {
           noTechSupport: 'No home-office technical support'
         },
         recommendations: {
-          remotePolicies: 'Define clear remote work policies',
-          provideTools: 'Provide software tools that support remote work',
-          homeOfficeSupport: 'Technical support for home office setup (ergonomics)'
+          remotePolicies: 'Define clear policies',
+          provideTools: 'Provide adequate tools',
+          homeOfficeSupport: 'Offer technical and ergonomic support'
         }
       },
 
     technostress_overload: {
       title: 'Technostress Overload',
-      description: 'Stress from excess technologies and tools',
+      description: 'If the project uses too many digital tools and there is no adequate training, overload may arise',
       indicators: {
         tooManyTools: 'Too many different tools',
         complexTools: 'Complex tools',
         constantUpdates: 'Constant technological changes'
       },
       recommendations: {
-        standardizeTools: 'Standardize tools',
-        training: 'Provide adequate training',
-        simplify: 'Simplify technology stack'
-      }
-    },
-
-    change_resistance: {
-      title: 'Change Resistance',
-      description: 'Team resistance to changes in processes or technologies',
-      indicators: {
-        lowOpenness: 'Low openness to change in the team',
-        establishedRoutines: 'Very established routines',
-        fearOfChange: 'Fear of the unknown'
-      },
-      recommendations: {
-        involveTeam: 'Involve team in change decisions',
-        incremental: 'Implement incremental changes',
-        communication: 'Clearly communicate benefits of change'
+        standardizeTools: 'Consolidate technological tools',
+        training: 'Provide comprehensive training',
+        simplify: 'Implement changes gradually'
       }
     },
 
       change_resistance_risk: {
         title: 'Resistance to Change',
-        description: 'Organizational resistance to necessary changes',
+        description: 'If the team has low openness to experience and the project is highly complex, resistance to change may arise',
         indicators: {
           lowOpenness: 'Low openness to experience',
           manyNewTech: 'Multiple new technologies',
@@ -425,160 +372,57 @@ module.exports = {
           experienceGap: 'Experience gap'
         },
         recommendations: {
-          adoptionPlan: 'Adoption plan: checklist per sprint',
-          pairingMentoring: 'Pairing/mentoring in new areas',
-          limitChanges: 'Limit simultaneous changes (one transition at a time)'
+          adoptionPlan: 'Apply progressive adoption plans',
+          pairingMentoring: 'Mentoring in new areas',
+          limitChanges: 'Limit simultaneous changes'
         }
-      },
-
-      other: {
-        title: 'Other Risk',
-        description: 'Unclassified risk type',
-        indicators: {},
-        recommendations: {}
       },
 
     // Management Risks
     scope_creep: {
       title: 'Scope Creep',
-      description: 'Continuous expansion of scope without adequate control',
+      description: 'If the project description is vague, documentation incomplete and key roles are not defined, risk of uncontrolled scope expansion may arise',
       indicators: {
         frequentChanges: 'Frequent changes in requirements',
         poorDocumentation: 'Poor documentation',
         stakeholderPressure: 'Stakeholder pressure'
       },
       recommendations: {
-        changeControl: 'Implement change control process',
-        clearScope: 'Define scope clearly',
-        stakeholderManagement: 'Active stakeholder management'
+        changeControl: 'Hold an initial requirements meeting',
+        clearScope: 'Define a clear MVP',
+        stakeholderManagement: 'Maintain alignment with stakeholders'
       }
     },
 
     process_mismatch: {
       title: 'Process Mismatch',
-      description: 'Processes do not fit project needs',
+      description: 'If the project lacks onboarding processes, CI/CD, has tool fragmentation and low experience in distributed projects, a process mismatch will occur',
       indicators: {
         heavyProcess: 'Too heavy processes',
         lightProcess: 'Insufficient processes',
         poorAdherence: 'Low adherence to processes'
       },
       recommendations: {
-        adaptProcess: 'Adapt processes to context',
-        rightSize: 'Adjust formality level',
-        continuousImprovement: 'Continuous process improvement'
+        adaptProcess: 'Adapt ceremonies to distributed work',
+        rightSize: 'Document workflows'
       }
     },
 
     dependency_blockage: {
       title: 'Dependency Blockage',
-      description: 'External dependencies that block progress',
+      description: 'If there are multiple critical dependencies and several teams, blockages may occur delaying the project',
       indicators: {
         externalDependencies: 'Critical external dependencies',
         delays: 'Frequent delays',
         lackOfControl: 'Lack of control over dependencies'
       },
       recommendations: {
-        identifyEarly: 'Identify dependencies early',
-        alternatives: 'Prepare alternatives',
-        activeManagement: 'Active dependency management'
+        identifyEarly: 'Hold weekly synchronization meetings',
+        alternatives: 'Add integration time to planning',
+        activeManagement: 'Define clear interfaces between teams'
       }
     },
 
-    resource_unavailability: {
-      title: 'Resource Unavailability',
-      description: 'Key resources not available when needed',
-      indicators: {
-        keyPeopleUnavailable: 'Key people unavailable',
-        sharedResources: 'Resources shared with other projects',
-        budgetConstraints: 'Budget constraints'
-      },
-      recommendations: {
-        resourcePlanning: 'Detailed resource planning',
-        buffers: 'Include resource buffers',
-        alternatives: 'Identify alternative resources'
-      }
-    },
-
-    role_clarity_risk: {
-      title: 'Lack of Role Clarity',
-      description: 'Roles and responsibilities are not clearly defined',
-      indicators: {
-        overlappingRoles: 'Overlapping roles',
-        gaps: 'Gaps in responsibilities',
-        confusion: 'Confusion about who does what'
-      },
-      recommendations: {
-        raciMatrix: 'Create RACI matrix',
-        clearDefinitions: 'Define roles clearly',
-        communication: 'Communicate roles to team'
-      }
-    },
-
-    standards_compliance_gap: {
-      title: 'Standards Compliance Gap',
-      description: 'Required project standards are not met',
-      indicators: {
-        lackOfStandards: 'Lack of defined standards',
-        poorCompliance: 'Low compliance',
-        noValidation: 'No standards validation'
-      },
-      recommendations: {
-        defineStandards: 'Define standards clearly',
-        training: 'Train on standards',
-        validation: 'Implement automatic validation'
-      }
-    },
-
-    team_insufficient: {
-      title: 'Insufficient Team',
-      description: 'Team size is inadequate for the project',
-      indicators: {
-        understaffed: 'Team below required size',
-        highWorkload: 'High workload per person',
-        cannotMeetDeadlines: 'Cannot meet deadlines'
-      },
-      recommendations: {
-        hire: 'Hire more staff',
-        reduceScope: 'Reduce project scope',
-        extendTimeline: 'Extend project timeline'
-      }
-    },
-
-    // Requirements Risks
-    unclear_requirements: {
-      title: 'Unclear Requirements',
-      description: 'Project requirements are not clearly defined or constantly evolving',
-      indicators: {
-        ambiguousRequirements: 'Ambiguous or incomplete requirements',
-        frequentChanges: 'Frequent changes in specifications',
-        stakeholderDisagreement: 'Stakeholder disagreement',
-        uncertaintyInScope: 'Uncertainty in project scope'
-      },
-      recommendations: {
-        clarifyRequirements: 'Conduct requirements clarification sessions with stakeholders',
-        documentRequirements: 'Document requirements in detail and obtain approval',
-        iterativeApproach: 'Adopt iterative approach to validate requirements early',
-        prototypeValidation: 'Create prototypes to validate requirements understanding'
-      }
-    },
-
-    // External Dependencies Risks
-    third_party_dependency: {
-      title: 'Third Party Dependency',
-      description: 'Project depends on third-party services, APIs, or components',
-      indicators: {
-        externalServices: 'Dependency on external services',
-        apiIntegrations: 'Multiple third-party API integrations',
-        vendorLockIn: 'Vendor lock-in risk',
-        limitedControl: 'Limited control over external components'
-      },
-      recommendations: {
-        evaluateVendors: 'Thoroughly evaluate vendors before integration',
-        fallbackPlans: 'Prepare contingency plans for critical services',
-        abstractDependencies: 'Abstract dependencies to facilitate future changes',
-        monitorThirdParty: 'Monitor third-party service status and performance'
-      }
-    }
   },
 
   // Common terms
@@ -702,34 +546,34 @@ module.exports = {
         title: 'Role Changed',
         message: 'Your role at {organizationName} has been changed'
       },
-      // CV
+      // Currículo
       cv_uploaded: {
-        title: 'CV Uploaded',
-        message: 'Your CV has been uploaded successfully'
+        title: 'Curriculum Uploaded',
+        message: 'Your curriculum has been uploaded successfully'
       },
       cv_processed: {
-        title: 'CV Processed',
-        message: 'Your CV has been processed successfully'
+        title: 'Curriculum Processed',
+        message: 'Your curriculum has been processed successfully'
       },
       cv_analysis_ready: {
-        title: 'CV Analysis Ready',
-        message: 'Your CV analysis is now available'
+        title: 'Curriculum Analysis Ready',
+        message: 'Your curriculum analysis is now available'
       },
       cv_analysis_failed: {
-        title: 'CV Analysis Failed',
-        message: 'An error occurred while analyzing your CV'
+        title: 'Curriculum Analysis Failed',
+        message: 'An error occurred while analyzing your curriculum'
       },
       cv_submitted_to_org: {
-        title: 'New CV Received',
-        message: '{userName} has submitted their CV to {organizationName}'
+        title: 'New Curriculum Received',
+        message: '{userName} has submitted their curriculum to {organizationName}'
       },
       cv_reviewed: {
-        title: 'CV Update',
-        message: 'Your CV submitted to {organizationName} has been reviewed'
+        title: 'Curriculum Update',
+        message: 'Your curriculum submitted to {organizationName} has been reviewed'
       },
       cv_status_changed: {
-        title: 'CV Status Updated',
-        message: 'The status of your CV at {organizationName} has changed to: {statusLabel}'
+        title: 'Curriculum Status Updated',
+        message: 'The status of your curriculum at {organizationName} has changed to: {statusLabel}'
       },
       // Organization
       org_employee_added: {
@@ -836,10 +680,7 @@ module.exports = {
       process_mismatch: 'Processes did not fit project needs',
       scope_creep: 'Uncontrolled expansion of project scope',
       team_overload: 'Team was overloaded with work',
-      quality_degradation: 'Decrease in product quality',
-      unclear_requirements: 'Unclear or constantly evolving requirements',
       dependency_blockage: 'Blockages from external dependencies',
-      resource_unavailability: 'Key resources unavailable when needed',
       timezone_scheduling_gap: 'Coordination difficulties due to time zone differences',
       social_isolation: 'Lack of social interaction in the team',
       team_autonomy_risk: 'Team autonomy level did not meet requirements',
@@ -850,8 +691,246 @@ module.exports = {
       linguistic_distance_risk: 'Language barriers affected communication',
       burnout_susceptibility: 'Team experienced professional burnout',
       conflict_escalation_risk: 'Minor conflicts escalated without proper resolution',
-      onboarding_issues: 'Difficulties integrating new team members',
-      third_party_dependency: 'Issues with third-party services or APIs'
+      onboarding_issues: 'Difficulties integrating new team members'
+    }
+  },
+
+  // Team Synergy translations
+  synergy: {
+    // Availability messages
+    notAvailable: {
+      message: 'No personality data available for team members',
+      recommendation: 'Request team members to complete BFI-44 assessment'
+    },
+
+    // Team roles
+    roles: {
+      innovator: {
+        name: 'Innovator/Creator',
+        description: 'Generates new ideas and creative solutions'
+      },
+      executor: {
+        name: 'Executor/Implementer',
+        description: 'Completes tasks reliably and with discipline'
+      },
+      facilitator: {
+        name: 'Facilitator/Coordinator',
+        description: 'Manages team communication and resolves conflicts'
+      },
+      analyst: {
+        name: 'Analyst/Specialist',
+        description: 'Deep analysis and technical problem solving'
+      },
+      stabilizer: {
+        name: 'Stabilizer/Monitor',
+        description: 'Maintains team stability under pressure'
+      }
+    },
+
+    // Project profiles
+    projectProfiles: {
+      innovation: {
+        name: 'Innovation/Startup',
+        description: 'New product development with novel technologies'
+      },
+      maintenance: {
+        name: 'Legacy/Maintenance',
+        description: 'Maintaining and improving existing systems'
+      },
+      crisis: {
+        name: 'Crisis/Tight Deadline',
+        description: 'High-pressure projects with strict deadlines'
+      },
+      research: {
+        name: 'Research/R&D',
+        description: 'Exploratory projects with uncertain outcomes'
+      },
+      standard: {
+        name: 'Standard Development',
+        description: 'Typical software development project'
+      }
+    },
+
+    // Score levels
+    levels: {
+      excellent: 'excellent',
+      good: 'good',
+      fair: 'fair',
+      poor: 'poor'
+    },
+
+    // Inverse score levels (for risks)
+    inverseLevels: {
+      low: 'low',
+      medium: 'medium',
+      high: 'high',
+      critical: 'critical'
+    },
+
+    // Metric messages
+    messages: {
+      complementarity: {
+        excellent: 'Team members complement each other excellently',
+        good: 'Good complementarity between team members',
+        fair: 'Moderate complementarity - some improvement possible',
+        poor: 'Team members may be too similar or too different'
+      },
+      projectFit: {
+        excellent: 'Team personality is excellent for {projectType}',
+        good: 'Team personality is good for {projectType}',
+        fair: 'Team personality is adequate for {projectType}',
+        poor: 'Team personality may not be well-suited for {projectType}'
+      },
+      balance: {
+        excellent: 'Team traits are well-balanced',
+        good: 'Team traits are reasonably balanced',
+        fair: 'Team traits show some imbalance',
+        poor: 'Team traits are significantly imbalanced'
+      },
+      previousCollaborations: {
+        excellent: 'Excellent collaboration history - {percentage}% of pairs have worked together',
+        good: 'Good collaboration history - {percentage}% of pairs have worked together',
+        fair: 'Moderate collaboration history - {percentage}% of pairs have worked together',
+        limited: 'Limited collaboration history - only {percentage}% of pairs have worked together',
+        none: 'No previous collaborations detected - this is a new team'
+      },
+      tooSmall: {
+        complementarity: 'Team too small to measure complementarity',
+        collaborations: 'Team too small to measure previous collaborations'
+      }
+    },
+
+    // Conflict risks (deprecated but translated for backward compatibility)
+    conflictRisks: {
+      high_stress_tendency: {
+        description: 'Team has high average neuroticism - may struggle under pressure',
+        recommendation: 'Consider stress management training and regular check-ins'
+      },
+      low_discipline: {
+        description: 'Team has low conscientiousness - quality and deadline risks',
+        recommendation: 'Implement strict processes, code reviews, and project management oversight'
+      },
+      personality_conflict: {
+        description: 'Wide variance in agreeableness - potential for interpersonal conflicts',
+        recommendation: 'Assign a facilitator role and establish clear communication protocols'
+      },
+      low_adaptability: {
+        description: 'Team has low openness - may resist new technologies or methods',
+        recommendation: 'Provide extra time for adaptation and consider training programs'
+      },
+      extreme_difference: {
+        description: 'Extreme differences in {trait} ({min} to {max})',
+        recommendation: 'Be aware of different working styles related to {traitLower}'
+      }
+    },
+
+    // Recommendations
+    recommendations: {
+      roleDiversity: {
+        title: 'Improve Role Diversity',
+        description: 'Team lacks diversity in personality roles',
+        actions: [
+          'Consider adding members with complementary personality profiles',
+          'Identify missing team roles and recruit accordingly',
+          'Use personality assessments in hiring process'
+        ]
+      },
+      projectFit: {
+        title: 'Improve Fit for {projectType} Projects',
+        description: 'Team personality profile doesn\'t match project requirements',
+        actions: [
+          'Seek members with traits suited for {projectTypeLower}',
+          'Provide training and support to compensate for trait gaps',
+          'Adjust project management style to accommodate team personality'
+        ]
+      },
+      buildCohesion: {
+        title: 'Build Team Cohesion',
+        description: 'Limited collaboration history detected ({percentage}% of pairs have worked together)',
+        actions: [
+          'Schedule team-building activities to build rapport',
+          'Pair experienced collaborators with new team members as mentors',
+          'Establish clear communication channels and protocols early',
+          'Consider more frequent check-ins during initial project phases'
+        ]
+      },
+      leverageSynergy: {
+        title: 'Leverage Existing Synergy',
+        description: 'Strong collaboration history ({percentage}% of pairs have worked together)',
+        actions: [
+          'Capitalize on existing team dynamics and workflows',
+          'Use past successful patterns as templates',
+          'Be mindful of potential groupthink - encourage fresh perspectives'
+        ]
+      },
+      success: {
+        title: 'Excellent Team Synergy',
+        description: 'Team shows strong personality complementarity and balance',
+        actions: [
+          'Maintain current team composition',
+          'Continue to monitor team dynamics',
+          'Use this team as a template for future projects'
+        ]
+      }
+    },
+
+    // Summary / explanation
+    summary: {
+      text: 'This team has {level} synergy ({score}/100) for {projectType} projects. The team shows {roleDiversityLevel} role diversity and {projectFitLevel} fit with project requirements.'
+    },
+
+    // Strengths
+    strengths: {
+      roleDiversity: 'Team has {uniqueRoles} different personality roles, ensuring good coverage',
+      projectFit: 'Team personality profile matches {projectType} project requirements',
+      previousCollaborations: 'Strong collaboration history with {totalCollaborations} past project(s) together'
+    },
+
+    // Concerns
+    concerns: {
+      roleDiversity: 'Team lacks diversity in personality roles',
+      projectFit: 'Team personality may not be suited for this project type',
+      previousCollaborations: 'Limited or no previous collaboration history'
+    },
+
+    // Incremental update note
+    incrementalNote: 'New member has no BFI-44 profile yet. Synergy based on existing team.'
+  },
+
+  // Personality Optimizer translations
+  personalityOptimizer: {
+    // Addition validation messages (validateTeamAddition)
+    addition: {
+      noData: 'Unable to assess impact due to missing personality data - proceeding based on technical fit',
+      excellent: 'Excellent addition - significantly improves team synergy',
+      good: 'Good addition - improves team synergy',
+      neutral: 'Neutral addition - maintains current synergy level',
+      acceptable: 'Acceptable - slight decrease in synergy but may be justified by technical skills',
+      warning: 'Warning - may negatively impact team synergy. Consider alternatives if available.'
+    },
+
+    // Improvement comparison messages (compareTeamSynergy)
+    improvement: {
+      noData: 'Unable to compare due to missing personality data',
+      significant: 'Significant improvement in team synergy',
+      moderate: 'Moderate improvement in team synergy',
+      slight: 'Slight improvement in team synergy',
+      noChange: 'No change in team synergy',
+      decreased: 'Team synergy decreased (technical fit may be prioritized)'
+    },
+
+    // Hiring recommendations
+    hiring: {
+      notAvailable: 'Unable to generate recommendations without personality data',
+      seekRole: 'Seek {roleName} to fill missing role in team',
+      higherTrait: 'Higher {trait}',
+      lowAverage: 'Team average is low ({average})',
+      veryHighTrait: 'Very high {trait}',
+      highAverage: 'Team average is already high ({average})',
+      lowNeuroticism: 'Low Neuroticism (< 2.5)',
+      balanceStress: 'To balance high team stress tendency',
+      highConscientiousness: 'High Conscientiousness (> 4.0)',
+      improveDiscipline: 'To improve team discipline and reliability'
     }
   }
 };

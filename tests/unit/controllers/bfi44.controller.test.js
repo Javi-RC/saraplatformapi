@@ -16,6 +16,7 @@ describe('BFI44 Controller - Unit Tests', () => {
     req = {
       body: {},
       params: {},
+      query: {},
       user: {
         id: 'user123',
         role: 'employee'
@@ -289,6 +290,7 @@ describe('BFI44 Controller - Unit Tests', () => {
     it('should notify pending employees successfully', async () => {
       req.user.role = 'org_admin';
       req.user.organization = 'org123';
+      req.isProjectManager = false;
       const mockResult = { notified: 5, total: 10 };
       BFI44Service.notifyEmployeesWithoutTest.mockResolvedValue(mockResult);
 
@@ -301,8 +303,25 @@ describe('BFI44 Controller - Unit Tests', () => {
       });
     });
 
+    it('should notify pending employees as project manager', async () => {
+      req.user.role = 'employee';
+      req.user.organization = 'org123';
+      req.isProjectManager = true;
+      const mockResult = { notified: 3, total: 8 };
+      BFI44Service.notifyEmployeesWithoutTest.mockResolvedValue(mockResult);
+
+      await BFI44Controller.notifyPendingEmployees(req, res);
+
+      expect(BFI44Service.notifyEmployeesWithoutTest).toHaveBeenCalledWith('org123');
+      expect(responseHandler.success).toHaveBeenCalledWith(res, {
+        message: '3 empleado(s) notificado(s)',
+        ...mockResult
+      });
+    });
+
     it('should deny access for non-admin', async () => {
       req.user.role = 'employee';
+      req.isProjectManager = false;
 
       await BFI44Controller.notifyPendingEmployees(req, res);
 
@@ -335,7 +354,7 @@ describe('BFI44 Controller - Unit Tests', () => {
   });
 
   describe('getEmployeesWithoutTest', () => {
-    it('should return employees without test', async () => {
+    it('should return employees without test as org_admin', async () => {
       req.user.role = 'org_admin';
       req.user.organization = 'org123';
       const mockEmployees = [
@@ -356,8 +375,29 @@ describe('BFI44 Controller - Unit Tests', () => {
       });
     });
 
-    it('should deny access for non-admin', async () => {
+    it('should return employees without test as project manager', async () => {
       req.user.role = 'employee';
+      req.user.organization = 'org123';
+      req.isProjectManager = true;
+      const mockEmployees = [
+        { _id: 'emp1', name: 'John Doe', email: 'john@example.com' }
+      ];
+      BFI44Service.getEmployeesWithoutTest.mockResolvedValue(mockEmployees);
+
+      await BFI44Controller.getEmployeesWithoutTest(req, res);
+
+      expect(BFI44Service.getEmployeesWithoutTest).toHaveBeenCalledWith('org123');
+      expect(responseHandler.success).toHaveBeenCalledWith(res, {
+        count: 1,
+        employees: [
+          { id: 'emp1', name: 'John Doe', email: 'john@example.com' }
+        ]
+      });
+    });
+
+    it('should deny access for regular employee', async () => {
+      req.user.role = 'employee';
+      req.isProjectManager = false;
 
       await BFI44Controller.getEmployeesWithoutTest(req, res);
 
@@ -375,6 +415,70 @@ describe('BFI44 Controller - Unit Tests', () => {
         'No perteneces a ninguna organización',
         400
       );
+    });
+  });
+
+  describe('getConsentStatus', () => {
+    it('should return consent status when user has consent', async () => {
+      const mockConsent = {
+        accepted: true,
+        acceptedAt: new Date(),
+        version: '1.0',
+        details: { personalityProfiling: true, dataRetention: true }
+      };
+      const mockUser = {
+        personalityDataConsent: mockConsent,
+        hasPersonalityDataConsent: jest.fn().mockReturnValue(true)
+      };
+      User.findById.mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockUser)
+      });
+
+      await BFI44Controller.getConsentStatus(req, res);
+
+      expect(responseHandler.success).toHaveBeenCalledWith(res, {
+        hasConsent: true,
+        consent: mockConsent
+      });
+    });
+
+    it('should return false when user has no consent', async () => {
+      const mockConsent = { accepted: false, version: '1.0' };
+      const mockUser = {
+        personalityDataConsent: mockConsent,
+        hasPersonalityDataConsent: jest.fn().mockReturnValue(false)
+      };
+      User.findById.mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockUser)
+      });
+
+      await BFI44Controller.getConsentStatus(req, res);
+
+      expect(responseHandler.success).toHaveBeenCalledWith(res, {
+        hasConsent: false,
+        consent: mockConsent
+      });
+    });
+
+    it('should return 404 when user not found', async () => {
+      User.findById.mockReturnValue({
+        select: jest.fn().mockResolvedValue(null)
+      });
+
+      await BFI44Controller.getConsentStatus(req, res);
+
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Usuario no encontrado', 404);
+    });
+
+    it('should handle errors', async () => {
+      const error = new Error('Database error');
+      User.findById.mockReturnValue({
+        select: jest.fn().mockRejectedValue(error)
+      });
+
+      await BFI44Controller.getConsentStatus(req, res);
+
+      expect(responseHandler.handleError).toHaveBeenCalledWith(error, res);
     });
   });
 

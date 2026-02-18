@@ -17,17 +17,17 @@ const certificationsExtractor = require('./cvExtractors/certificationsExtractor'
 const achievementsExtractor = require('./cvExtractors/achievementsExtractor');
 
 /**
- * Servicio principal de procesamiento de CVs
+ * Servicio principal de procesamiento de currículos
  * Orquesta todos los extractores y gestiona el ciclo completo de análisis
  * Sigue el patrón de Inyección de Dependencias y Open/Closed Principle
  */
 class CVService {
   /**
-   * Procesa un CV y guarda la información extraída
-   * @param {string} userId - ID del usuario propietario del CV
-   * @param {string} textContent - Contenido de texto del CV
+   * Procesa un currículo y guarda la información extraída
+   * @param {string} userId - ID del usuario propietario del currículo
+   * @param {string} textContent - Contenido de texto del currículo
    * @param {string} originalFileName - Nombre original del archivo
-   * @returns {Object} - CV guardado con toda la información extraída
+   * @returns {Object} - Currículo guardado con toda la información extraída
    */
   async processCV(userId, textContent, originalFileName) {
     try {
@@ -70,20 +70,20 @@ class CVService {
       const user = await userRepository.findById(userId);
       const userName = user?.name || 'Usuario';
 
-      // Enviar notificación In-App de CV procesado
+      // Enviar notificación In-App de currículo procesado
       cvNotificationHelper.notifyCVProcessed(userId, userName, cv._id).catch(err => {
-        console.error('Error enviando notificación de CV procesado:', err);
+        console.error('Error enviando notificación de currículo procesado:', err);
       });
 
       return cv;
     } catch (error) {
-      console.error('Error procesando CV:', error);
+      console.error('Error procesando currículo:', error);
       throw new Error('ERROR_PROCESSING_CV');
     }
   }
 
   /**
-   * Obtiene el CV de un usuario
+   * Obtiene el currículo de un usuario
    */
   async getUserCV(userId) {
     const cv = await cvRepository.findByUser(userId);
@@ -94,10 +94,10 @@ class CVService {
   }
 
   /**
-   * Envía un CV a una organización
+   * Envía un currículo a una organización
    * @param {string} userId - ID del usuario
    * @param {string} organizationId - ID de la organización
-   * @returns {Object} - CV actualizado
+   * @returns {Object} - Currículo actualizado
    */
   async submitCVToOrganization(userId, organizationId) {
     try {
@@ -120,13 +120,13 @@ class CVService {
         throw new Error('ORGANIZATION_NOT_ACTIVE');
       }
 
-      // Verificar que el usuario tiene un CV
+      // Verificar que el usuario tiene un currículo
       let cv = await cvRepository.findByUser(userId);
       if (!cv) {
         throw new Error('CV_NOT_FOUND');
       }
 
-      // Verificar si ya envió el CV a esta organización
+      // Verificar si ya envió el currículo a esta organización
       if (cv.organization && cv.organization.toString() === organizationId) {
         throw new Error('CV_ALREADY_SUBMITTED');
       }
@@ -137,7 +137,7 @@ class CVService {
         throw new Error('USER_NOT_FOUND');
       }
 
-      // Actualizar el CV con la información de la organización
+      // Actualizar el currículo con la información de la organización
       cv.organization = organizationId;
       cv.organizationStatus = 'pending';
       cv.submittedToOrganizationAt = new Date();
@@ -148,17 +148,17 @@ class CVService {
 
       return cv;
     } catch (error) {
-      console.error('Error enviando CV a organización:', error);
+      console.error('Error enviando currículo a organización:', error);
       throw error;
     }
   }
 
   /**
-   * Obtiene los CVs enviados a una organización
+   * Obtiene los currículos enviados a una organización
    * @param {string} organizationId - ID de la organización
    * @param {string} adminId - ID del administrador que solicita
    * @param {Object} filters - Filtros opcionales
-   * @returns {Array} - Lista de CVs
+   * @returns {Array} - Lista de currículos
    */
   async getOrganizationCVs(organizationId, adminId, filters = {}) {
     try {
@@ -186,7 +186,7 @@ class CVService {
       const limit = parseInt(filters.limit) || 20;
       const skip = (page - 1) * limit;
 
-      // Obtener CVs con información del usuario
+      // Obtener currículos con información del usuario
       const cvs = await cvRepository.find(
         query,
         {
@@ -209,20 +209,20 @@ class CVService {
         }
       };
     } catch (error) {
-      console.error('Error obteniendo CVs de organización:', error);
+      console.error('Error obteniendo currículos de organización:', error);
       throw error;
     }
   }
 
   /**
-   * Actualiza el estado de un CV en una organización
-   * @param {string} cvId - ID del CV
+   * Actualiza el estado de un currículo en una organización
+   * @param {string} cvId - ID del currículo
    * @param {string} organizationId - ID de la organización
    * @param {string} adminId - ID del administrador
    * @param {string} newStatus - Nuevo estado
    * @param {string} notes - Notas del administrador
    * @param {Object} employeeData - Datos adicionales del empleado (posición, departamento)
-   * @returns {Object} - CV actualizado
+   * @returns {Object} - Currículo actualizado
    */
   async updateCVStatus(cvId, organizationId, adminId, newStatus, notes = '', employeeData = {}) {
     try {
@@ -237,20 +237,20 @@ class CVService {
         throw new Error('UNAUTHORIZED_ACCESS');
       }
 
-      // Buscar el CV
+      // Buscar el currículo
       const cv = await cvRepository.findById(cvId);
       if (!cv) {
         throw new Error('CV_NOT_FOUND');
       }
 
-      // Verificar que el CV pertenece a esta organización
+      // Verificar que el currículo pertenece a esta organización
       if (!cv.organization || cv.organization.toString() !== organizationId) {
         throw new Error('CV_NOT_BELONGS_TO_ORGANIZATION');
       }
 
       const oldStatus = cv.organizationStatus;
 
-      console.log('[updateCVStatus] Actualizando estado de CV:', {
+      console.log('[updateCVStatus] Actualizando estado de currículo:', {
         cvId,
         userId: cv.userId,
         oldStatus,
@@ -265,14 +265,14 @@ class CVService {
       }
       await cv.save();
 
-      // Si el CV es aceptado, agregar al usuario como empleado de la organización
+      // Si el currículo es aceptado, agregar al usuario como empleado de la organización
       if (newStatus === 'accepted' && oldStatus !== 'accepted') {
-        console.log('[updateCVStatus] CV aceptado, agregando usuario como empleado...');
+        console.log('[updateCVStatus] Currículo aceptado, agregando usuario como empleado...');
         await this._addUserAsEmployee(cv.userId, organization, employeeData);
         console.log('[updateCVStatus] Usuario agregado como empleado exitosamente');
       }
 
-      // Si el CV es rechazado y el usuario era empleado, removerlo
+      // Si el currículo es rechazado y el usuario era empleado, removerlo
       if (newStatus === 'rejected' && oldStatus === 'accepted') {
         await this._removeUserAsEmployee(cv.userId, organization);
       }
@@ -287,13 +287,13 @@ class CVService {
 
       return cv;
     } catch (error) {
-      console.error('Error actualizando estado de CV:', error);
+      console.error('Error actualizando estado de currículo:', error);
       throw error;
     }
   }
 
   /**
-   * Añade un usuario como empleado de una organización cuando su CV es aceptado
+   * Añade un usuario como empleado de una organización cuando su currículo es aceptado
    * @param {string} userId - ID del usuario
    * @param {Object} organization - Organización
    * @param {Object} employeeData - Datos del empleado (posición, departamento)
@@ -381,7 +381,7 @@ class CVService {
   }
 
   /**
-   * Remueve un usuario como empleado de una organización cuando su CV es rechazado
+   * Remueve un usuario como empleado de una organización cuando su currículo es rechazado
    * @param {string} userId - ID del usuario
    * @param {Object} organization - Organización
    * @private
@@ -410,11 +410,11 @@ class CVService {
   }
 
   /**
-   * Obtiene un CV específico de una organización
-   * @param {string} cvId - ID del CV
+   * Obtiene un currículo específico de una organización
+   * @param {string} cvId - ID del currículo
    * @param {string} organizationId - ID de la organización
    * @param {string} adminId - ID del administrador
-   * @returns {Object} - CV con detalles completos
+   * @returns {Object} - Currículo con detalles completos
    */
   async getOrganizationCV(cvId, organizationId, adminId) {
     try {
@@ -429,7 +429,7 @@ class CVService {
         throw new Error('UNAUTHORIZED_ACCESS');
       }
 
-      // Buscar el CV
+      // Buscar el currículo
       const cv = await cvRepository.findById(
         cvId,
         { populate: [{ path: 'userId', select: 'name email avatar' }] }
@@ -438,20 +438,20 @@ class CVService {
         throw new Error('CV_NOT_FOUND');
       }
 
-      // Verificar que el CV pertenece a esta organización
+      // Verificar que el currículo pertenece a esta organización
       if (!cv.organization || cv.organization.toString() !== organizationId) {
         throw new Error('CV_NOT_BELONGS_TO_ORGANIZATION');
       }
 
       return cv;
     } catch (error) {
-      console.error('Error obteniendo CV de organización:', error);
+      console.error('Error obteniendo currículo de organización:', error);
       throw error;
     }
   }
 
   /**
-   * Obtiene todos los CVs (para admin)
+   * Obtiene todos los currículos (para admin)
    */
   async getAllCVs(filters = {}) {
     const query = {};
@@ -475,7 +475,7 @@ class CVService {
   }
 
   /**
-   * Actualiza el CV de un usuario
+   * Actualiza el currículo de un usuario
    */
   async updateCV(userId, cvId, updates) {
     const cv = await cvRepository.findOne({ _id: cvId, userId: userId });
@@ -489,7 +489,7 @@ class CVService {
   }
 
   /**
-   * Elimina el CV de un usuario
+   * Elimina el currículo de un usuario
    */
   async deleteCV(userId, cvId) {
     const cv = await cvRepository.findOne({ _id: cvId, userId: userId });
@@ -497,11 +497,11 @@ class CVService {
       throw new Error('CV_NOT_FOUND');
     }
     await cvRepository.deleteById(cvId);
-    return { message: 'CV eliminado exitosamente' };
+    return { message: 'Currículo eliminado exitosamente' };
   }
 
   /**
-   * Busca CVs por criterios
+   * Busca currículos por criterios
    */
   async searchCVs(criteria) {
     const query = {};
@@ -647,7 +647,7 @@ class CVService {
   }
 
   /**
-   * Limpia campos vacíos del objeto de datos del CV
+   * Limpia campos vacíos del objeto de datos del currículo
    */
   _cleanEmptyFields(cvData) {
     // Limpiar arrays vacíos
@@ -690,18 +690,18 @@ class CVService {
   }
 
   /**
-   * Guarda o actualiza el CV en la base de datos
+   * Guarda o actualiza el currículo en la base de datos
    */
   async _saveOrUpdateCV(userId, cvData) {
-    // Buscar si ya existe un CV para este usuario
+    // Buscar si ya existe un currículo para este usuario
     let cv = await cvRepository.findByUser(userId);
 
     if (cv) {
-      // Actualizar CV existente
+      // Actualizar currículo existente
       Object.assign(cv, cvData);
       await cv.save();
     } else {
-      // Crear nuevo CV
+      // Crear nuevo currículo
       cv = await cvRepository.create(cvData);
       await cv.save();
     }

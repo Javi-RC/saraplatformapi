@@ -9,7 +9,7 @@ const RISK_CATALOG = {
   communication_breakdown: {
     type: 'communication_breakdown',
     title: 'Fallo de comunicación',
-    description: 'Problemas de comunicación que impiden la coordinación efectiva del equipo',
+    description: 'Si el equipo está distribuido en zonas horarias con poco solapamiento, pueden surgir fallos de comunicación que retrasen entregas y generen malentendidos',
     category: 'coordination',
     typicalSeverities: ['medium', 'high', 'critical'],
     possibleSources: ['expert_rules', 'expert_rules_enhanced', 'cbr', 'combined'],
@@ -22,8 +22,7 @@ const RISK_CATALOG = {
     ],
     typicalRecommendations: [
       'Implementar actualizaciones asíncronas diarias',
-      'Definir protocolos claros de escalación',
-      'Usar herramientas de comunicación asíncrona efectivas',
+      'Utilizar herramientas de comunicación asíncrona eficaces',
       'Establecer normas de comunicación'
     ]
   },
@@ -31,7 +30,7 @@ const RISK_CATALOG = {
   communication_tools_missing: {
     type: 'communication_tools_missing',
     title: 'Herramientas de comunicación inadecuadas',
-    description: 'Falta de herramientas de comunicación apropiadas según el solapamiento horario entre países',
+    description: 'Si el proyecto involucra múltiples países y no se han definido herramientas de comunicación, surgirán problemas graves de coordinación al no contar con canales adecuados',
     category: 'coordination',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules_enhanced'],
@@ -44,18 +43,16 @@ const RISK_CATALOG = {
       'Herramientas insuficientes para coordinación'
     ],
     typicalRecommendations: [
-      'Implementar actualizaciones asíncronas diarias',
-      'Definir protocolos claros de escalación',
-      'Usar herramientas de comunicación asíncrona efectivas',
-      'Establecer normas de comunicación'
+      'Implementar herramientas de comunicación tanto síncronas como asíncronas',
+      'Establecer normas de comunicación claras'
     ]
   },
 
   // Cultural & Linguistic Risks (Hofstede)
   cultural_distance_risk: {
     type: 'cultural_distance_risk',
-    title: 'Distancia cultural elevada',
-    description: 'Alta distancia cultural entre países del equipo según dimensiones de Hofstede',
+    title: 'Distancia socio-cultural elevada',
+    description: 'Si hay personas de diferentes culturas en el proyecto, pueden surgir malentendidos derivados de la distancia socio-cultural que provoquen retrasos en las entregas',
     category: 'team',
     typicalSeverities: ['medium', 'high', 'critical'],
     possibleSources: ['expert_rules_hofstede'],
@@ -70,16 +67,16 @@ const RISK_CATALOG = {
       'Posibles malentendidos culturales'
     ],
     typicalRecommendations: [
-      'Implementar capacitación intercultural para el equipo',
-      'Establecer normas de comunicación sensibles culturalmente',
-      'Asignar mediadores culturales en el equipo'
+      'Implementar formación socio-cultural',
+      'Establecer normas de comunicación culturalmente sensibles',
+      'Asignar mediadores culturales'
     ]
   },
 
   linguistic_distance_risk: {
     type: 'linguistic_distance_risk',
-    title: 'Distancia lingüística',
-    description: 'Barrera lingüística parcial - no todos los países hablan el idioma común',
+    title: 'Distancia socio-cultural lingüística',
+    description: 'Si el equipo es multicultural y no todos los países hablan el idioma común del proyecto, pueden surgir problemas de distancia socio-cultural que dificulten la comprensión',
     category: 'coordination',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules_linguistic'],
@@ -92,9 +89,9 @@ const RISK_CATALOG = {
       'No todos los miembros hablan el idioma común'
     ],
     typicalRecommendations: [
-      'Proporcionar capacitación en el idioma común',
-      'Usar servicios de traducción si es necesario',
-      'Documentar en idioma común',
+      'Proporcionar formación en el idioma común',
+      'Emplear servicios de traducción',
+      'Documentar en el mismo idioma',
       'Asignar facilitadores bilingües'
     ]
   },
@@ -102,7 +99,7 @@ const RISK_CATALOG = {
   linguistic_distance_no_common_language: {
     type: 'linguistic_distance_no_common_language',
     title: 'Sin idioma común definido',
-    description: 'No existe un idioma común definido para el equipo multicultural',
+    description: 'Si el equipo multicultural no tiene definido un idioma común de proyecto, la falta de un mismo idioma compartido provocará malentendidos constantes y retrasos',
     category: 'coordination',
     typicalSeverities: ['high', 'critical'],
     possibleSources: ['expert_rules_linguistic'],
@@ -114,10 +111,10 @@ const RISK_CATALOG = {
       'Alto riesgo de malentendidos'
     ],
     typicalRecommendations: [
-      'Definir idioma común para el proyecto',
-      'Proporcionar capacitación en el idioma común',
-      'Usar servicios de traducción si es necesario',
-      'Documentar en idioma común'
+      'Definir un idioma común de proyecto',
+      'Proporcionar formación lingüística',
+      'Usar servicios de traducción',
+      'Documentar todo en dicho idioma'
     ]
   },
 
@@ -125,7 +122,7 @@ const RISK_CATALOG = {
   team_autonomy_risk: {
     type: 'team_autonomy_risk',
     title: 'Riesgo de autonomía del equipo',
-    description: 'El nivel de autonomía del equipo no cumple con los requisitos del proyecto',
+    description: 'Si el proyecto requiere un alto nivel de autonomía del equipo, pueden surgir problemas si el equipo no está preparado para trabajar con ese grado de independencia',
     category: 'team',
     typicalSeverities: ['low', 'medium', 'high'],
     possibleSources: ['expert_rules_project_requirements'],
@@ -138,17 +135,16 @@ const RISK_CATALOG = {
       'Necesidad de supervisión constante'
     ],
     typicalRecommendations: [
-      'Evaluar si el equipo puede trabajar con la autonomía requerida',
-      'Proporcionar capacitación si es necesario',
-      'Ajustar estructura de supervisión',
-      'Asignar líderes técnicos si se requiere alta autonomía'
+      'Evaluar la capacidad real del equipo',
+      'Proporcionar formación',
+      'Ajustar la estructura de supervisión'
     ]
   },
 
   schedule_flexibility_risk: {
     type: 'schedule_flexibility_risk',
     title: 'Riesgo de flexibilidad horaria',
-    description: 'La flexibilidad horaria del equipo no cumple con los requisitos del proyecto',
+    description: 'Si el proyecto requiere alta flexibilidad horaria, pueden surgir problemas de coordinación y disponibilidad',
     category: 'management',
     typicalSeverities: ['low', 'medium', 'high'],
     possibleSources: ['expert_rules_project_requirements'],
@@ -161,9 +157,8 @@ const RISK_CATALOG = {
       'Coordinación en diferentes zonas horarias'
     ],
     typicalRecommendations: [
-      'Evaluar flexibilidad horaria del equipo',
-      'Establecer horarios core si es necesario',
-      'Usar herramientas asíncronas',
+      'Evaluar la flexibilidad del equipo',
+      'Establecer horas centrales',
       'Definir ventanas de disponibilidad'
     ]
   },
@@ -171,7 +166,7 @@ const RISK_CATALOG = {
   travel_availability_risk: {
     type: 'travel_availability_risk',
     title: 'Riesgo de disponibilidad de viaje',
-    description: 'La disponibilidad de viaje del equipo no cumple con los requisitos del proyecto',
+    description: 'Si el proyecto requiere alta disponibilidad para viajes, pueden producirse problemas logísticos y de coste',
     category: 'management',
     typicalSeverities: ['low', 'medium', 'high'],
     possibleSources: ['expert_rules_project_requirements'],
@@ -184,10 +179,10 @@ const RISK_CATALOG = {
       'Necesidad de reuniones presenciales'
     ],
     typicalRecommendations: [
-      'Evaluar disponibilidad de viaje del equipo',
-      'Planificar viajes con anticipación',
-      'Usar reuniones virtuales cuando sea posible',
-      'Presupuestar costos de viaje'
+      'Evaluar la disponibilidad del equipo',
+      'Planificar viajes con antelación',
+      'Priorizar reuniones virtuales',
+      'Presupuestar los costes'
     ]
   },
 
@@ -195,7 +190,7 @@ const RISK_CATALOG = {
   skill_gap: {
     type: 'skill_gap',
     title: 'Brecha de habilidades',
-    description: 'Falta de habilidades técnicas necesarias en el equipo',
+    description: 'Si el equipo carece de varias tecnologías del proyecto o la cobertura tecnológica es inferior al 50%, surgirá un problema de habilidades que afectará la calidad y velocidad de desarrollo',
     category: 'technical',
     typicalSeverities: ['medium', 'high', 'critical'],
     possibleSources: ['expert_rules', 'cbr', 'combined'],
@@ -207,60 +202,16 @@ const RISK_CATALOG = {
       'Experiencia junior en proyecto complejo'
     ],
     typicalRecommendations: [
-      'Contratar especialistas en tecnologías críticas',
-      'Programa de capacitación intensiva',
-      'Añadir un senior, para entrenamiento o tareas de mentoría'
-    ]
-  },
-
-  technical_infrastructure: {
-    type: 'technical_infrastructure',
-    title: 'Problemas de infraestructura técnica',
-    description: 'Infraestructura técnica inadecuada para el proyecto',
-    category: 'technical',
-    typicalSeverities: ['medium', 'high'],
-    possibleSources: ['expert_rules', 'cbr'],
-    isHofstedeRelated: false,
-    triggerConditions: 'Infrastructure requirements vs availability',
-    typicalIndicators: [
-      'Infraestructura insuficiente',
-      'Herramientas inadecuadas'
-    ],
-    typicalRecommendations: [
-      'Evaluar y mejorar infraestructura',
-      'Invertir en herramientas adecuadas',
-      'Contratar servicios cloud si es necesario'
-    ]
-  },
-
-  quality_degradation: {
-    type: 'quality_degradation',
-    title: 'Degradación de calidad',
-    description: 'Riesgo de disminución en la calidad del producto',
-    category: 'technical',
-    typicalSeverities: ['medium', 'high', 'critical'],
-    possibleSources: ['expert_rules', 'cbr'],
-    isHofstedeRelated: false,
-    triggerConditions: 'Quality standards vs team practices',
-    typicalIndicators: [
-      'Baja consciencia del equipo',
-      'Equipo sobrecargado',
-      'Equipo junior',
-      'Sin CI/CD',
-      'Documentación mínima'
-    ],
-    typicalRecommendations: [
-      'Testing automatizado',
-      'Definition of Done muy específico',
-      'Pair programming obligatorio',
-      'Revisiones'
+      'Contratar especialistas en las tecnologías críticas',
+      'Implementar un programa de formación',
+      'Añadir un perfil senior para mentoría'
     ]
   },
 
   tool_fragmentation: {
     type: 'tool_fragmentation',
     title: 'Fragmentación de herramientas',
-    description: 'Uso excesivo o desorganizado de herramientas técnicas',
+    description: 'Si el proyecto utiliza varias herramientas sin integración, surgirá fragmentación de herramientas que generará confusión y pérdida de productividad',
     category: 'technical',
     typicalSeverities: ['low', 'medium'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -270,7 +221,7 @@ const RISK_CATALOG = {
       '>5 herramientas principales'
     ],
     typicalRecommendations: [
-      'Máximo 3-4 herramientas principales'
+      'Limitar el número de herramientas y asegurar su integración'
     ]
   },
 
@@ -278,7 +229,7 @@ const RISK_CATALOG = {
   team_overload: {
     type: 'team_overload',
     title: 'Sobrecarga del equipo',
-    description: 'Equipo con excesiva carga de trabajo',
+    description: 'Si los miembros del equipo trabajan en más de dos proyectos concurrentes, superan las 45 horas semanales o presentan alta tendencia al estrés, podrá surgir una sobrecarga de trabajo',
     category: 'team',
     typicalSeverities: ['medium', 'high', 'critical'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -290,16 +241,15 @@ const RISK_CATALOG = {
       'Múltiples miembros sobrecargados'
     ],
     typicalRecommendations: [
-      'Redistribuir carga o contratar recursos',
-      'Reducir concurrencia o extender plazos',
-      'Extender fecha de finalización'
+      'Redistribuir la carga de trabajo o contratar más recursos',
+      'Reducir la concurrencia de proyectos o ampliar los plazos de entrega'
     ]
   },
 
   team_conflicts: {
     type: 'team_conflicts',
     title: 'Conflictos de equipo',
-    description: 'Conflictos interpersonales dentro del equipo',
+    description: 'Si existen choques de personalidad o mala comunicación entre miembros del equipo, podrán surgir conflictos que afectarán la productividad y el ambiente laboral',
     category: 'team',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -311,8 +261,8 @@ const RISK_CATALOG = {
       'Baja moral'
     ],
     typicalRecommendations: [
-      'Mediación de conflictos',
-      'Team building',
+      'Aplicar mediación de conflictos',
+      'Realizar actividades de team building',
       'Clarificar roles y responsabilidades'
     ]
   },
@@ -320,7 +270,7 @@ const RISK_CATALOG = {
   burnout_susceptibility: {
     type: 'burnout_susceptibility',
     title: 'Susceptibilidad al burnout',
-    description: 'Riesgo de agotamiento profesional en el equipo',
+    description: 'Si el equipo presenta neuroticismo alto, alta carga de trabajo y requiere comunicación síncrona con bajo solapamiento horario, podrán surgir burnout',
     category: 'team',
     typicalSeverities: ['medium', 'high', 'critical'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -333,14 +283,16 @@ const RISK_CATALOG = {
       'Presión sostenida'
     ],
     typicalRecommendations: [
-      'Definir límites de carga horaria (tope de horas) Potenciar políticas  de bienestar y conciliación familiar en la empresa'
+      'Definir límites claros de carga de trabajo',
+      'Establecer topes de horas',
+      'Promover políticas de bienestar y equilibrio vida-trabajo'
     ]
   },
 
   social_isolation: {
     type: 'social_isolation',
     title: 'Aislamiento social',
-    description: 'Falta de interacción social en equipos remotos',
+    description: 'Si el trabajo remoto supera el 70%, no hay reuniones presenciales anuales, no existe experiencia previa conjunta ni actividades de team building, puede producirse aislamiento social',
     category: 'team',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -353,16 +305,16 @@ const RISK_CATALOG = {
       'Sin actividades de team building'
     ],
     typicalRecommendations: [
-      'Fomentar la utilización de canales de comunicación social (no solo trabajo)',
-      'Actividades de team building remotas o en persona',
-      'Visibilidad del trabajo de cada uno'
+      'Fomentar canales de comunicación social',
+      'Organizar actividades de team building remotas y presenciales',
+      'Dar visibilidad al trabajo de cada miembro'
     ]
   },
 
   conflict_escalation_risk: {
     type: 'conflict_escalation_risk',
     title: 'Riesgo de escalada de conflictos',
-    description: 'Conflictos menores pueden escalar sin resolución adecuada',
+    description: 'Si el equipo tiene baja amabilidad, alta diversidad cultural y múltiples equipos involucrados, podrán surgir riesgo de conflictos',
     category: 'team',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -370,20 +322,20 @@ const RISK_CATALOG = {
     triggerConditions: 'Unresolved conflicts, poor communication',
     typicalIndicators: [
       'Baja amabilidad promedio (<3)',
-      'Alta presión(Revisar articulo para saber qué hacer cuando había mucha presión)',
+      'Alta diversidad cultural',
       'Personalidades conflictivas'
     ],
     typicalRecommendations: [
-      'Establecer protocolos de comunicación (tono, tiempos de respuesta, escalación)',
-      'Definir proceso explícito de resolución de conflictos (1:1 → mediación → escalación)',
-      'Asegurar claridad de roles y ownership'
+      'Establecer protocolos de comunicación claros',
+      'Definir un proceso explícito de resolución de conflictos',
+      'Asegurar claridad de roles y responsabilidades'
     ]
   },
 
   onboarding_issues: {
     type: 'onboarding_issues',
     title: 'Problemas de onboarding',
-    description: 'Dificultades en la integración de nuevos miembros',
+    description: 'Si el equipo está compuesto por nuevos miembros, no hay programa de mentoría ni documentación de onboarding, podrán surgir problemas de incorporación',
     category: 'team',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -396,9 +348,9 @@ const RISK_CATALOG = {
       'Trabajo remoto'
     ],
     typicalRecommendations: [
-      'Implementar programa de mentoring',
-      'Crear welcome pack con videos, documentación y contactos clave',
-      'Programar reuniones introductorias'
+      'Implementar un programa de mentoría',
+      'Crear un pack de bienvenida con documentación y contactos clave',
+      'Programar reuniones de presentación'
     ]
   },
 
@@ -406,7 +358,7 @@ const RISK_CATALOG = {
   dependency_blockage: {
     type: 'dependency_blockage',
     title: 'Bloqueo por dependencias',
-    description: 'Dependencias externas o internas causan bloqueos',
+    description: 'Si existen múltiples dependencias críticas y varios equipos, pueden producirse bloqueos que retrasen el proyecto',
     category: 'management',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -418,16 +370,16 @@ const RISK_CATALOG = {
       'Alta dependencia de infraestructura compartida'
     ],
     typicalRecommendations: [
-      'Reuniones de sincronización semanales con los equipos',
-      'Añadir a la planificación mas tiempo para integraciones',
-      'Definir una interfaz de comunicación para partes distribuidas'
+      'Realizar reuniones semanales de sincronización',
+      'Añadir tiempo de integración a la planificación',
+      'Definir interfaces claras entre equipos'
     ]
   },
 
   scope_creep: {
     type: 'scope_creep',
     title: 'Aumento no controlado del alcance',
-    description: 'Expansión del alcance sin control adecuado',
+    description: 'Si la descripción del proyecto es vaga, la documentación incompleta y los roles clave no están definidos, podrá surgir el riesgo de aumento no controlado del alcance',
     category: 'management',
     typicalSeverities: ['medium', 'high', 'critical'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -439,16 +391,16 @@ const RISK_CATALOG = {
       'Poco solape horario con el cliente'
     ],
     typicalRecommendations: [
-      'Workshop detallado de requisitos (semana 1)',
-      'Definir MVP claramente',
-      'Alineación semanal con stakeholders'
+      'Realizar una reunión inicial de requisitos',
+      'Definir un MVP claro',
+      'Mantener alineación con los stakeholders'
     ]
   },
 
   process_mismatch: {
     type: 'process_mismatch',
     title: 'Desajuste de procesos',
-    description: 'Procesos inadecuados para el proyecto',
+    description: 'Si el proyecto carece de procesos de onboarding, CI/CD, presenta fragmentación de herramientas y baja experiencia en proyectos distribuidos, se producirá un desajuste de procesos',
     category: 'management',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -459,34 +411,15 @@ const RISK_CATALOG = {
       'Sin CI/CD completo'
     ],
     typicalRecommendations: [
-      'Adaptar ceremonias para trabajo distribuido',
-      'Documentar workflows'
-    ]
-  },
-
-  resource_unavailability: {
-    type: 'resource_unavailability',
-    title: 'Indisponibilidad de recursos',
-    description: 'Recursos necesarios no disponibles',
-    category: 'management',
-    typicalSeverities: ['medium', 'high'],
-    possibleSources: ['expert_rules', 'cbr'],
-    isHofstedeRelated: false,
-    triggerConditions: 'Resource constraints, competing priorities',
-    typicalIndicators: [
-      'Dependencia de personas clave'
-    ],
-    typicalRecommendations: [
-      'Crear backups',
-      'Plan de contingencia para ausencias',
-      'Documentación diaria de las tareas realizadas y problemas encontrados/resueltos(Gestión del conocimiento)'
+      'Adaptar las ceremonias al trabajo distribuido',
+      'Documentar los flujos de trabajo'
     ]
   },
 
   timezone_scheduling_gap: {
     type: 'timezone_scheduling_gap',
     title: 'Brecha de programación por zonas horarias',
-    description: 'Dificultades de coordinación por diferencias horarias',
+    description: 'Si el proyecto tiene bajo solapamiento horario, tres o más zonas horarias distintas y reuniones frecuentes, surgirán brechas que dificulten la sincronización del equipo',
     category: 'management',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -498,19 +431,18 @@ const RISK_CATALOG = {
       'Reuniones frecuentes requeridas'
     ],
     typicalRecommendations: [
-      'Establecer horas de trabajo para todo el equipo',
-      'Rotar horarios de reuniones equitativamente',
-      'Comunicación asíncrona',
-      'Grabaciones de reuniones importantes',
-      'Asignar al equipo empleados con flexibilidad horaria, cuando sea posible',
-      'Repositorios de documentación comunes para todos los equipos'
+      'Establecer horas centrales de trabajo para todo el equipo',
+      'Rotar los horarios de reuniones equitativamente',
+      'Usar comunicación asíncrona',
+      'Grabar reuniones importantes',
+      'Asignar empleados con flexibilidad horaria'
     ]
   },
 
   role_clarity_gap: {
     type: 'role_clarity_gap',
     title: 'Falta de claridad de roles',
-    description: 'Roles y responsabilidades no están claramente definidos',
+    description: 'Si el equipo supera los ocho miembros y los roles no están claramente definidos, podrá surgir falta de claridad',
     category: 'management',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -522,8 +454,8 @@ const RISK_CATALOG = {
       'Múltiples equipos'
     ],
     typicalRecommendations: [
-      'Definir roles y responsabilidades claras',
-      'Revisión de roles al inicio del proyecto con el equipo'
+      'Definir roles y responsabilidades',
+      'Revisarlos al inicio del proyecto con todo el equipo'
     ]
   },
 
@@ -531,7 +463,7 @@ const RISK_CATALOG = {
   knowledge_management_gap: {
     type: 'knowledge_management_gap',
     title: 'Brecha en gestión del conocimiento',
-    description: 'Falta de sistemas para capturar y compartir conocimiento',
+    description: 'Si el equipo es numeroso, no hay herramientas de gestión del conocimiento y la documentación es mínima, podrá surgir una brecha en la gestión del conocimiento',
     category: 'organizational',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -541,16 +473,16 @@ const RISK_CATALOG = {
       'Equipo demasiado grande >5 personas'
     ],
     typicalRecommendations: [
-      'Implementar sistema de gestión del conocimiento (Confluence, Notion, SharePoint)',
-      'Wiki del proyecto actualizada',
-      'Documentación diaria de las tareas realizadas y problemas encontrados/resueltos(Gestión del conocimiento)'
+      'Implementar un sistema de gestión del conocimiento',
+      'Mantener una wiki actualizada',
+      'Documentar el trabajo de forma continua'
     ]
   },
 
   remote_work_support_gap: {
     type: 'remote_work_support_gap',
     title: 'Falta de soporte para trabajo remoto',
-    description: 'Soporte organizacional inadecuado para trabajo remoto',
+    description: 'Si el modo de trabajo no es presencial y no existen políticas, existirá falta de soporte para el trabajo remoto',
     category: 'organizational',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -563,34 +495,16 @@ const RISK_CATALOG = {
       'Sin soporte técnico home office'
     ],
     typicalRecommendations: [
-      'Definir políticas claras de trabajo remoto',
-      'Proveer herramientas software que apoyen al trabajo remoto',
-      'Soporte técnico para configuración home office(ergonomía)'
-    ]
-  },
-
-  standards_compliance_gap: {
-    type: 'standards_compliance_gap',
-    title: 'Brecha en cumplimiento de estándares',
-    description: 'No cumplimiento de estándares organizacionales',
-    category: 'organizational',
-    typicalSeverities: ['medium', 'high', 'critical'],
-    possibleSources: ['expert_rules', 'cbr'],
-    isHofstedeRelated: false,
-    triggerConditions: 'Standards requirements, compliance needs',
-    typicalIndicators: [
-      'Alta diversidad cultural'
-    ],
-    typicalRecommendations: [
-      'Revisiones cruzadas entre equipos',
-      'Capacitación en estándares específicos'
+      'Definir políticas claras',
+      'Proporcionar herramientas adecuadas',
+      'Ofrecer soporte técnico y ergonómico'
     ]
   },
 
   change_resistance_risk: {
     type: 'change_resistance_risk',
     title: 'Resistencia al cambio',
-    description: 'Resistencia organizacional a cambios necesarios',
+    description: 'Si el equipo tiene baja apertura a la experiencia y el proyecto es de alta complejidad, podrá surgir resistencia al cambio',
     category: 'organizational',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -603,16 +517,16 @@ const RISK_CATALOG = {
       'Gap de experiencia'
     ],
     typicalRecommendations: [
-      'Plan de adopción: checklist por sprint',
-      'pairing/mentoring en áreas nuevas',
-      'Limitar cambios simultáneos (una transición cada vez)'
+      'Aplicar planes de adopción progresiva',
+      'Mentoría en áreas nuevas',
+      'Limitar cambios simultáneos'
     ]
   },
 
   digital_fatigue: {
     type: 'digital_fatigue',
     title: 'Fatiga digital',
-    description: 'Agotamiento por exceso de interacciones digitales',
+    description: 'Si el trabajo es completamente remoto, hay un número elevado de reuniones y no existe política de desconexión, podrá surgir fatiga digital',
     category: 'organizational',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -624,16 +538,16 @@ const RISK_CATALOG = {
       'Interacción digital constante'
     ],
     typicalRecommendations: [
-      'Establecer "no-meeting" days Promover reuniones con cámara opcional',
-      'Incentivar pausas entre reuniones',
-      'Alternativas asíncronas cuando sea posible'
+      'Establecer días sin reuniones',
+      'Promover pausas',
+      'Utilizar alternativas asíncronas'
     ]
   },
 
   work_life_boundary_blur: {
     type: 'work_life_boundary_blur',
     title: 'Difuminación de límites trabajo-vida',
-    description: 'Falta de separación entre trabajo y vida personal',
+    description: 'Si el modo de trabajo es remoto, no hay política de desconexión ni horario definido y los plazos son ajustados, podrá surgir burnout',
     category: 'organizational',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -646,15 +560,14 @@ const RISK_CATALOG = {
     ],
     typicalRecommendations: [
       'Definir políticas claras de desconexión',
-      'Establecer limitaciones horarias',
-      'Respetar horas fuera de trabajo (Si el empleado no está disponible)'
+      'Respetar los horarios fuera de trabajo'
     ]
   },
 
   meeting_fatigue: {
     type: 'meeting_fatigue',
     title: 'Fatiga de reuniones',
-    description: 'Exceso de reuniones afectando productividad',
+    description: 'Si hay un número excesivo de reuniones, múltiples equipos distribuidos, podrá surgir burnout',
     category: 'organizational',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -666,15 +579,15 @@ const RISK_CATALOG = {
       'Reuniones largas e improductivas'
     ],
     typicalRecommendations: [
-      'Limitar reuniones a 45 min máximo',
-      'Considerar alternativas asíncronas'
+      'Limitar la duración de las reuniones',
+      'Priorizar la comunicación asíncrona'
     ]
   },
 
   technostress_overload: {
     type: 'technostress_overload',
     title: 'Sobrecarga de tecnoestrés',
-    description: 'Estrés causado por tecnología y herramientas digitales',
+    description: 'Si el proyecto utiliza demasiadas herramientas digitales y no hay formación adecuada, podrán surgir sobrecarga',
     category: 'organizational',
     typicalSeverities: ['medium', 'high'],
     possibleSources: ['expert_rules', 'cbr'],
@@ -686,29 +599,12 @@ const RISK_CATALOG = {
       'Falta de capacitación'
     ],
     typicalRecommendations: [
-      'Consolidar stack tecnológico',
-      'Capacitación completa en herramientas',
-      'Introducir cambios gradualmente'
+      'Consolidar herramientas tecnológicas',
+      'Proporcionar formación completa',
+      'Realizar cambios de forma gradual'
     ]
   },
 
-  // Other
-  other: {
-    type: 'other',
-    title: 'Otro riesgo',
-    description: 'Riesgo que no encaja en las categorías existentes',
-    category: 'management',
-    typicalSeverities: ['low', 'medium', 'high'],
-    possibleSources: ['manual'],
-    isHofstedeRelated: false,
-    triggerConditions: 'Manual entry by PM',
-    typicalIndicators: ['Casos específicos no cubiertos'],
-    typicalRecommendations: [
-      'Análisis caso por caso',
-      'Identificación temprana de riesgos emergentes',
-      'Plan de mitigación personalizado'
-    ]
-  }
 };
 
 /**

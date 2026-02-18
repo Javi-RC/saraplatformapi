@@ -1,0 +1,45 @@
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+FAIL tests/unit/utils/jwt.test.js
+  JWT Utils - Unit Tests
+    generateToken
+      ├ù deber├¡a generar token JWT correctamente (10 ms)
+    verifyToken
+      ÔêÜ deber├¡a verificar token v├ílido (1 ms)
+      ÔêÜ deber├¡a lanzar error para token expirado (4 ms)
+      ÔêÜ deber├¡a lanzar error para token inv├ílido (1 ms)
+
+  ÔùÅ JWT Utils - Unit Tests ÔÇ║ generateToken ÔÇ║ deber├¡a generar token JWT correctamente
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    - Expected
+    + Received
+
+      Object {
+        "email": "test@example.com",
+        "name": "Test User",
+    +   "organization": null,
+        "role": "employee",
+        "userId": "507f1f77bcf86cd799439011",
+      },
+      "test-jwt-secret-for-testing-only-32-chars",
+      {"expiresIn": "7d"},
+
+    Number of calls: 1
+
+      23 |       jwt.sign.mockReturnValue('fake-jwt-token');
+      24 |       const token = generateToken(user);
+    > 25 |       expect(jwt.sign).toHaveBeenCalledWith(
+         |                        ^
+      26 |         {
+      27 |           userId: user._id,
+      28 |           email: user.email,
+
+      at Object.toHaveBeenCalledWith (tests/unit/utils/jwt.test.js:25:24)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 3 passed, 4 total
+Snapshots:   0 total
+Time:        0.497 s, estimated 1 s
+Ran all test suites matching tests/unit/utils/jwt.test.js.
+Ô£ô MongoDB test server closed successfully

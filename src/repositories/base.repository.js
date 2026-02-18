@@ -55,6 +55,10 @@ class BaseRepository {
     if (options.populate) {
       query = query.populate(options.populate);
     }
+
+    if (options.sort) {
+      query = query.sort(options.sort);
+    }
     
     return query.exec();
   }
@@ -198,6 +202,16 @@ class BaseRepository {
    */
   async startSession() {
     return mongoose.startSession();
+  }
+
+  /**
+   * Get distinct values for a field
+   * @param {string} field - Field name
+   * @param {Object} criteria - Filter criteria
+   * @returns {Promise<Array>}
+   */
+  async distinct(field, criteria = {}) {
+    return this.model.distinct(field, criteria).exec();
   }
 
   /**

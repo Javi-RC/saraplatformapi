@@ -1,5 +1,5 @@
 /**
- * Unit Tests for CV Completeness Validator Service
+ * Unit Tests for Curriculum Completeness Validator Service
  */
 
 const {
@@ -10,9 +10,9 @@ const {
   CRITICAL_FIELDS
 } = require('../../src/services/cvCompletenessValidator.service');
 
-describe('CV Completeness Validator Service', () => {
+describe('Curriculum Completeness Validator Service', () => {
   describe('validateCVCompleteness', () => {
-    test('should return complete status for a fully populated CV', () => {
+    test('should return complete status for a fully populated curriculum', () => {
       const completeCV = {
         contact: {
           email: 'john@example.com',
@@ -285,12 +285,12 @@ describe('CV Completeness Validator Service', () => {
 
       const result = validateCVCompleteness(cvWithTravelButNoFrequency);
 
-      // Travel frequency is optional, so CV should be complete
+      // Travel frequency is optional, so curriculum should be complete
       expect(result.isComplete).toBe(true);
       expect(result.missingFields).not.toContain('availability.travelFrequency');
     });
 
-    test('should return 0% completeness for null CV', () => {
+    test('should return 0% completeness for null curriculum', () => {
       const result = validateCVCompleteness(null);
 
       expect(result.isComplete).toBe(false);

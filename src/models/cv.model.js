@@ -7,14 +7,14 @@ const cvSchema = new mongoose.Schema({
     required: true
   },
   
-  // Organización a la que se envía el CV (opcional)
+  // Organización a la que se envía el currículo (opcional)
   organization: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
     index: true
   },
   
-  // Estado del CV en relación a la organización
+  // Estado del currículo en relación a la organización
   organizationStatus: {
     type: String,
     enum: ['pending', 'reviewed', 'accepted', 'rejected'],

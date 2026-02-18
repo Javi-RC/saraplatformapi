@@ -21,10 +21,10 @@ class OrganizationNotificationHelper {
   }
 
   /**
-   * Notifica a los administradores cuando un empleado envía su CV
-   * @param {Object} organization - Organización a la que se envió el CV
-   * @param {Object} user - Usuario que envió el CV
-   * @param {Object} cv - CV enviado
+   * Notifica a los administradores cuando un empleado envía su currículo
+   * @param {Object} organization - Organización a la que se envió el currículo
+   * @param {Object} user - Usuario que envió el currículo
+   * @param {Object} cv - Currículo enviado
    */
   async notifyCVSubmitted(organization, user, cv) {
     try {
@@ -44,8 +44,8 @@ class OrganizationNotificationHelper {
         notificationService.create({
           recipientId: adminId,
           type: NotificationTypes.CV_SUBMITTED_TO_ORG,
-          title: 'New CV Received',
-          message: `${user.name || user.email} has submitted their CV to ${organization.name}`,
+          title: 'New Curriculum Received',
+          message: `${user.name || user.email} has submitted their curriculum to ${organization.name}`,
           channels: [NotificationChannels.IN_APP],
           priority: NotificationPriority.HIGH,
           metadata: {
@@ -58,22 +58,22 @@ class OrganizationNotificationHelper {
             submittedAt: cv.submittedToOrganizationAt || new Date()
           },
           actionUrl: `/organizations/${this._extractId(organization)}/cvs/${this._extractId(cv)}`,
-          actionText: 'View CV'
+          actionText: 'View Curriculum'
         })
       );
 
       await Promise.all(notificationPromises);
     } catch (error) {
-      console.error('Error al notificar CV enviado:', error);
+      console.error('Error al notificar currículo enviado:', error);
       // No lanzar error para no interrumpir el flujo principal
     }
   }
 
   /**
-   * Notifica al empleado cuando su CV ha sido revisado
-   * @param {Object} cv - CV revisado
-   * @param {Object} organization - Organización que revisó el CV
-   * @param {string} status - Nuevo estado del CV
+   * Notifica al empleado cuando su currículo ha sido revisado
+   * @param {Object} cv - Currículo revisado
+   * @param {Object} organization - Organización que revisó el currículo
+   * @param {string} status - Nuevo estado del currículo
    */
   async notifyCVReviewed(cv, organization, status) {
     try {
@@ -83,12 +83,12 @@ class OrganizationNotificationHelper {
         rejected: 'has been reviewed'
       };
 
-      const message = `Your CV submitted to ${organization.name} ${statusMessages[status] || 'has been updated'}`;
+      const message = `Your curriculum submitted to ${organization.name} ${statusMessages[status] || 'has been updated'}`;
 
       await notificationService.create({
         recipientId: this._extractId(cv.userId),
         type: NotificationTypes.CV_REVIEWED,
-        title: 'CV Update',
+        title: 'Curriculum Update',
         message,
         channels: [NotificationChannels.IN_APP],
         priority: NotificationPriority.MEDIUM,
@@ -104,13 +104,13 @@ class OrganizationNotificationHelper {
       });
 
     } catch (error) {
-      console.error('Error al notificar CV revisado:', error);
+      console.error('Error al notificar currículo revisado:', error);
     }
   }
 
   /**
-   * Notifica cuando cambia el estado del CV
-   * @param {Object} cv - CV con estado actualizado
+   * Notifica cuando cambia el estado del currículo
+   * @param {Object} cv - Currículo con estado actualizado
    * @param {Object} organization - Organización
    * @param {string} oldStatus - Estado anterior
    * @param {string} newStatus - Nuevo estado
@@ -127,8 +127,8 @@ class OrganizationNotificationHelper {
       await notificationService.create({
         recipientId: this._extractId(cv.userId),
         type: NotificationTypes.CV_STATUS_CHANGED,
-        title: 'CV Status Updated',
-        message: `The status of your CV at ${organization.name} has changed to: ${statusLabels[newStatus]}`,
+        title: 'Curriculum Status Updated',
+        message: `The status of your curriculum at ${organization.name} has changed to: ${statusLabels[newStatus]}`,
         channels: [NotificationChannels.IN_APP],
         priority: newStatus === 'accepted' ? NotificationPriority.HIGH : NotificationPriority.MEDIUM,
         metadata: {
@@ -140,11 +140,11 @@ class OrganizationNotificationHelper {
           statusLabel: statusLabels[newStatus]
         },
         actionUrl: `/my-cvs/${this._extractId(cv)}`,
-        actionText: 'View CV'
+        actionText: 'View Curriculum'
       });
 
     } catch (error) {
-      console.error('Error al notificar cambio de estado de CV:', error);
+      console.error('Error al notificar cambio de estado de currículo:', error);
     }
   }
 

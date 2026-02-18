@@ -17,7 +17,9 @@
     "test:watch": "cross-env NODE_ENV=test jest --watch",
     "seed": "cross-env NODE_ENV=development node scripts/comprehensive-seed.js",
     "seed:prod": "cross-env NODE_ENV=production node scripts/comprehensive-seed.js",
-    "seed:help": "node scripts/seed-help.js"
+    "seed:help": "node scripts/seed-help.js",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -142,7 +142,7 @@ function analyzeTeamComposition(project, cvs, bfi44Results, otherProjects) {
 }
 
 /**
- * Extract all technical skills from team CVs
+ * Extract all technical skills from team curricula
  */
 function extractTeamSkills(cvs) {
   const allSkills = new Set();

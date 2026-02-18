@@ -17,7 +17,7 @@ class BFI44Repository extends BaseRepository {
    * @returns {Promise<Object|null>}
    */
   async findByUser(userId, options = {}) {
-    return this.findOne({ user: userId }, options);
+    return this.findOne({ userId }, options);
   }
 
   /**
@@ -27,7 +27,7 @@ class BFI44Repository extends BaseRepository {
    * @returns {Promise<Array>}
    */
   async findByUsers(userIds, options = {}) {
-    return this.find({ user: { $in: userIds } }, options);
+    return this.find({ userId: { $in: userIds } }, options);
   }
 
   /**
@@ -36,7 +36,7 @@ class BFI44Repository extends BaseRepository {
    * @returns {Promise<boolean>}
    */
   async userHasCompleted(userId) {
-    return this.exists({ user: userId });
+    return this.exists({ userId });
   }
 
   /**

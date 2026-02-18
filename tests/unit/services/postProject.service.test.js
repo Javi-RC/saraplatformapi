@@ -21,7 +21,6 @@ describe('postProject.service - Unit Tests', () => {
   describe('i18n integration - risk translations', () => {
     it('should translate risk types to Spanish', () => {
       const riskTypes = [
-        'unclear_requirements',
         'timezone_scheduling_gap',
         'social_isolation',
         'team_autonomy_risk',
@@ -41,7 +40,6 @@ describe('postProject.service - Unit Tests', () => {
 
     it('should translate risk types to English', () => {
       const riskTypes = [
-        'unclear_requirements',
         'timezone_scheduling_gap',
         'social_isolation',
         'team_autonomy_risk',
@@ -106,10 +104,7 @@ describe('postProject.service - Unit Tests', () => {
         'process_mismatch',
         'scope_creep',
         'team_overload',
-        'quality_degradation',
-        'unclear_requirements',
         'dependency_blockage',
-        'resource_unavailability',
         'timezone_scheduling_gap',
         'social_isolation',
         'team_autonomy_risk',

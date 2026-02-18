@@ -363,28 +363,16 @@ async function predictRisksWithRules(project, team, organization, otherProjects 
     
     const processRisk = safeRunRule('checkProcessRisk', () => checkProcessRisk(projectForRules, team));
     if (processRisk) risks.push(processRisk);
-    
-    const infrastructureRisk = safeRunRule('checkInfrastructureRisk', () => checkInfrastructureRisk(projectForRules));
-    if (infrastructureRisk) risks.push(infrastructureRisk);
-    
-    const qualityRisk = safeRunRule('checkQualityRisk', () => checkQualityRisk(projectForRules, team));
-    if (qualityRisk) risks.push(qualityRisk);
 
     // Apply NEW enhanced expert rules
     const kmRisk = safeRunRule('checkKnowledgeManagementRisk', () => checkKnowledgeManagementRisk(projectForRules, team, organization));
     if (kmRisk) risks.push(kmRisk);
-
-    const resourceAvailabilityRisk = safeRunRule('checkResourceAvailabilityRisk', () => checkResourceAvailabilityRisk(projectForRules, team, organization));
-    if (resourceAvailabilityRisk) risks.push(resourceAvailabilityRisk);
 
     const remoteWorkRisk = safeRunRule('checkRemoteWorkSupportRisk', () => checkRemoteWorkSupportRisk(projectForRules, team, organization));
     if (remoteWorkRisk) risks.push(remoteWorkRisk);
 
     const roleClarityRisk = safeRunRule('checkRoleClarityRisk', () => checkRoleClarityRisk(projectForRules, team));
     if (roleClarityRisk) risks.push(roleClarityRisk);
-
-    const complianceRisk = safeRunRule('checkStandardsComplianceRisk', () => checkStandardsComplianceRisk(projectForRules, team));
-    if (complianceRisk) risks.push(complianceRisk);
 
     const timezoneSchedulingRisk = safeRunRule('checkTimezoneSchedulingRisk', () => checkTimezoneSchedulingRisk(projectForRules, team));
     if (timezoneSchedulingRisk) risks.push(timezoneSchedulingRisk);
@@ -542,6 +530,7 @@ function checkConflictEscalationRisk(project, teamAnalysis) {
  * - changeResistanceRiskScoreHigh: HIGH severity threshold (default 7)
  */
 function checkChangeResistanceRisk(project, teamAnalysis) {
+  const complexity = project?.complexity || 'medium';
   const lowOpennessThreshold = project?.decisionTree?.riskThresholds?.lowOpennessThreshold ?? 2.5;
   const highComplexityRiskScore = project?.decisionTree?.riskThresholds?.highComplexityRiskScore ?? 1;
   const specializedToolsRiskScore = project?.decisionTree?.riskThresholds?.specializedToolsRiskScore ?? 1;
@@ -606,7 +595,7 @@ function checkChangeResistanceRisk(project, teamAnalysis) {
 
   const recommendations = [];
   // Only user-specified recommendations
-  recommendations.push('Limitar cambios simultáneos (una transición cada vez)');
+  recommendations.push('Limitar cambios simultáneos');
 
   const confidence = dataPoints / totalDataPoints;
 
@@ -725,7 +714,7 @@ function checkBurnoutSusceptibilityRisk(project, teamAnalysis) {
 
   const recommendations = [];
   // Only user-specified recommendations
-  recommendations.push('Definir límites de carga horaria (tope de horas)');
+  recommendations.push('Definir límites claros de carga de trabajo');
   const confidence = dataPoints / totalDataPoints;
 
   return {
@@ -1265,11 +1254,12 @@ function checkCommunicationRisk(project, teamAnalysis) {  const indicators = [];
 /**
  * RULE 2: Skill Gap Risk
  * Detects mismatches between required skills and team capabilities
- * NOW USES: team.technicalMatch, team.experience, team.skills from CVs
+ * NOW USES: team.technicalMatch, team.experience, team.skills from curricula
  * CONFIGURABLE: PM can set riskThresholds in project.decisionTree
  */
 function checkSkillGapRisk(project, teamAnalysis) {
   const requiredLevel = project.requiredExperienceLevel || 'mid';
+  const complexity = project.complexity || 'medium';
   const mainTechs = project.mainTechnologies || [];
   const docLevel = project.documentationLevel || 'partial';
   
@@ -1287,7 +1277,7 @@ function checkSkillGapRisk(project, teamAnalysis) {
   const teamSkills = teamAnalysis?.skills;
   const teamExperience = teamAnalysis?.experience;
   
-  // Factor 1: Missing critical technologies (from CVs)
+  // Factor 1: Missing critical technologies (from curricula)
   if (technicalMatch && technicalMatch.missing && technicalMatch.missing.length >= minTechnologiesThreshold) {
     riskScore += 4;
     severity = 'high';
@@ -1579,6 +1569,7 @@ function checkDependencyRisk(project) {
  */
 function checkScopeCreepRisk(project) {
   const descLength = project.briefDescription?.length || 0;
+  const complexity = project.complexity || 'medium';
   const docLevel = project.documentationLevel || 'none';
   const rolesCount = project.rolesAndResponsibilities?.length || 0;
   const experienceLevel = project.requiredExperienceLevel || 'mid';
@@ -1737,172 +1728,6 @@ function checkProcessRisk(project, teamAnalysis) {
       { signal: 'Meeting time > 30% of time', threshold: '30%', checkFrequency: 'weekly' },
       { signal: 'Frequent tool-switching', threshold: '> 5 tools', checkFrequency: 'monthly' },
       { signal: 'Onboarding > 2 weeks', threshold: '2 weeks', checkFrequency: 'per hire' }
-    ]
-  };
-}
-
-/**
- * RULE 7: Infrastructure Risk
- * Detects technical infrastructure issues
- */
-function checkInfrastructureRisk(project) {
-  const hasCICD = project.hasVersionControlAndCICD;
-  const sharedInfra = project.sharedInfrastructureDependency;
-  const experienceLevel = project.requiredExperienceLevel;
-  const requiresTools = project.requiresSpecializedTools?.needed || false;  let severity = 'low';
-  const recommendations = [];
-  
-  // Factor 1: No CI/CD
-  if (hasCICD === 'no' || hasCICD === 'partial') {
-    severity = 'medium';  }
-  
-  // Factor 2: High shared infrastructure dependency
-  if (sharedInfra === 'high' && complexity === 'high') {
-    severity = 'medium-high';
-  }
-  
-  // Factor 3: Requires specialized tools
-  if (requiresTools) {  }
-  
-  if (severity === 'low') {
-    return null;
-  }
-  
-  return {
-    type: 'technical_infrastructure',
-    title: 'Deficient Technical Infrastructure',
-    description: `Lack of complete CI/CD and specialized tools for ${complexity} complexity. Risk of deployment and quality problems`,
-    category: 'technical',
-    severity,
-    source: 'expert_rules',
-    indicators: [
-      `CI/CD: ${hasCICD}`,
-      `Shared infra: ${sharedInfra || 'unknown'}`,
-      `Complexity: ${complexity}`,
-      `Specialized tools: ${requiresTools ? 'Yes' : 'No'}`
-    ],
-    predictedImpact: {
-      scheduleDelay: {
-        min: 5,
-        max: 15,
-        description: 'Pipeline failures and environment issues'
-      },
-      budgetOverrun: {
-        min: 10,
-        max: 20,
-        description: 'Time debugging infrastructure'
-      },
-      qualityImpact: 'medium',
-      teamMoraleImpact: 'low'
-    },
-    recommendations,
-    earlyWarningSignals: [
-      { signal: 'Pipeline failures > 20%', threshold: '20%', checkFrequency: 'weekly' },
-      { signal: 'Deployment time > 1h', threshold: '1 hour', checkFrequency: 'per deployment' },
-      { signal: 'Environment drifts', threshold: '> 1 drift', checkFrequency: 'monthly' }
-    ]
-  };
-}
-
-/**
- * RULE 8: Quality Degradation Risk
- * Detects potential quality issues
- * NOW USES: team.personality (conscientiousness), team.workload
- */
-function checkQualityRisk(project, teamAnalysis) {
-  const experienceLevel = project.requiredExperienceLevel;
-  const docLevel = project.documentationLevel;
-  const hasCICD = project.hasVersionControlAndCICD;
-  
-  // Get configurable thresholds
-  const thresholds = project.decisionTree?.riskThresholds || {};
-  const lowDisciplineScore = thresholds.lowDisciplineRiskScore || 3;
-  const overloadScore = thresholds.overloadQualityRiskScore || 2;
-  const juniorComplexityScore = thresholds.juniorComplexityRiskScore || 3;
-  const riskScoreHigh = thresholds.qualityRiskScoreHigh || 6;
-  const riskScoreMediumHigh = thresholds.qualityRiskScoreMediumHigh || 4;  let severity = 'low';
-  let riskScore = 0;
-  const personality = teamAnalysis?.personality;
-  const personalityIssues = Array.isArray(personality?.concerns) ? personality.concerns : [];
-  if (personality && personality.concerns) {
-    const lowDiscipline = personality.concerns.find(c => 
-      c.type === 'low_discipline' || (typeof c === 'string' && c.includes('discipline'))
-    );
-    
-    if (lowDiscipline) {
-      riskScore += lowDisciplineScore;
-      severity = 'medium-high';    }
-  }
-  const workload = teamAnalysis?.workload;
-  if (workload && workload.isOverloaded) {
-    riskScore += overloadScore;
-    severity = severity === 'medium-high' ? 'high' : 'medium-high';  }
-  
-  // Factor 1: Experience vs complexity  const experience = teamAnalysis?.experience;
-  const teamExperienceLevel = experience?.overallLevel || 'unknown';
-  const complexity = experienceLevel; // Use project's requiredExperienceLevel as complexity indicator
-  if (complexity === 'expert' && experience && experience.overallLevel === 'junior') {
-    riskScore += juniorComplexityScore;
-    severity = 'high';  } else if (complexity === 'expert' && experience && experience.overallLevel === 'mid') {
-    riskScore += 2;
-    severity = severity === 'high' ? 'high' : 'medium-high';  }
-  
-  // Factor 2: Poor documentation
-  if (docLevel === 'minimal' || docLevel === 'none') {  }
-  
-  // Factor 3: No CI/CD
-  if (hasCICD === 'no') {
-  }
-  
-  if (riskScore >= riskScoreHigh) {
-    severity = 'high';
-  } else if (riskScore >= riskScoreMediumHigh) {
-    severity = severity === 'high' ? 'high' : 'medium-high';
-  } else if (severity === 'low' && riskScore === 0) {
-    return null;
-  }
-  
-  return {
-    type: 'quality_degradation',
-    title: 'Quality Degradation',
-    description: `Risk score: ${riskScore}/${riskScoreHigh} (threshold for HIGH: ${riskScoreHigh}). Baja consciencia del equipo, equipo sobrecargado, equipo junior, sin CI/CD completo, o documentación mínima.`,
-    category: 'technical',
-    severity,
-    source: 'expert_rules',
-    thresholdDetails: {
-      riskScore: riskScore,
-      riskScoreHigh: riskScoreHigh,
-      riskScoreMediumHigh: riskScoreMediumHigh,
-      lowDisciplineScore: lowDisciplineScore,
-      overloadScore: overloadScore,
-      juniorComplexityScore: juniorComplexityScore
-    },
-    indicators: [
-      `Risk score: ${riskScore}/${riskScoreHigh}`,
-      `Complexity: ${complexity}`,
-      `Team experience: ${experienceLevel}`,
-      `Documentation: ${docLevel}`,
-      `CI/CD: ${hasCICD}`
-    ],
-    predictedImpact: {
-      scheduleDelay: {
-        min: severity === 'high' ? 15 : 10,
-        max: severity === 'high' ? 40 : 30,
-        description: 'Bugs and technical debt'
-      },
-      budgetOverrun: {
-        min: severity === 'high' ? 20 : 15,
-        max: severity === 'high' ? 45 : 35,
-        description: 'Firefighting and rework'
-      },
-      qualityImpact: 'high',
-      teamMoraleImpact: 'medium'
-    },
-    recommendations,
-    earlyWarningSignals: [
-      { signal: 'Bug rate > 0.15', threshold: '0.15', checkFrequency: 'weekly' },
-      { signal: 'Test coverage < 60%', threshold: '60%', checkFrequency: 'per sprint' },
-      { signal: 'Technical debt backlog grows', threshold: '> 10% growth', checkFrequency: 'per sprint' }
     ]
   };
 }
@@ -2096,148 +1921,6 @@ function checkKnowledgeManagementRisk(project, team, organization) {
       { signal: 'Information lost/recreated > 2 times', threshold: '2 instances', checkFrequency: 'per sprint' },
       { signal: 'Repetitive questions in communications', threshold: 'subjective', checkFrequency: 'weekly' },
       { signal: 'Time searching for information > 2h/day', threshold: '2 hours', checkFrequency: 'weekly' }
-    ]
-  };
-}
-
-/**
- * NEW RULE: Resource Unavailability Risk
- * Detects risks from critical person dependencies and lack of backups
- * Thresholds:
- * - keyPersonDependencyThreshold: Critical person ratio (default 0.3 = 30%)
- * - keyPersonRiskScore: Risk score for dependency (default 4)
- * - backupCoverageRequired: Backup coverage ratio (default 0.8 = 80%)
- * - contingencyPlanRiskScore: Risk score for missing contingency (default 2)
- * - documentationComplianceThreshold: Documentation threshold (default 0.9 = 90%)
- */
-function checkResourceAvailabilityRisk(project, team, organization) {
-  const keyPersonDependencyThreshold = project?.decisionTree?.riskThresholds?.keyPersonDependencyThreshold ?? 0.3;
-  const keyPersonRiskScoreThreshold = project?.decisionTree?.riskThresholds?.keyPersonRiskScore ?? 4;
-  const backupCoverageRequired = project?.decisionTree?.riskThresholds?.backupCoverageRequired ?? 0.8;
-  const contingencyPlanRiskScore = project?.decisionTree?.riskThresholds?.contingencyPlanRiskScore ?? 2;
-  const documentationComplianceThreshold = project?.decisionTree?.riskThresholds?.documentationComplianceThreshold ?? 0.9;  let severity = 'low';
-  let riskScore = 0;
-  let dataPoints = 0;
-  const totalDataPoints = 5;
-  const recommendations = [];
-
-  // Factor 1: Key Person Dependency
-  const keyPersonDependency = team?.keyPersonDependency ?? 0;
-  if (keyPersonDependency > keyPersonDependencyThreshold) {
-    riskScore += keyPersonRiskScoreThreshold;
-    dataPoints++;
-  } else if (keyPersonDependency >= 0) {
-    dataPoints++;
-  }
-
-  // Factor 2: Backup Coverage
-  const backupCoverage = team?.backupCoverage ?? 0;
-  if (backupCoverage < backupCoverageRequired) {
-    riskScore += 2;
-    dataPoints++;
-  } else if (backupCoverage >= 0) {
-    dataPoints++;
-  }
-
-  // Factor 3: Contingency Plan
-  const hasContingencyPlan = project?.contingencyPlans?.exists ?? false;
-  if (!hasContingencyPlan) {
-    riskScore += contingencyPlanRiskScore;    dataPoints++;
-  } else if (hasContingencyPlan) {
-    dataPoints++;
-  }
-
-  // Factor 4: Documentation Compliance
-  const documentedTasksRatio = project?.taskDocumentation?.documentedRatio ?? 0;
-  if (documentedTasksRatio < documentationComplianceThreshold) {
-    riskScore += 1;
-    dataPoints++;
-  } else if (documentedTasksRatio >= 0) {
-    dataPoints++;
-  }
-
-  // Factor 5: Cross-Training
-  const crossTrainedMembers = team?.crossTrainedMembers ?? 0;
-  const teamSize = project?.teamSize || team?.members?.length || 0;
-  const crossTrainRatio = teamSize > 0 ? crossTrainedMembers / teamSize : 0;
-  if (crossTrainRatio < 0.5 && teamSize > 1) {
-    riskScore += 1;
-    dataPoints++;
-  } else if (teamSize > 0) {
-    dataPoints++;
-  }
-
-  // Determine severity based on risk score
-  if (riskScore >= keyPersonRiskScoreThreshold + contingencyPlanRiskScore) {
-    severity = 'high';
-  } else if (riskScore >= keyPersonRiskScoreThreshold) {
-    severity = 'medium-high';
-  } else if (riskScore >= 2) {
-    severity = 'medium';
-  }
-
-  // If risk exists, add recommendations
-  if (riskScore > 0) {
-  }
-
-  // Calculate confidence based on available data
-  const baseConfidence = dataPoints / totalDataPoints;
-  const adjustedConfidence = Math.max(0.30, baseConfidence * 0.85);
-
-  if (riskScore < 1) {
-    return null;
-  }
-
-  return {
-    type: 'resource_unavailability',
-    title: 'Resource Unavailability Risk',
-    description: keyPersonDependency > keyPersonDependencyThreshold
-      ? `Critical person dependency detected: ${(keyPersonDependency * 100).toFixed(1)}% of critical tasks depend on key individuals. High risk if they become unavailable.`
-      : `Insufficient backup coverage (${(backupCoverage * 100).toFixed(1)}%) and documentation (${(documentedTasksRatio * 100).toFixed(1)}%) to handle key person absences.`,
-    category: 'resource',
-    severity,
-    source: 'expert_rules_enhanced',
-    thresholdDetails: {
-      riskScore: riskScore,
-      keyPersonRiskScoreThreshold: keyPersonRiskScoreThreshold,
-      contingencyPlanRiskScore: contingencyPlanRiskScore,
-      keyPersonDependency: (keyPersonDependency * 100).toFixed(1) + '%',
-      keyPersonDependencyThreshold: (keyPersonDependencyThreshold * 100).toFixed(1) + '%',
-      backupCoverage: (backupCoverage * 100).toFixed(1) + '%',
-      backupCoverageRequired: (backupCoverageRequired * 100).toFixed(1) + '%',
-      documentationCompliance: (documentedTasksRatio * 100).toFixed(1) + '%',
-      documentationComplianceThreshold: (documentationComplianceThreshold * 100).toFixed(1) + '%',
-      crossTrainRatio: (crossTrainRatio * 100).toFixed(1) + '%'
-    },
-    dataAvailability: `${dataPoints}/${totalDataPoints} data points available`,
-    indicators: [
-      `Critical person dependency: ${(keyPersonDependency * 100).toFixed(1)}% (risk if > ${(keyPersonDependencyThreshold * 100).toFixed(1)}%)`,
-      `Risk score: ${riskScore}/${keyPersonRiskScoreThreshold + contingencyPlanRiskScore}`,
-      `Backup coverage: ${(backupCoverage * 100).toFixed(1)}% (required: ${(backupCoverageRequired * 100).toFixed(1)}%)`,
-      `Documentation compliance: ${(documentedTasksRatio * 100).toFixed(1)}% (required: ${(documentationComplianceThreshold * 100).toFixed(1)}%)`,
-      `Cross-training: ${(crossTrainRatio * 100).toFixed(1)}%`,
-      `Contingency plan: ${hasContingencyPlan ? 'Yes' : 'No'}`
-    ],
-    predictedImpact: {
-      scheduleDelay: {
-        min: severity === 'high' ? 15 : 5,
-        max: severity === 'high' ? 60 : 20,
-        description: 'Knowledge loss, rework if key person becomes unavailable'
-      },
-      budgetOverrun: {
-        min: severity === 'high' ? 20 : 10,
-        max: severity === 'high' ? 40 : 20,
-        description: 'Emergency hiring, overtime for recovery'
-      },
-      qualityImpact: 'high',
-      teamMoraleImpact: severity === 'high' ? 'high' : 'medium'
-    },
-    recommendations,
-    earlyWarningSignals: [
-      { signal: 'Only one person knows critical system/task', threshold: 'subjective', checkFrequency: 'per sprint' },
-      { signal: 'Key person working excessive hours', threshold: '> 50h/week', checkFrequency: 'weekly' },
-      { signal: 'Documentation lag > 1 sprint', threshold: '1 sprint', checkFrequency: 'per sprint' },
-      { signal: 'No backup trained for critical role', threshold: 'subjective', checkFrequency: 'monthly' }
     ]
   };
 }
@@ -2523,138 +2206,6 @@ function checkRoleClarityRisk(project, team) {
 }
 
 /**
- * RULE: Standards Compliance Gap
- * Detects discrepancies in standards compliance due to cultural differences
- * Thresholds:
- * - highCulturalDiversityThreshold: Minimum cultures for high diversity (default 3)
- * - noProceduresRiskScore: Risk score for missing procedures (default 3)
- * - noStandardsRiskScore: Risk score for missing standards (default 2)
- * - complianceRiskScoreHigh: HIGH severity threshold (default 6)
- */
-function checkStandardsComplianceRisk(project, team) {
-  const highCulturalDiversityThreshold = project?.decisionTree?.riskThresholds?.highCulturalDiversityThreshold ?? 3;
-  const noProceduresRiskScore = project?.decisionTree?.riskThresholds?.noProceduresRiskScore ?? 3;
-  const noStandardsRiskScore = project?.decisionTree?.riskThresholds?.noStandardsRiskScore ?? 2;
-  const complianceRiskScoreHigh = project?.decisionTree?.riskThresholds?.complianceRiskScoreHigh ?? 6;
-
-  const culturalDiversity = project?.culturalDiversityLevel || 'unknown';
-  const hasStandards = project?.hasStandardizedProcedures;
-  const requiresCompliance = project?.requiresRegulatoryCompliance;
-  const complianceStandards = project?.complianceStandards || [];
-
-  console.log('[DEBUG] checkStandardsComplianceRisk:', {
-    culturalDiversity,
-    highCulturalDiversityThreshold,
-    hasStandards,
-    requiresCompliance,
-    complianceStandardsCount: complianceStandards.length,
-    involvedCountries: project?.involvedCountries
-  });  let severity = 'low';
-  let riskScore = 0;
-  let dataPoints = 0;
-  const totalDataPoints = 3;
-
-  // Count unique cultures/regions first
-  let uniqueCultures = 0;
-  const involvedCountries = project?.involvedCountries || [];
-  uniqueCultures = new Set(involvedCountries).size;
-
-  // Only applicable if high cultural diversity detected
-  if (culturalDiversity !== 'high' && uniqueCultures < highCulturalDiversityThreshold) {
-    return null;
-  }
-
-  // Factor 1: High cultural diversity
-  if (uniqueCultures >= highCulturalDiversityThreshold || culturalDiversity === 'high') {
-    dataPoints++;
-  } else if (uniqueCultures > 0) {
-    dataPoints++;
-  }
-
-  // Factor 2: No standardized procedures with diversity
-  if (hasStandards === false && uniqueCultures >= highCulturalDiversityThreshold) {
-    riskScore += noProceduresRiskScore;    dataPoints++;
-  } else if (hasStandards === true) {
-    dataPoints++;
-  } else if (hasStandards === undefined && uniqueCultures >= highCulturalDiversityThreshold) {
-    riskScore += 1;  }
-
-  // Factor 3: No compliance standards documented
-  if (complianceStandards.length === 0 && requiresCompliance === true && uniqueCultures >= highCulturalDiversityThreshold) {
-    riskScore += noStandardsRiskScore;    dataPoints++;
-  } else if (complianceStandards.length > 0) {
-    dataPoints++;
-  }
-
-  // Determine final severity
-  if (riskScore >= complianceRiskScoreHigh) {
-    severity = 'high';
-  } else if (riskScore >= 4) {
-    severity = 'medium-high';
-  } else if (riskScore >= 2) {
-    severity = 'medium';
-  }
-
-  // Add only user-specified recommendations
-  if (riskScore > 0) {  }
-
-  // Calculate confidence based on available data
-  const baseConfidence = dataPoints / totalDataPoints;
-  const adjustedConfidence = Math.max(0.30, baseConfidence * 0.75);
-
-  if (riskScore < 1) {
-    return null;
-  }
-
-  return {
-    type: 'standards_compliance_gap',
-    title: 'Standards Compliance Gap',
-    description: `High cultural diversity (${uniqueCultures} unique cultures). ${!hasStandards ? 'No standardized procedures.' : ''} ${complianceStandards.length === 0 ? 'No documented compliance standards.' : ''}`.trim(),
-    category: 'organizational',
-    severity,
-    source: 'expert_rules_enhanced',
-    thresholdDetails: {
-      riskScore: riskScore,
-      complianceRiskScoreHigh: complianceRiskScoreHigh,
-      uniqueCultures: uniqueCultures,
-      highCulturalDiversityThreshold: highCulturalDiversityThreshold,
-      noProceduresRiskScore: noProceduresRiskScore,
-      noStandardsRiskScore: noStandardsRiskScore,
-      hasStandards: hasStandards,
-      complianceStandards: complianceStandards.length
-    },
-    dataAvailability: `${dataPoints}/${totalDataPoints} data points available`,
-    indicators: [
-      `Unique cultures: ${uniqueCultures} (high diversity if >= ${highCulturalDiversityThreshold})`,
-      `Risk score: ${riskScore}/${complianceRiskScoreHigh}`,
-      `Standardized procedures: ${hasStandards ? 'Yes' : 'No'}`,
-      `Compliance standards: ${complianceStandards.length}`,
-      `Cultural diversity level: ${culturalDiversity}`
-    ],
-    predictedImpact: {
-      scheduleDelay: {
-        min: severity === 'high' ? 15 : 8,
-        max: severity === 'high' ? 40 : 20,
-        description: 'Misinterpretations, need for clarifications, rework from different standards'
-      },
-      budgetOverrun: {
-        min: severity === 'high' ? 18 : 10,
-        max: severity === 'high' ? 35 : 20,
-        description: 'Rework to meet standards, training costs'
-      },
-      qualityImpact: 'high',
-      teamMoraleImpact: 'medium'
-    },
-    recommendations,
-    earlyWarningSignals: [
-      { signal: 'Standards interpretation conflicts', threshold: '> 2 per sprint', checkFrequency: 'per sprint' },
-      { signal: 'Quality reviews rejected for standards', threshold: '> 15%', checkFrequency: 'per sprint' },
-      { signal: 'Team reports confusion about standards', threshold: 'subjective', checkFrequency: 'monthly' }
-    ]
-  };
-}
-
-/**
  * NEW RULE 13: Timezone Scheduling Gap (More Specific)
  * Detects planning issues due to timezone differences
  * WORKS WITH PARTIAL DATA - adjusts confidence based on available information
@@ -2859,7 +2410,7 @@ function checkWorkLifeBoundaryBlur(project, teamAnalysis, organization) {
 
   if (severity === 'low') return null;
 
-  // Only user-specified recommendations  recommendations.push('Respetar horas fuera de trabajo (Si el empleado no está disponible)');
+  // Only user-specified recommendations  recommendations.push('Respetar los horarios fuera de trabajo');
 
   const confidence = dataPoints / totalDataPoints;
 
@@ -3653,12 +3204,9 @@ module.exports = {
   checkDependencyRisk,
   checkScopeCreepRisk,
   checkProcessRisk,
-  checkInfrastructureRisk,
-  checkQualityRisk,
   checkKnowledgeManagementRisk,
   checkRemoteWorkSupportRisk,
   checkRoleClarityRisk,
-  checkStandardsComplianceRisk,
   checkTimezoneSchedulingRisk,
   checkConflictEscalationRisk,
   checkChangeResistanceRisk,

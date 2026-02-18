@@ -29,13 +29,13 @@ const seedNotifications = async (users, projects, organizations) => {
     }
   );
   
-  // CV notifications
+  // Currículo notifications
   notifications.push(
     {
       recipient: getUserByEmail('pending.user1@example.com')._id,
       type: 'CV_SUBMITTED_TO_ORG',
-      title: 'CV Submitted Successfully',
-      message: 'Your CV has been submitted to Tech Innovators and is pending review.',
+      title: 'Currículo Submitted Successfully',
+      message: 'Your currículo has been submitted to Tech Innovators and is pending review.',
       metadata: {
         organizationId: organizations[0]._id.toString(),
         organizationName: 'Tech Innovators'
@@ -53,8 +53,8 @@ const seedNotifications = async (users, projects, organizations) => {
     {
       recipient: getUserByEmail('admin.techinnov@example.com')._id,
       type: 'CV_SUBMITTED_TO_ORG',
-      title: 'New CV Submitted for Review',
-      message: 'Roberto Silva Costa has submitted a CV for your review.',
+      title: 'New Currículo Submitted for Review',
+      message: 'Roberto Silva Costa has submitted a currículo for your review.',
       metadata: {
         userId: getUserByEmail('pending.user1@example.com')._id.toString(),
         userName: 'Roberto Silva Costa'
@@ -71,8 +71,8 @@ const seedNotifications = async (users, projects, organizations) => {
     {
       recipient: getUserByEmail('carlos.dev@example.com')._id,
       type: 'CV_PROCESSED',
-      title: 'CV Processing Complete',
-      message: 'Your CV has been successfully processed and analyzed by our AI system.',
+      title: 'Currículo Processing Complete',
+      message: 'Your currículo has been successfully processed and analyzed by our AI system.',
       metadata: {
         completenessScore: 95,
         suggestedImprovements: 2

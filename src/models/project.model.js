@@ -990,40 +990,6 @@ const projectSchema = new mongoose.Schema({
           default: 4,
           description: 'KM risk score threshold for MEDIUM-HIGH severity'
         },
-        // Resource Unavailability Thresholds
-        keyPersonDependencyThreshold: {
-          type: Number,
-          min: 0,
-          max: 1,
-          default: 0.3,
-          description: 'Critical person ratio (e.g., 0.3 = 30% of critical tasks)'
-        },
-        keyPersonRiskScore: {
-          type: Number,
-          min: 0,
-          default: 4,
-          description: 'Risk score for critical person dependency'
-        },
-        backupCoverageRequired: {
-          type: Number,
-          min: 0,
-          max: 1,
-          default: 0.8,
-          description: 'Required backup coverage ratio (e.g., 0.8 = 80% of key persons must have backup)'
-        },
-        contingencyPlanRiskScore: {
-          type: Number,
-          min: 0,
-          default: 2,
-          description: 'Risk score increment for missing contingency plan'
-        },
-        documentationComplianceThreshold: {
-          type: Number,
-          min: 0,
-          max: 1,
-          default: 0.9,
-          description: 'Documentation compliance threshold (e.g., 0.9 = 90% of tasks must be documented)'
-        },
         // Remote Work Support Gap Thresholds
         remoteWorkPercentageThreshold: {
           type: Number,
@@ -1086,31 +1052,6 @@ const projectSchema = new mongoose.Schema({
           min: 1,
           default: 4,
           description: 'Role clarity risk score threshold for MEDIUM-HIGH severity'
-        },
-        // Standards Compliance Gap Thresholds
-        highCulturalDiversityThreshold: {
-          type: Number,
-          min: 1,
-          default: 3,
-          description: 'Minimum unique cultures/regions to trigger high diversity (e.g., >= 3)'
-        },
-        noProceduresRiskScore: {
-          type: Number,
-          min: 0,
-          default: 3,
-          description: 'Risk score for missing standardized procedures'
-        },
-        noStandardsRiskScore: {
-          type: Number,
-          min: 0,
-          default: 2,
-          description: 'Risk score for missing compliance standards'
-        },
-        complianceRiskScoreHigh: {
-          type: Number,
-          min: 1,
-          default: 6,
-          description: 'Standards compliance risk score threshold for HIGH severity'
         },
         // Timezone Scheduling Gap Thresholds
         minTimeOverlapHoursThreshold: {

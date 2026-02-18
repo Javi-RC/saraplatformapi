@@ -2,7 +2,7 @@ const cvUtils = require('../../utils/cvUtils');
 
 /**
  * Extractor de proyectos
- * Responsabilidad única: extraer proyectos del CV
+ * Responsabilidad única: extraer proyectos del currículo
  */
 class ProjectsExtractor {
   /**

@@ -20,24 +20,24 @@ const seedProjects = async (users, organizations) => {
   const projects = [
     // Active project in planning phase - Tech Innovators
     {
-      projectName: 'E-Commerce Platform Modernization',
-      briefDescription: 'Migration of legacy e-commerce platform to modern microservices architecture with React frontend and Node.js backend',
+      projectName: 'Modernización de la plataforma de e-commerce',
+      briefDescription: 'Migración de una plataforma legacy de e-commerce a una arquitectura moderna de microservicios con frontend React y backend Node.js',
       estimatedStartDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
       estimatedEndDate: new Date(Date.now() + 130 * 24 * 60 * 60 * 1000),
       requiresSynchronousCommunication: 'only_critical_moments',
       realTimeCommunicationLevel: 'medium',
       weeklyMeetingsCount: 3,
       averageMeetingDuration: { value: 60, unit: 'minutes' },
-      requiredAvailabilitySchedule: '10:00-16:00 UTC for critical meetings',
-      requiredLanguages: ['English', 'Spanish'],
+      requiredAvailabilitySchedule: '10:00-16:00 UTC para reuniones críticas',
+      requiredLanguages: ['Inglés', 'Español'],
       minimumLanguageProficiency: 'B2',
       mainTechnologies: ['React', 'Node.js', 'MongoDB', 'Docker', 'AWS'],
       requiredExperienceLevel: 'senior',
       systemComplexity: 'high',
-      sharedInfrastructureDependency: 'AWS infrastructure shared with other teams',
+      sharedInfrastructureDependency: 'Infraestructura AWS compartida con otros equipos',
       requiresSpecializedTools: {
         needed: true,
-        description: 'Kubernetes, ArgoCD, Datadog monitoring'
+        description: 'Kubernetes, ArgoCD, monitorización con Datadog'
       },
       documentationLevel: 'partial',
       involvedCountries: ['Spain', 'Mexico'],
@@ -45,12 +45,12 @@ const seedProjects = async (users, organizations) => {
       expectedTimeOverlap: { value: 6, unit: 'hours' },
       culturalDiversityLevel: 'medium',
       rolesAndResponsibilities: [
-        { roleName: 'Tech Lead', responsibilities: ['Architecture and technical decisions'], clarityScore: 5 },
-        { roleName: 'Frontend Developer', responsibilities: ['React components and UI'], clarityScore: 4 },
-        { roleName: 'Backend Developer', responsibilities: ['API and microservices'], clarityScore: 4 },
-        { roleName: 'QA Engineer', responsibilities: ['Test automation'], clarityScore: 4 }
+        { roleName: 'Líder técnico', responsibilities: ['Arquitectura y decisiones técnicas'], clarityScore: 5 },
+        { roleName: 'Desarrollador Frontend', responsibilities: ['Componentes React y UI'], clarityScore: 4 },
+        { roleName: 'Desarrollador Backend', responsibilities: ['API y microservicios'], clarityScore: 4 },
+        { roleName: 'Ingeniero de QA', responsibilities: ['Automatización de pruebas'], clarityScore: 4 }
       ],
-      criticalDependencies: ['Payment gateway API', 'Legacy database access', 'CDN setup'],
+      criticalDependencies: ['API de pasarela de pago', 'Acceso a base de datos legacy', 'Configuración de CDN'],
       weeklyHoursPerMember: 35,
       methodology: 'scrum',
       sprintDuration: { value: 2, unit: 'weeks' },
@@ -67,9 +67,9 @@ const seedProjects = async (users, organizations) => {
       teamFormationApproach: 'manual',
       manualSelection: {
         selectedMembers: [
-          { userId: anaId, role: 'Frontend Developer' },
-          { userId: davidId, role: 'Backend Developer' },
-          { userId: lauraId, role: 'QA Engineer' }
+          { userId: anaId, role: 'Desarrollador Frontend' },
+          { userId: davidId, role: 'Desarrollador Backend' },
+          { userId: lauraId, role: 'Ingeniero de QA' }
         ]
       },
       createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
@@ -77,8 +77,8 @@ const seedProjects = async (users, organizations) => {
     
     // Active project in progress - Tech Innovators
     {
-      projectName: 'Mobile Banking App Redesign',
-      briefDescription: 'Complete redesign of mobile banking application for iOS and Android with improved UX and new features',
+      projectName: 'Rediseño de la app de banca móvil',
+      briefDescription: 'Rediseño completo de la aplicación de banca móvil para iOS y Android con mejor UX y nuevas funcionalidades',
       estimatedStartDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
       estimatedEndDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
       actualStartDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
@@ -86,13 +86,13 @@ const seedProjects = async (users, organizations) => {
       realTimeCommunicationLevel: 'high',
       weeklyMeetingsCount: 5,
       averageMeetingDuration: { value: 45, unit: 'minutes' },
-      requiredAvailabilitySchedule: '09:00-18:00 local time with 4h overlap',
-      requiredLanguages: ['English'],
+      requiredAvailabilitySchedule: '09:00-18:00 hora local con 4h de solapamiento',
+      requiredLanguages: ['Inglés'],
       minimumLanguageProficiency: 'C1',
       mainTechnologies: ['React Native', 'TypeScript', 'Firebase', 'REST API'],
       requiredExperienceLevel: 'mid',
       systemComplexity: 'medium',
-      sharedInfrastructureDependency: 'None - dedicated infrastructure',
+      sharedInfrastructureDependency: 'Ninguna: infraestructura dedicada',
       requiresSpecializedTools: {
         needed: true,
         description: 'Figma, TestFlight, Firebase Analytics'
@@ -103,11 +103,11 @@ const seedProjects = async (users, organizations) => {
       expectedTimeOverlap: { value: 4, unit: 'hours' },
       culturalDiversityLevel: 'low',
       rolesAndResponsibilities: [
-        { roleName: 'Mobile Lead', responsibilities: ['Mobile architecture'], clarityScore: 5 },
-        { roleName: 'UX Designer', responsibilities: ['User experience design'], clarityScore: 5 },
-        { roleName: 'Mobile Developer', responsibilities: ['Feature implementation'], clarityScore: 4 }
+        { roleName: 'Líder móvil', responsibilities: ['Arquitectura móvil'], clarityScore: 5 },
+        { roleName: 'Diseñador UX', responsibilities: ['Diseño de experiencia de usuario'], clarityScore: 5 },
+        { roleName: 'Desarrollador Móvil', responsibilities: ['Implementación de funcionalidades'], clarityScore: 4 }
       ],
-      criticalDependencies: ['Banking API', 'Biometric authentication SDK'],
+      criticalDependencies: ['API bancaria', 'SDK de autenticación biométrica'],
       weeklyHoursPerMember: 40,
       methodology: 'kanban',
       sprintDuration: { value: 1, unit: 'weeks' },
@@ -124,8 +124,8 @@ const seedProjects = async (users, organizations) => {
       teamFormationApproach: 'manual',
       manualSelection: {
         selectedMembers: [
-          { userId: anaId, role: 'UX Designer' },
-          { userId: davidId, role: 'Mobile Developer' }
+          { userId: anaId, role: 'Diseñador UX' },
+          { userId: davidId, role: 'Desarrollador Móvil' }
         ]
       },
       actualTeamMembers: [
@@ -138,8 +138,8 @@ const seedProjects = async (users, organizations) => {
     
     // Completed project - Tech Innovators
     {
-      projectName: 'Customer Portal Development',
-      briefDescription: 'Development of self-service customer portal with account management and support features',
+      projectName: 'Desarrollo del portal de clientes',
+      briefDescription: 'Desarrollo de un portal de autoservicio con gestión de cuentas y funciones de soporte',
       estimatedStartDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
       estimatedEndDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
       actualStartDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000),
@@ -148,8 +148,8 @@ const seedProjects = async (users, organizations) => {
       realTimeCommunicationLevel: 'low',
       weeklyMeetingsCount: 2,
       averageMeetingDuration: { value: 30, unit: 'minutes' },
-      requiredAvailabilitySchedule: 'Flexible with 2h daily overlap',
-      requiredLanguages: ['English', 'Spanish'],
+      requiredAvailabilitySchedule: 'Flexible con 2h de solapamiento diario',
+      requiredLanguages: ['Inglés', 'Español'],
       minimumLanguageProficiency: 'B2',
       mainTechnologies: ['Vue.js', 'Node.js', 'PostgreSQL', 'Redis'],
       requiredExperienceLevel: 'mid',
@@ -160,9 +160,9 @@ const seedProjects = async (users, organizations) => {
       expectedTimeOverlap: { value: 8, unit: 'hours' },
       culturalDiversityLevel: 'low',
       rolesAndResponsibilities: [
-        { roleName: 'Full Stack Developer', responsibilities: ['End to end development'], clarityScore: 5 }
+        { roleName: 'Desarrollador Full Stack', responsibilities: ['Desarrollo end-to-end'], clarityScore: 5 }
       ],
-      criticalDependencies: ['CRM integration'],
+      criticalDependencies: ['Integración con CRM'],
       weeklyHoursPerMember: 40,
       methodology: 'scrum',
       sprintDuration: { value: 2, unit: 'weeks' },
@@ -189,8 +189,8 @@ const seedProjects = async (users, organizations) => {
     
     // Active project - Global Solutions
     {
-      projectName: 'Cloud Infrastructure Migration',
-      briefDescription: 'Migration of on-premise infrastructure to AWS cloud with zero downtime requirement',
+      projectName: 'Migración de infraestructura a la nube',
+      briefDescription: 'Migración de infraestructura on-premise a la nube de AWS con requisito de cero downtime',
       estimatedStartDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
       estimatedEndDate: new Date(Date.now() + 135 * 24 * 60 * 60 * 1000),
       actualStartDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000),
@@ -198,13 +198,13 @@ const seedProjects = async (users, organizations) => {
       realTimeCommunicationLevel: 'high',
       weeklyMeetingsCount: 4,
       averageMeetingDuration: { value: 90, unit: 'minutes' },
-      requiredAvailabilitySchedule: '14:00-18:00 UTC for global coordination',
-      requiredLanguages: ['English'],
+      requiredAvailabilitySchedule: '14:00-18:00 UTC para coordinación global',
+      requiredLanguages: ['Inglés'],
       minimumLanguageProficiency: 'C1',
       mainTechnologies: ['AWS', 'Terraform', 'Kubernetes', 'Docker', 'Python'],
       requiredExperienceLevel: 'expert',
       systemComplexity: 'high',
-      sharedInfrastructureDependency: 'Shared AWS account with multiple teams',
+      sharedInfrastructureDependency: 'Cuenta de AWS compartida con múltiples equipos',
       requiresSpecializedTools: {
         needed: true,
         description: 'AWS Control Tower, Terraform Cloud, Datadog'
@@ -215,11 +215,11 @@ const seedProjects = async (users, organizations) => {
       expectedTimeOverlap: { value: 5, unit: 'hours' },
       culturalDiversityLevel: 'high',
       rolesAndResponsibilities: [
-        { roleName: 'Cloud Architect', responsibilities: ['Design cloud architecture'], clarityScore: 5 },
-        { roleName: 'DevOps Lead', responsibilities: ['Implement infrastructure as code'], clarityScore: 5 },
-        { roleName: 'Site Reliability Engineer', responsibilities: ['Ensure system reliability'], clarityScore: 4 }
+        { roleName: 'Arquitecto Cloud', responsibilities: ['Diseñar la arquitectura cloud'], clarityScore: 5 },
+        { roleName: 'Líder DevOps', responsibilities: ['Implementar infraestructura como código'], clarityScore: 5 },
+        { roleName: 'Ingeniero SRE', responsibilities: ['Asegurar la fiabilidad del sistema'], clarityScore: 4 }
       ],
-      criticalDependencies: ['AWS account setup', 'Network connectivity', 'Security audit'],
+      criticalDependencies: ['Configuración de cuenta de AWS', 'Conectividad de red', 'Auditoría de seguridad'],
       weeklyHoursPerMember: 40,
       methodology: 'scrum',
       sprintDuration: { value: 2, unit: 'weeks' },
@@ -244,24 +244,24 @@ const seedProjects = async (users, organizations) => {
     
     // Planning project - Asian Tech Hub
     {
-      projectName: 'AI-Powered Recommendation Engine',
-      briefDescription: 'Development of machine learning based recommendation system for e-commerce platform',
+      projectName: 'Motor de recomendaciones impulsado por IA',
+      briefDescription: 'Desarrollo de un sistema de recomendación basado en aprendizaje automático para una plataforma de e-commerce',
       estimatedStartDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
       estimatedEndDate: new Date(Date.now() + 135 * 24 * 60 * 60 * 1000),
       requiresSynchronousCommunication: 'only_critical_moments',
       realTimeCommunicationLevel: 'medium',
       weeklyMeetingsCount: 2,
       averageMeetingDuration: { value: 60, unit: 'minutes' },
-      requiredAvailabilitySchedule: 'Asian timezone friendly',
-      requiredLanguages: ['English', 'Japanese'],
+      requiredAvailabilitySchedule: 'Compatible con zona horaria asiática',
+      requiredLanguages: ['Inglés', 'Japonés'],
       minimumLanguageProficiency: 'B2',
       mainTechnologies: ['Python', 'TensorFlow', 'PostgreSQL', 'Redis', 'FastAPI'],
       requiredExperienceLevel: 'senior',
       systemComplexity: 'high',
-      sharedInfrastructureDependency: 'Shared data warehouse',
+      sharedInfrastructureDependency: 'Almacén de datos compartido',
       requiresSpecializedTools: {
         needed: true,
-        description: 'MLflow, Jupyter, GPU compute instances'
+        description: 'MLflow, Jupyter, instancias de cómputo con GPU'
       },
       documentationLevel: 'partial',
       involvedCountries: ['Japan', 'China', 'India'],
@@ -269,11 +269,11 @@ const seedProjects = async (users, organizations) => {
       expectedTimeOverlap: { value: 6, unit: 'hours' },
       culturalDiversityLevel: 'high',
       rolesAndResponsibilities: [
-        { roleName: 'ML Engineer', responsibilities: ['Model development and training'], clarityScore: 4 },
-        { roleName: 'Data Scientist', responsibilities: ['Data analysis and feature engineering'], clarityScore: 4 },
-        { roleName: 'Backend Developer', responsibilities: ['API and integration'], clarityScore: 5 }
+        { roleName: 'Ingeniero de ML', responsibilities: ['Desarrollo y entrenamiento de modelos'], clarityScore: 4 },
+        { roleName: 'Científico de datos', responsibilities: ['Análisis de datos e ingeniería de características'], clarityScore: 4 },
+        { roleName: 'Desarrollador Backend', responsibilities: ['API e integración'], clarityScore: 5 }
       ],
-      criticalDependencies: ['Training data pipeline', 'Model serving infrastructure'],
+      criticalDependencies: ['Pipeline de datos de entrenamiento', 'Infraestructura de serving del modelo'],
       weeklyHoursPerMember: 40,
       methodology: 'agile',
       sprintDuration: { value: 1, unit: 'weeks' },
@@ -293,8 +293,8 @@ const seedProjects = async (users, organizations) => {
     
     // Cancelled project - Global Solutions
     {
-      projectName: 'Legacy System Replacement',
-      briefDescription: 'Complete replacement of legacy mainframe system - cancelled due to budget constraints',
+      projectName: 'Sustitución del sistema legacy',
+      briefDescription: 'Sustitución completa del sistema legacy en mainframe (cancelado por restricciones presupuestarias)',
       estimatedStartDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
       estimatedEndDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
       actualStartDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
@@ -303,7 +303,7 @@ const seedProjects = async (users, organizations) => {
       realTimeCommunicationLevel: 'low',
       weeklyMeetingsCount: 1,
       averageMeetingDuration: { value: 30, unit: 'minutes' },
-      requiredLanguages: ['English'],
+      requiredLanguages: ['Inglés'],
       minimumLanguageProficiency: 'B2',
       mainTechnologies: ['Java', 'Spring Boot', 'Oracle', 'COBOL'],
       requiredExperienceLevel: 'expert',
@@ -314,9 +314,9 @@ const seedProjects = async (users, organizations) => {
       expectedTimeOverlap: { value: 8, unit: 'hours' },
       culturalDiversityLevel: 'low',
       rolesAndResponsibilities: [
-        { roleName: 'Legacy Systems Expert', responsibilities: ['COBOL migration'], clarityScore: 3 }
+        { roleName: 'Experto en sistemas legacy', responsibilities: ['Migración de COBOL'], clarityScore: 3 }
       ],
-      criticalDependencies: ['Mainframe access', 'Documentation'],
+      criticalDependencies: ['Acceso al mainframe', 'Documentación'],
       weeklyHoursPerMember: 35,
       methodology: 'waterfall',
       hasOnboardingProcess: 'no',
@@ -333,7 +333,7 @@ const seedProjects = async (users, organizations) => {
       actualTeamMembers: [
         { userId: michaelId, assignedAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) }
       ],
-      cancellationReason: 'Budget constraints and unclear requirements',
+      cancellationReason: 'Restricciones presupuestarias y requisitos poco claros',
       cancelledAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
       createdAt: new Date(Date.now() - 95 * 24 * 60 * 60 * 1000)
     }

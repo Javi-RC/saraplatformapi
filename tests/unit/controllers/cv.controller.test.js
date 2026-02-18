@@ -25,7 +25,7 @@ const User = require('../../../src/models/user.model');
 const CV = require('../../../src/models/cv.model');
 const pdfParse = require('pdf-parse');
 
-describe('CV Controller - Unit Tests', () => {
+describe('Curriculum Controller - Unit Tests', () => {
   let req, res;
 
   const createPopulateQuery = (resolvedValue) => {
@@ -80,7 +80,7 @@ describe('CV Controller - Unit Tests', () => {
       );
     });
 
-    it('should return error when user has no CV processing consent', async () => {
+    it('should return error when user has no curriculum processing consent', async () => {
       req.file = {
         mimetype: 'application/pdf',
         buffer: Buffer.from('test pdf content'),
@@ -102,7 +102,7 @@ describe('CV Controller - Unit Tests', () => {
       );
     });
 
-    it('should process PDF CV successfully', async () => {
+    it('should process PDF curriculum successfully', async () => {
       req.file = {
         mimetype: 'application/pdf',
         buffer: Buffer.from('test pdf content'),
@@ -146,7 +146,7 @@ describe('CV Controller - Unit Tests', () => {
       expect(responseHandler.success).toHaveBeenCalled();
     });
 
-    it('should process TXT CV successfully', async () => {
+    it('should process TXT curriculum successfully', async () => {
       req.file = {
         mimetype: 'text/plain',
         buffer: Buffer.from('CV text content'),
@@ -215,7 +215,7 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('getMyCV', () => {
-    it('should return user CV successfully', async () => {
+    it('should return user curriculum successfully', async () => {
       const mockCV = {
         id: 'cv123',
         skills: ['JavaScript'],
@@ -230,7 +230,7 @@ describe('CV Controller - Unit Tests', () => {
     });
 
     it('should handle errors', async () => {
-      const error = new Error('CV not found');
+      const error = new Error('Curriculum not found');
       aiExtractorService.getUserCV.mockRejectedValue(error);
 
       await cvController.getMyCV(req, res);
@@ -240,7 +240,7 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('getCVById', () => {
-    it('should return own CV by ID', async () => {
+    it('should return own curriculum by ID', async () => {
       req.params.cvId = 'cv123';
       const mockCV = {
         _id: 'cv123',
@@ -254,7 +254,7 @@ describe('CV Controller - Unit Tests', () => {
       expect(responseHandler.success).toHaveBeenCalledWith(res, { cv: mockCV });
     });
 
-    it('should deny access to other user CV', async () => {
+    it('should deny access to other user curriculum', async () => {
       req.params.cvId = 'otherCV123';
       req.user.role = 'employee';
       const mockCV = {
@@ -267,12 +267,12 @@ describe('CV Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'No tienes permisos para ver este CV',
+        'No tienes permisos para ver este currículo',
         403
       );
     });
 
-    it('should allow org_admin to access any CV', async () => {
+    it('should allow org_admin to access any curriculum', async () => {
       req.params.cvId = 'otherCV123';
       req.user.role = 'org_admin';
       const mockCV = {
@@ -288,7 +288,7 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('getAllCVs', () => {
-    it('should return all CVs with filters', async () => {
+    it('should return all curricula with filters', async () => {
       req.query.skills = 'JavaScript,Node.js';
       req.query.languages = 'English,Spanish';
       
@@ -310,7 +310,7 @@ describe('CV Controller - Unit Tests', () => {
       });
     });
 
-    it('should return all CVs without filters', async () => {
+    it('should return all curricula without filters', async () => {
       const mockCVs = [{ id: 'cv1' }];
       aiExtractorService.getAllCVs.mockResolvedValue(mockCVs);
 
@@ -349,7 +349,7 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('searchCVs', () => {
-    it('should search CVs by criteria', async () => {
+    it('should search curricula by criteria', async () => {
       req.body = {
         skills: ['JavaScript', 'React'],
         languages: ['English'],
@@ -417,7 +417,7 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('updateCV', () => {
-    it('should update CV successfully', async () => {
+    it('should update curriculum successfully', async () => {
       req.params.cvId = 'cv123';
       req.body = {
         skills: { technical: ['JavaScript', 'TypeScript'] }
@@ -437,7 +437,7 @@ describe('CV Controller - Unit Tests', () => {
         req.body
       );
       expect(responseHandler.success).toHaveBeenCalledWith(res, {
-        message: 'CV actualizado exitosamente',
+        message: 'Currículo actualizado exitosamente',
         cv: mockCV
       });
     });
@@ -455,9 +455,9 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('deleteCV', () => {
-    it('should delete CV successfully', async () => {
+    it('should delete curriculum successfully', async () => {
       req.params.cvId = 'cv123';
-      const mockResult = { message: 'CV eliminado exitosamente' };
+      const mockResult = { message: 'Currículo eliminado exitosamente' };
       aiExtractorService.deleteCV.mockResolvedValue(mockResult);
 
       await cvController.deleteCV(req, res);
@@ -478,7 +478,7 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('getCVStats', () => {
-    it('should return CV statistics', async () => {
+    it('should return curriculum statistics', async () => {
       const mockCV = {
         skills: { technical: ['JavaScript', 'Node.js', 'React'] },
         experience: [{ title: 'Developer' }],
@@ -503,7 +503,7 @@ describe('CV Controller - Unit Tests', () => {
       }));
     });
 
-    it('should handle CV with no data', async () => {
+    it('should handle curriculum with no data', async () => {
       const mockCV = {};
       aiExtractorService.getUserCV.mockResolvedValue(mockCV);
 
@@ -525,7 +525,7 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('submitToOrganization', () => {
-    it('should submit CV to organization successfully', async () => {
+    it('should submit curriculum to organization successfully', async () => {
       req.body.organizationId = 'org123';
       const mockCV = {
         id: 'cv123',
@@ -539,7 +539,7 @@ describe('CV Controller - Unit Tests', () => {
       expect(responseHandler.success).toHaveBeenCalledWith(
         res,
         {
-          message: 'CV sent successfully to the organization',
+          message: 'Curriculum sent successfully to the organization',
           cv: mockCV
         },
         201
@@ -581,21 +581,21 @@ describe('CV Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'Ya has enviado tu CV a esta organización',
+        'Ya has enviado tu currículo a esta organización',
         409
       );
     });
   });
 
   describe('getCompleteness', () => {
-    it('should return 404 when CV not found', async () => {
+    it('should return 404 when curriculum not found', async () => {
       CV.findOne.mockReturnValue(createPopulateQuery(null));
 
       await cvController.getCompleteness(req, res);
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'CV not found. Please upload your CV first.',
+        'Curriculum not found. Please upload your curriculum first.',
         404
       );
     });
@@ -626,20 +626,20 @@ describe('CV Controller - Unit Tests', () => {
           completeness: expect.objectContaining({ score: 60 }),
           categories: { basics: { score: 50 } }
         }),
-        'CV completeness retrieved successfully'
+        'Curriculum completeness retrieved successfully'
       );
     });
   });
 
   describe('getMissingFieldsQuestions', () => {
-    it('should return 404 when CV not found', async () => {
+    it('should return 404 when curriculum not found', async () => {
       CV.findOne.mockResolvedValue(null);
 
       await cvController.getMissingFieldsQuestions(req, res);
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'CV not found. Please upload your CV first.',
+        'Curriculum not found. Please upload your curriculum first.',
         404
       );
     });
@@ -656,9 +656,9 @@ describe('CV Controller - Unit Tests', () => {
         {
           isComplete: true,
           questions: [],
-          message: 'Your CV is complete! No additional information needed.'
+          message: 'Your curriculum is complete! No additional information needed.'
         },
-        'CV is complete'
+        'Curriculum is complete'
       );
     });
 
@@ -727,7 +727,7 @@ describe('CV Controller - Unit Tests', () => {
       expect(responseHandler.error).toHaveBeenCalledWith(res, 'No updates provided', 400);
     });
 
-    it('should return 404 when CV not found', async () => {
+    it('should return 404 when curriculum not found', async () => {
       req.body = { 'availability.immediate': true };
       CV.findOne.mockResolvedValue(null);
 
@@ -735,7 +735,7 @@ describe('CV Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'CV not found. Please upload your CV first.',
+        'Curriculum not found. Please upload your curriculum first.',
         404
       );
     });
@@ -767,19 +767,19 @@ describe('CV Controller - Unit Tests', () => {
   });
 
   describe('startQuestionnaire', () => {
-    it('should return 404 when CV not found', async () => {
+    it('should return 404 when curriculum not found', async () => {
       CV.findOne.mockResolvedValue(null);
 
       await cvController.startQuestionnaire(req, res);
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'CV not found. Please upload your CV first.',
+        'Curriculum not found. Please upload your curriculum first.',
         404
       );
     });
 
-    it('should return isComplete when CV is already complete', async () => {
+    it('should return isComplete when curriculum is already complete', async () => {
       CV.findOne.mockResolvedValue({});
       const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({ isComplete: true });
@@ -792,7 +792,7 @@ describe('CV Controller - Unit Tests', () => {
           isComplete: true,
           completenessScore: 100
         }),
-        'CV is complete'
+        'Curriculum is complete'
       );
     });
 
@@ -836,7 +836,7 @@ describe('CV Controller - Unit Tests', () => {
       expect(responseHandler.error).toHaveBeenCalledWith(res, 'Current phase is required', 400);
     });
 
-    it('should return 404 when CV not found', async () => {
+    it('should return 404 when curriculum not found', async () => {
       req.body = { responses: {}, currentPhase: 'p1' };
       CV.findOne.mockResolvedValue(null);
 
@@ -844,7 +844,7 @@ describe('CV Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'CV not found. Please upload your CV first.',
+        'Curriculum not found. Please upload your curriculum first.',
         404
       );
     });
@@ -911,13 +911,13 @@ describe('CV Controller - Unit Tests', () => {
       );
     });
 
-    it('should return 404 when CV not found', async () => {
+    it('should return 404 when curriculum not found', async () => {
       req.body = { sessionId: 's1', currentPhase: 'p1', responses: { a: 1 } };
       CV.findOne.mockResolvedValue(null);
 
       await cvController.submitPhaseResponses(req, res);
 
-      expect(responseHandler.error).toHaveBeenCalledWith(res, 'CV not found', 404);
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Curriculum not found', 404);
     });
 
     it('should return completion when questionnaire becomes complete', async () => {
@@ -960,13 +960,13 @@ describe('CV Controller - Unit Tests', () => {
       );
     });
 
-    it('should return 404 when CV not found', async () => {
+    it('should return 404 when curriculum not found', async () => {
       req.body = { sessionId: 's1', finalResponses: { a: 1 } };
       CV.findOne.mockResolvedValue(null);
 
       await cvController.submitQuestionnaire(req, res);
 
-      expect(responseHandler.error).toHaveBeenCalledWith(res, 'CV not found', 404);
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Curriculum not found', 404);
     });
 
     it('should save final responses and return improvement', async () => {

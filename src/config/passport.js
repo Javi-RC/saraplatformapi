@@ -21,7 +21,8 @@ passport.use(
           id: user._id,
           email: user.email,
           name: user.name,
-          role: user.role
+          role: user.role,
+          organization: user.organization
         });
       }
       return done(null, false);

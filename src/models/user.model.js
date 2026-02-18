@@ -174,6 +174,33 @@ const userSchema = new mongoose.Schema({
         default: false
       }
     }
+  },
+
+  personalityDataConsent: {
+    accepted: {
+      type: Boolean,
+      default: false
+    },
+    acceptedAt: {
+      type: Date
+    },
+    version: {
+      type: String,
+      default: '1.0'
+    },
+    ipAddress: {
+      type: String
+    },
+    details: {
+      personalityProfiling: {
+        type: Boolean,
+        default: false
+      },
+      dataRetention: {
+        type: Boolean,
+        default: false
+      }
+    }
   }
 });
 
@@ -203,6 +230,11 @@ userSchema.methods.isProfileComplete = function() {
 userSchema.methods.hasCVProcessingConsent = function() {
   return this.cvProcessingConsent?.accepted === true && 
          this.cvProcessingConsent?.details?.aiProcessing === true;
+};
+
+userSchema.methods.hasPersonalityDataConsent = function() {
+  return this.personalityDataConsent?.accepted === true &&
+         this.personalityDataConsent?.details?.personalityProfiling === true;
 };
 
 userSchema.methods.comparePassword = async function(candidatePassword) {

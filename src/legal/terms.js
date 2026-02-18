@@ -36,7 +36,7 @@ The Platform may include, among others, the following features:
 - User registration and login.
 - Organization and project management.
 - Notification management and display.
-- Uploading and processing résumés/CVs to extract structured information.
+- Uploading and processing résumés/curricula to extract structured information.
 - Decision-support services based on rules and/or models.
 
 Features may evolve over time.
@@ -69,11 +69,11 @@ You must not:
 - Impersonate others or provide false information.
 - Upload content that infringes third-party rights.
 
-## 7. User content (including CVs)
+## 7. User content (including curricula)
 
 ### 7.1 Ownership and responsibility
 
-- Content you upload (e.g., CVs, text, files) remains yours or belongs to the rights holder.
+- Content you upload (e.g., curricula, text, files) remains yours or belongs to the rights holder.
 - You confirm you have the right to upload such content.
 - You are responsible for the accuracy and legality of the content.
 
@@ -83,14 +83,14 @@ You grant the Platform a limited, non-exclusive, royalty-free license to store, 
 
 ## 8. Automated processing and third-party services
 
-The Platform may perform automated processing of content (for example, extracting information from a CV). Some features may require third-party services (for example, AI providers).
+The Platform may perform automated processing of content (for example, extracting information from a curriculum). Some features may require third-party services (for example, AI providers).
 
 - Where required, the Platform will request your explicit consent before sending information to third parties.
 - The Platform will aim to minimize data sharing to what is strictly necessary.
 
 ## 9. Privacy and personal data
 
-Personal data processing is governed by the Platform's Privacy Policy and applicable regulations. Consent may be requested for specific processing activities (for example, AI-based CV analysis).
+Personal data processing is governed by the Platform's Privacy Policy and applicable regulations. Consent may be requested for specific processing activities (for example, AI-based curriculum analysis).
 
 ## 10. Availability and maintenance
 

@@ -29,9 +29,9 @@ describe('CVNotificationHelper - Unit Tests', () => {
     expect(notificationService.create).toHaveBeenCalledWith(
       expect.objectContaining({
         recipientId: 'user-1',
-        title: 'CV Processed',
+        title: 'Curriculum Processed',
         actionUrl: '/cv/cv-123',
-        actionText: 'View CV',
+        actionText: 'View Curriculum',
         channels: ['in_app'],
         priority: 'high',
         metadata: expect.objectContaining({ cvId: 'cv-123', event: 'cv_processed' })

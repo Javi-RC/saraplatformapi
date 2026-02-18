@@ -1,5 +1,5 @@
 /**
- * Unit Tests for CV Questions Generator Service
+ * Unit Tests for Curriculum Questions Generator Service
  */
 
 const {
@@ -10,7 +10,7 @@ const {
   QUESTION_TEMPLATES
 } = require('../../src/services/cvQuestionsGenerator.service');
 
-describe('CV Questions Generator Service', () => {
+describe('Curriculum Questions Generator Service', () => {
   describe('generateQuestionsForMissingFields', () => {
     test('should generate questions in English by default', () => {
       const missingFields = ['contact.email', 'availability.immediate'];

@@ -1,6 +1,6 @@
-// Comprehensive Seed CVs with Complete Data
+// Comprehensive Seed Currículos with Complete Data
 const seedCVs = async (users, organizations) => {
-  console.log('\n📄 Creating comprehensive CVs with complete data...');
+  console.log('\n📄 Creating comprehensive currículos with complete data...');
   
   const CV = require('../../src/models/cv.model');
   
@@ -1048,11 +1048,11 @@ const seedCVs = async (users, organizations) => {
     }
   ];
   
-  // Add more employees with complete CVs (Michael, Emma, Yuki, Li Wei, Priya, Pending users)
+  // Add more employees with complete currículos (Michael, Emma, Yuki, Li Wei, Priya, Pending users)
   // Continue pattern with full details...
   
   const createdCVs = await CV.insertMany(cvs);
-  console.log(`✅ Created ${createdCVs.length} comprehensive CVs`);
+  console.log(`✅ Created ${createdCVs.length} comprehensive currículos`);
   return createdCVs;
 };
 

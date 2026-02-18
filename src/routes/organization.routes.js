@@ -129,20 +129,20 @@ router.get('/:id/project-managers', authenticate, organizationController.getProj
 router.post('/:id/admins', authenticate, organizationController.addAdmin);
 
 /**
- * Obtener CVs enviados a la organización
+ * Obtener currículos enviados a la organización
  * GET /api/organizations/:id/cvs
  * Query params: status, page, limit
  */
 router.get('/:id/cvs', authenticate, require('../controllers/cv.controller').getOrganizationCVs);
 
 /**
- * Obtener un CV específico de la organización
+ * Obtener un currículo específico de la organización
  * GET /api/organizations/:id/cvs/:cvId
  */
 router.get('/:id/cvs/:cvId', authenticate, require('../controllers/cv.controller').getOrganizationCV);
 
 /**
- * Actualizar estado de un CV
+ * Actualizar estado de un currículo
  * PATCH /api/organizations/:id/cvs/:cvId/status
  * Body: { status: 'pending' | 'reviewed' | 'accepted' | 'rejected', notes }
  */

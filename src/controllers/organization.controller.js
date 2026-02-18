@@ -27,6 +27,23 @@ class OrganizationController {
       });
     } catch (error) {
       console.error('Error al crear organización:', error);
+
+      const duplicateNameMessage = 'An organization with that name already exists';
+
+      if (error.code === 11000) {
+        return res.status(409).json({
+          success: false,
+          error: duplicateNameMessage
+        });
+      }
+
+      if (error.message === 'ORGANIZATION_NAME_ALREADY_EXISTS') {
+        return res.status(409).json({
+          success: false,
+          error: duplicateNameMessage
+        });
+      }
+
       const statusCode = error.message.includes('ya administra') ? 409 : 400;
       return res.status(statusCode).json({
         success: false,

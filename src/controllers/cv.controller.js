@@ -18,12 +18,12 @@ const {
 } = require('../services/cvInteractiveQuestionnaire.service');
 
 /**
- * Controlador de CVs
- * Maneja las peticiones HTTP relacionadas con CVs
+ * Controlador de currículos
+ * Maneja las peticiones HTTP relacionadas con currículos
  */
 class CVController {
   /**
-   * Sube y procesa un CV
+   * Sube y procesa un currículo
    * Acepta archivos PDF y TXT
    */
   async uploadCV(req, res) {
@@ -56,29 +56,29 @@ class CVController {
 
       if (!user.hasCVProcessingConsent()) {
         return responseHandler.error(res, 
-          'You must accept consent for AI CV processing before uploading your CV. ' +
+          'You must accept consent for AI curriculum processing before uploading your curriculum. ' +
           'Please accept the terms in your privacy profile.', 
           403
         );
       }
 
       cvNotificationHelper.notifyCVUploaded(userId, userName, null, file.originalname).catch(err => {
-        console.error('Error enviando notificación de CV subido:', err);
+        console.error('Error enviando notificación de currículo subido:', err);
       });
 
       const cv = await aiExtractorService.processCV(userId, textContent, file.originalname);
 
-      // ✅ Verificar completitud del CV y decidir si mostrar cuestionario
+      // ✅ Verificar completitud del currículo y decidir si mostrar cuestionario
       const completenessValidation = validateCVCompleteness(cv);
       const language = req.body.language || req.query.language || user.preferredLanguage || 'en';
 
-      // Si el CV no está completo, iniciar sesión de cuestionario
+      // Si el currículo no está completo, iniciar sesión de cuestionario
       if (!completenessValidation.isComplete) {
         const session = createQuestionnaireSession(userId.toString(), language);
         const questionnaire = getInitialQuestions(cv, language, session);
 
         return responseHandler.success(res, {
-          message: 'CV processed successfully. Please complete the questionnaire to finish your profile.',
+          message: 'Curriculum processed successfully. Please complete the questionnaire to finish your profile.',
           cv: cv.getSummary(),
           completeness: {
             isComplete: false,
@@ -97,9 +97,9 @@ class CVController {
         }, 201);
       }
 
-      // CV completo
+      // Currículo completo
       return responseHandler.success(res, {
-        message: 'CV processed successfully. Your profile is 100% complete!',
+        message: 'Curriculum processed successfully. Your profile is 100% complete!',
         cv: cv.getSummary(),
         completeness: {
           isComplete: true,
@@ -118,7 +118,7 @@ class CVController {
   }
 
   /**
-   * Obtiene el CV del usuario autenticado
+   * Obtiene el currículo del usuario autenticado
    */
   async getMyCV(req, res) {
     try {
@@ -135,7 +135,7 @@ class CVController {
   }
 
   /**
-   * Obtiene un CV específico por ID (solo el propietario o admin)
+   * Obtiene un currículo específico por ID (solo el propietario o admin)
    */
   async getCVById(req, res) {
     try {
@@ -146,7 +146,7 @@ class CVController {
       const cv = await aiExtractorService.getUserCV(userId);
 
       if (cv._id.toString() !== cvId && userRole !== 'org_admin') {
-        return responseHandler.error(res, 'No tienes permisos para ver este CV', 403);
+        return responseHandler.error(res, 'No tienes permisos para ver este currículo', 403);
       }
 
       return responseHandler.success(res, { cv });
@@ -157,8 +157,8 @@ class CVController {
   }
 
   /**
-   * Obtiene todos los CVs (solo admin)
-   * Los org_admin solo ven CVs de su organización
+   * Obtiene todos los currículos (solo admin)
+   * Los org_admin solo ven currículos de su organización
    */
   async getAllCVs(req, res) {
     try {
@@ -181,8 +181,8 @@ class CVController {
   }
 
   /**
-   * Busca CVs por criterios (solo admin)
-   * Los org_admin solo buscan en CVs de su organización
+   * Busca currículos por criterios (solo admin)
+   * Los org_admin solo buscan en currículos de su organización
    */
   async searchCVs(req, res) {
     try {
@@ -206,7 +206,7 @@ class CVController {
   }
 
   /**
-   * Actualiza el CV del usuario
+   * Actualiza el currículo del usuario
    */
   async updateCV(req, res) {
     try {
@@ -217,7 +217,7 @@ class CVController {
       const cv = await aiExtractorService.updateCV(userId, cvId, updates);
 
       return responseHandler.success(res, {
-        message: 'CV actualizado exitosamente',
+        message: 'Currículo actualizado exitosamente',
         cv
       });
 
@@ -227,7 +227,7 @@ class CVController {
   }
 
   /**
-   * Elimina el CV del usuario
+   * Elimina el currículo del usuario
    */
   async deleteCV(req, res) {
     try {
@@ -244,7 +244,7 @@ class CVController {
   }
 
   /**
-   * Obtiene estadísticas del CV (para dashboard)
+   * Obtiene estadísticas del currículo (para dashboard)
    */
   async getCVStats(req, res) {
     try {
@@ -270,7 +270,7 @@ class CVController {
   }
 
   /**
-   * Envía el CV a una organización
+   * Envía el currículo a una organización
    * POST /api/cv/submit-to-organization
    */
   async submitToOrganization(req, res) {
@@ -285,18 +285,18 @@ class CVController {
       const cv = await cvService.submitCVToOrganization(userId, organizationId);
 
       return responseHandler.success(res, {
-        message: 'CV sent successfully to the organization',
+        message: 'Curriculum sent successfully to the organization',
         cv
       }, 201);
 
     } catch (error) {
-      console.error('Error enviando CV a organización:', error);
+      console.error('Error enviando currículo a organización:', error);
       
       const errorMessages = {
         'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
         'ORGANIZATION_NOT_ACTIVE': 'La organización no está activa',
-        'CV_NOT_FOUND': 'No tienes un CV registrado',
-        'CV_ALREADY_SUBMITTED': 'Ya has enviado tu CV a esta organización',
+        'CV_NOT_FOUND': 'No tienes un currículo registrado',
+        'CV_ALREADY_SUBMITTED': 'Ya has enviado tu currículo a esta organización',
         'USER_NOT_FOUND': 'Usuario no encontrado'
       };
 
@@ -308,7 +308,7 @@ class CVController {
         'USER_NOT_FOUND': 404
       };
 
-      const message = errorMessages[error.message] || 'Error al enviar CV';
+      const message = errorMessages[error.message] || 'Error al enviar currículo';
       const statusCode = statusCodes[error.message] || 400;
 
       return responseHandler.error(res, message, statusCode);
@@ -316,13 +316,22 @@ class CVController {
   }
 
   /**
-   * Obtiene los CVs enviados a una organización (solo admins)
+   * Obtiene los currículos enviados a una organización (solo admins)
    * GET /api/organizations/:id/cvs
    */
   async getOrganizationCVs(req, res) {
     try {
-      const { id: organizationId } = req.params;
+      // Use the admin's own organization from their JWT profile.
+      // req.params.id is accepted but validated against the user's actual org.
+      const userOrg = req.user.organization?.toString();
+      const paramOrg = req.params.id;
+      const organizationId = userOrg || paramOrg;
       const adminId = req.user.id;
+
+      if (!organizationId) {
+        return responseHandler.error(res, 'No se proporcionó ID de organización', 400);
+      }
+
       const filters = {
         status: req.query.status,
         page: req.query.page,
@@ -334,11 +343,11 @@ class CVController {
       return responseHandler.success(res, result);
 
     } catch (error) {
-      console.error('Error obteniendo CVs de organización:', error);
+      console.error('Error obteniendo currículos de organización:', error);
       
       const errorMessages = {
         'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
-        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver estos CVs'
+        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver estos currículos'
       };
 
       const statusCodes = {
@@ -346,7 +355,7 @@ class CVController {
         'UNAUTHORIZED_ACCESS': 403
       };
 
-      const message = errorMessages[error.message] || 'Error al obtener CVs';
+      const message = errorMessages[error.message] || 'Error al obtener currículos';
       const statusCode = statusCodes[error.message] || 400;
 
       return responseHandler.error(res, message, statusCode);
@@ -354,12 +363,13 @@ class CVController {
   }
 
   /**
-   * Obtiene un CV específico de la organización
+   * Obtiene un currículo específico de la organización
    * GET /api/organizations/:id/cvs/:cvId
    */
   async getOrganizationCV(req, res) {
     try {
-      const { id: organizationId, cvId } = req.params;
+      const { cvId } = req.params;
+      const organizationId = req.user.organization?.toString() || req.params.id;
       const adminId = req.user.id;
 
       const cv = await cvService.getOrganizationCV(cvId, organizationId, adminId);
@@ -367,13 +377,13 @@ class CVController {
       return responseHandler.success(res, { cv });
 
     } catch (error) {
-      console.error('Error obteniendo CV de organización:', error);
+      console.error('Error obteniendo currículo de organización:', error);
       
       const errorMessages = {
         'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
-        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver este CV',
-        'CV_NOT_FOUND': 'CV no encontrado',
-        'CV_NOT_BELONGS_TO_ORGANIZATION': 'Este CV no pertenece a esta organización'
+        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver este currículo',
+        'CV_NOT_FOUND': 'Currículo no encontrado',
+        'CV_NOT_BELONGS_TO_ORGANIZATION': 'Este currículo no pertenece a esta organización'
       };
 
       const statusCodes = {
@@ -383,7 +393,7 @@ class CVController {
         'CV_NOT_BELONGS_TO_ORGANIZATION': 403
       };
 
-      const message = errorMessages[error.message] || 'Error al obtener CV';
+      const message = errorMessages[error.message] || 'Error al obtener currículo';
       const statusCode = statusCodes[error.message] || 400;
 
       return responseHandler.error(res, message, statusCode);
@@ -391,12 +401,13 @@ class CVController {
   }
 
   /**
-   * Actualiza el estado de un CV en la organización
+   * Actualiza el estado de un currículo en la organización
    * PATCH /api/organizations/:id/cvs/:cvId/status
    */
   async updateCVStatus(req, res) {
     try {
-      const { id: organizationId, cvId } = req.params;
+      const { cvId } = req.params;
+      const organizationId = req.user.organization?.toString() || req.params.id;
       const adminId = req.user.id;
       const { status, notes, position, department } = req.body;
 
@@ -413,7 +424,7 @@ class CVController {
         );
       }
 
-      // Datos adicionales del empleado cuando se acepta el CV
+      // Datos adicionales del empleado cuando se acepta el currículo
       const employeeData = {
         position: position || '',
         department: department || ''
@@ -429,18 +440,18 @@ class CVController {
       );
 
       return responseHandler.success(res, {
-        message: 'Estado del CV actualizado exitosamente',
+        message: 'Estado del currículo actualizado exitosamente',
         cv
       });
 
     } catch (error) {
-      console.error('Error actualizando estado de CV:', error);
+      console.error('Error actualizando estado de currículo:', error);
       
       const errorMessages = {
         'ORGANIZATION_NOT_FOUND': 'Organización no encontrada',
-        'UNAUTHORIZED_ACCESS': 'No tienes permisos para actualizar este CV',
-        'CV_NOT_FOUND': 'CV no encontrado',
-        'CV_NOT_BELONGS_TO_ORGANIZATION': 'Este CV no pertenece a esta organización'
+        'UNAUTHORIZED_ACCESS': 'No tienes permisos para actualizar este currículo',
+        'CV_NOT_FOUND': 'Currículo no encontrado',
+        'CV_NOT_BELONGS_TO_ORGANIZATION': 'Este currículo no pertenece a esta organización'
       };
 
       const statusCodes = {
@@ -458,7 +469,7 @@ class CVController {
   }
 
   /**
-   * Get CV completeness status
+   * Get curriculum completeness status
    * GET /api/cv/completeness
    */
   async getCompleteness(req, res) {
@@ -468,7 +479,7 @@ class CVController {
       const cv = await CV.findOne({ userId }).populate('userId', 'name email');
 
       if (!cv) {
-        return responseHandler.error(res, 'CV not found. Please upload your CV first.', 404);
+        return responseHandler.error(res, 'Curriculum not found. Please upload your curriculum first.', 404);
       }
 
       const completeness = validateCVCompleteness(cv);
@@ -490,10 +501,10 @@ class CVController {
         categories: categoryStatus,
         missingFields: completeness.missingFields,
         missingByPriority: completeness.missingByPriority
-      }, 'CV completeness retrieved successfully');
+      }, 'Curriculum completeness retrieved successfully');
     } catch (error) {
-      console.error('Error getting CV completeness:', error);
-      return responseHandler.error(res, 'Error retrieving CV completeness', 500);
+      console.error('Error getting curriculum completeness:', error);
+      return responseHandler.error(res, 'Error retrieving curriculum completeness', 500);
     }
   }
 
@@ -510,7 +521,7 @@ class CVController {
       const cv = await CV.findOne({ userId });
 
       if (!cv) {
-        return responseHandler.error(res, 'CV not found. Please upload your CV first.', 404);
+        return responseHandler.error(res, 'Curriculum not found. Please upload your curriculum first.', 404);
       }
 
       const completeness = validateCVCompleteness(cv);
@@ -519,8 +530,8 @@ class CVController {
         return responseHandler.success(res, {
           isComplete: true,
           questions: [],
-          message: 'Your CV is complete! No additional information needed.'
-        }, 'CV is complete');
+          message: 'Your curriculum is complete! No additional information needed.'
+        }, 'Curriculum is complete');
       }
 
       let questions;
@@ -559,13 +570,13 @@ class CVController {
       const cv = await CV.findOne({ userId });
 
       if (!cv) {
-        return responseHandler.error(res, 'CV not found. Please upload your CV first.', 404);
+        return responseHandler.error(res, 'Curriculum not found. Please upload your curriculum first.', 404);
       }
 
       // Validate completeness before update
       const beforeCompleteness = validateCVCompleteness(cv);
 
-      // Apply updates to CV
+      // Apply updates to curriculum
       Object.entries(updates).forEach(([key, value]) => {
         // Handle nested fields (e.g., 'availability.immediate')
         const keys = key.split('.');
@@ -620,7 +631,7 @@ class CVController {
       const cv = await CV.findOne({ userId });
 
       if (!cv) {
-        return responseHandler.error(res, 'CV not found. Please upload your CV first.', 404);
+        return responseHandler.error(res, 'Curriculum not found. Please upload your curriculum first.', 404);
       }
 
       const completeness = validateCVCompleteness(cv);
@@ -629,11 +640,11 @@ class CVController {
         return responseHandler.success(res, {
           isComplete: true,
           message: {
-            en: 'Your CV is already complete!',
-            es: '¡Tu CV ya está completo!'
+            en: 'Your curriculum is already complete!',
+            es: '¡Tu currículo ya está completo!'
           },
           completenessScore: 100
-        }, 'CV is complete');
+        }, 'Curriculum is complete');
       }
 
       // Create session and get initial questions
@@ -676,7 +687,7 @@ class CVController {
       const cv = await CV.findOne({ userId });
 
       if (!cv) {
-        return responseHandler.error(res, 'CV not found. Please upload your CV first.', 404);
+        return responseHandler.error(res, 'Curriculum not found. Please upload your curriculum first.', 404);
       }
 
       // Process and move to next phase
@@ -696,11 +707,10 @@ class CVController {
   }
 
   /**
-   * Submit and finalize questionnaire
-   * POST /api/cv/questionnaire/submit
-   * Body: { responses: { field: value, ... } }
+   * Submit and finalize questionnaire (legacy)
+   * @deprecated Use submitQuestionnaire with sessionId instead
    */
-  async submitQuestionnaire(req, res) {
+  async submitQuestionnaireSimple(req, res) {
     try {
       const userId = req.user.id;
       const { responses } = req.body;
@@ -712,7 +722,7 @@ class CVController {
       const cv = await CV.findOne({ userId });
 
       if (!cv) {
-        return responseHandler.error(res, 'CV not found. Please upload your CV first.', 404);
+        return responseHandler.error(res, 'Curriculum not found. Please upload your curriculum first.', 404);
       }
 
       // Finalize questionnaire and update CV
@@ -792,13 +802,13 @@ class CVController {
         return responseHandler.error(res, 'Missing required fields: sessionId, currentPhase, responses', 400);
       }
 
-      // Get user's CV
+      // Get user's curriculum
       const cv = await CV.findOne({ userId });
       if (!cv) {
-        return responseHandler.error(res, 'CV not found', 404);
+        return responseHandler.error(res, 'Curriculum not found', 404);
       }
 
-      // Update CV with responses
+      // Update curriculum with responses
       Object.entries(responses).forEach(([field, value]) => {
         const keys = field.split('.');
         let target = cv;
@@ -858,10 +868,10 @@ class CVController {
         return responseHandler.error(res, 'Missing required fields: sessionId, finalResponses', 400);
       }
 
-      // Get user's CV
+      // Get user's curriculum
       const cv = await CV.findOne({ userId });
       if (!cv) {
-        return responseHandler.error(res, 'CV not found', 404);
+        return responseHandler.error(res, 'Curriculum not found', 404);
       }
 
       const previousCompleteness = validateCVCompleteness(cv);
@@ -898,7 +908,7 @@ class CVController {
           fieldsUpdated: Object.keys(finalResponses).length,
           missingFields: finalCompleteness.missingFields
         },
-        message: 'CV successfully updated! You are now ready for team recommendations.'
+        message: 'Curriculum successfully updated! You are now ready for team recommendations.'
       });
 
     } catch (error) {

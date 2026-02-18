@@ -95,7 +95,7 @@ class ProjectService {
       throw AppError.notFound('PROJECT_NOT_FOUND', 'Project not found');
     }
 
-    // Si se solicitan empleados, cargar CVs y perfiles BFI44
+    // Si se solicitan empleados, cargar currículos y perfiles BFI44
     if (includeAssignedEmployees && project.assignedEmployees && project.assignedEmployees.length > 0) {
       const CV = require('../models/cv.model');
       const BFI44 = require('../models/bfi44.model');
@@ -104,7 +104,7 @@ class ProjectService {
         .filter(emp => emp.user != null)
         .map(emp => emp.user._id || emp.user);
       
-      // Obtener CVs de los miembros del equipo
+      // Obtener currículos de los miembros del equipo
       const cvs = await CV.find({ 
         userId: { $in: teamMemberIds },
         organizationStatus: 'accepted'
@@ -125,7 +125,7 @@ class ProjectService {
       // Convertir proyecto a objeto plano para poder modificarlo
       const projectObj = project.toObject();
       
-      // Agregar CVs y perfiles BFI44 a los usuarios
+      // Agregar currículos y perfiles BFI44 a los usuarios
       projectObj.assignedEmployees = projectObj.assignedEmployees.map(emp => {
         if (emp.user) {
           const userId = (emp.user._id || emp.user).toString();

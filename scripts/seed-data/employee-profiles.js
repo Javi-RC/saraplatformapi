@@ -56,24 +56,24 @@ const CITIES_BY_COUNTRY = {
 const COUNTRIES = Object.keys(CITIES_BY_COUNTRY);
 
 const POSITIONS = [
-  { title: 'Senior Full Stack Developer', specialty: 'Full Stack Development', mainTech: ['JavaScript', 'Node.js', 'React'], levelRange: ['mid', 'senior'] },
-  { title: 'Frontend Developer', specialty: 'Frontend & UX/UI', mainTech: ['React', 'TypeScript', 'CSS'], levelRange: ['junior', 'mid', 'senior'] },
-  { title: 'Backend Developer', specialty: 'Backend Development', mainTech: ['Java', 'Spring Boot', 'PostgreSQL'], levelRange: ['junior', 'mid', 'senior'] },
-  { title: 'Backend Engineer', specialty: 'Backend Development', mainTech: ['Python', 'FastAPI', 'PostgreSQL'], levelRange: ['junior', 'mid', 'senior'] },
-  { title: 'QA Engineer', specialty: 'Quality Assurance & Test Automation', mainTech: ['Selenium', 'Cypress', 'JavaScript'], levelRange: ['junior', 'mid', 'senior'] },
-  { title: 'DevOps Engineer', specialty: 'DevOps & Cloud Infrastructure', mainTech: ['AWS', 'Kubernetes', 'Terraform'], levelRange: ['mid', 'senior'] },
-  { title: 'Solutions Architect', specialty: 'Software Architecture & System Design', mainTech: ['AWS', 'Microservices', 'Java'], levelRange: ['senior'] },
-  { title: 'Mobile Developer', specialty: 'Mobile Development', mainTech: ['React Native', 'Swift', 'Kotlin'], levelRange: ['junior', 'mid', 'senior'] },
-  { title: 'Data Scientist', specialty: 'Data Science & ML', mainTech: ['Python', 'TensorFlow', 'SQL'], levelRange: ['mid', 'senior'] },
-  { title: 'Full Stack Engineer', specialty: 'Full Stack Development', mainTech: ['Python', 'Django', 'Vue.js'], levelRange: ['junior', 'mid', 'senior'] },
-  { title: 'Frontend Engineer', specialty: 'Frontend & UX/UI', mainTech: ['Vue.js', 'TypeScript', 'Tailwind'], levelRange: ['mid', 'senior'] },
-  { title: 'Software Engineer', specialty: 'Full Stack Development', mainTech: ['JavaScript', 'React', 'Node.js'], levelRange: ['junior', 'mid', 'senior'] },
-  { title: 'Cloud Engineer', specialty: 'DevOps & Cloud Infrastructure', mainTech: ['Azure', 'Kubernetes', 'Docker'], levelRange: ['mid', 'senior'] },
-  { title: 'Machine Learning Engineer', specialty: 'Data Science & ML', mainTech: ['Python', 'PyTorch', 'Kubernetes'], levelRange: ['mid', 'senior'] },
-  { title: 'Site Reliability Engineer', specialty: 'DevOps & Cloud Infrastructure', mainTech: ['Kubernetes', 'Prometheus', 'Go'], levelRange: ['mid', 'senior'] },
-  { title: 'Data Engineer', specialty: 'Data Science & ML', mainTech: ['Python', 'Spark', 'Airflow'], levelRange: ['mid', 'senior'] },
-  { title: 'Security Engineer', specialty: 'Backend Development', mainTech: ['Python', 'Security Tools', 'Kubernetes'], levelRange: ['mid', 'senior'] },
-  { title: 'UI/UX Designer', specialty: 'Frontend & UX/UI', mainTech: ['Figma', 'React', 'CSS'], levelRange: ['junior', 'mid', 'senior'] }
+  { title: 'Desarrollador Full Stack Senior', specialty: 'Desarrollo Full Stack', mainTech: ['JavaScript', 'Node.js', 'React'], levelRange: ['mid', 'senior'] },
+  { title: 'Desarrollador Frontend', specialty: 'Frontend y UX/UI', mainTech: ['React', 'TypeScript', 'CSS'], levelRange: ['junior', 'mid', 'senior'] },
+  { title: 'Desarrollador Backend', specialty: 'Desarrollo Backend', mainTech: ['Java', 'Spring Boot', 'PostgreSQL'], levelRange: ['junior', 'mid', 'senior'] },
+  { title: 'Ingeniero Backend', specialty: 'Desarrollo Backend', mainTech: ['Python', 'FastAPI', 'PostgreSQL'], levelRange: ['junior', 'mid', 'senior'] },
+  { title: 'Ingeniero de QA', specialty: 'Aseguramiento de Calidad y Automatización de Pruebas', mainTech: ['Selenium', 'Cypress', 'JavaScript'], levelRange: ['junior', 'mid', 'senior'] },
+  { title: 'Ingeniero DevOps', specialty: 'DevOps e Infraestructura Cloud', mainTech: ['AWS', 'Kubernetes', 'Terraform'], levelRange: ['mid', 'senior'] },
+  { title: 'Arquitecto de Soluciones', specialty: 'Arquitectura de Software y Diseño de Sistemas', mainTech: ['AWS', 'Microservices', 'Java'], levelRange: ['senior'] },
+  { title: 'Desarrollador Móvil', specialty: 'Desarrollo Móvil', mainTech: ['React Native', 'Swift', 'Kotlin'], levelRange: ['junior', 'mid', 'senior'] },
+  { title: 'Científico de Datos', specialty: 'Ciencia de Datos y ML', mainTech: ['Python', 'TensorFlow', 'SQL'], levelRange: ['mid', 'senior'] },
+  { title: 'Ingeniero Full Stack', specialty: 'Desarrollo Full Stack', mainTech: ['Python', 'Django', 'Vue.js'], levelRange: ['junior', 'mid', 'senior'] },
+  { title: 'Ingeniero Frontend', specialty: 'Frontend y UX/UI', mainTech: ['Vue.js', 'TypeScript', 'Tailwind'], levelRange: ['mid', 'senior'] },
+  { title: 'Ingeniero de Software', specialty: 'Desarrollo Full Stack', mainTech: ['JavaScript', 'React', 'Node.js'], levelRange: ['junior', 'mid', 'senior'] },
+  { title: 'Ingeniero Cloud', specialty: 'DevOps e Infraestructura Cloud', mainTech: ['Azure', 'Kubernetes', 'Docker'], levelRange: ['mid', 'senior'] },
+  { title: 'Ingeniero de Machine Learning', specialty: 'Ciencia de Datos y ML', mainTech: ['Python', 'PyTorch', 'Kubernetes'], levelRange: ['mid', 'senior'] },
+  { title: 'Ingeniero de Confiabilidad del Sitio (SRE)', specialty: 'DevOps e Infraestructura Cloud', mainTech: ['Kubernetes', 'Prometheus', 'Go'], levelRange: ['mid', 'senior'] },
+  { title: 'Ingeniero de Datos', specialty: 'Ciencia de Datos y ML', mainTech: ['Python', 'Spark', 'Airflow'], levelRange: ['mid', 'senior'] },
+  { title: 'Ingeniero de Seguridad', specialty: 'Desarrollo Backend', mainTech: ['Python', 'Security Tools', 'Kubernetes'], levelRange: ['mid', 'senior'] },
+  { title: 'Diseñador UI/UX', specialty: 'Frontend y UX/UI', mainTech: ['Figma', 'React', 'CSS'], levelRange: ['junior', 'mid', 'senior'] }
 ];
 
 // Helper function to generate random employee
@@ -315,4 +315,4 @@ module.exports = { COMPLETE_EMPLOYEE_DATA };
 
 // Instructions for integration:
 // The comprehensive-seed.js file should be updated to use this data
-// to generate complete CVs automatically for all employees
+// to generate complete currículos automatically for all employees

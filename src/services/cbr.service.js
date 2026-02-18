@@ -155,7 +155,7 @@ async function retrieveSimilarCases(project, organizationId, k = 5, teamAnalysis
 
 /**
  * Extract features from a project for similarity calculation
- * NOW ACCEPTS: teamAnalysis parameter with CV, BFI-44, org data
+ * NOW ACCEPTS: teamAnalysis parameter with curriculum, BFI-44, org data
  */
 function extractProjectFeatures(project, teamAnalysis = null) {
   return {
@@ -677,11 +677,9 @@ function getCategoryForRiskType(type) {
     'team_overload': 'team',
     'dependency_blockage': 'organizational',
     'scope_creep': 'management',
-    'process_mismatch': 'management',
-    'technical_infrastructure': 'technical',
-    'quality_degradation': 'technical'
+    'process_mismatch': 'management'
   };
-  return categoryMap[type] || 'other';
+  return categoryMap[type] || 'management';
 }
 
 function getClarityLevel(project) {

@@ -2,7 +2,7 @@ const { cvRepository, userRepository } = require('../repositories');
 const cvNotificationHelper = require('./cvNotificationHelper');
 
 /**
- * Servicio de extracción de CVs usando IA
+ * Servicio de extracción de currículos usando IA
  * Utiliza Gemini API (gratuita) de Google para extraer información estructurada
  * Implementa sistema de fallback automático entre modelos
  */
@@ -84,7 +84,7 @@ class AIExtractorService {
   }
 
   /**
-   * Procesa un CV usando IA y guarda la información extraída
+   * Procesa un currículo usando IA y guarda la información extraída
    * Requiere que el usuario haya dado consentimiento previo
    */
   async processCV(userId, textContent, originalFileName) {
@@ -101,13 +101,13 @@ class AIExtractorService {
       }
 
       if (!user.hasCVProcessingConsent()) {
-        throw new Error('CONSENT_REQUIRED: El usuario no ha dado consentimiento para el procesamiento de CVs con IA');
+        throw new Error('CONSENT_REQUIRED: El usuario no ha dado consentimiento para el procesamiento de currículos con IA');
       }
 
       // Extraer información usando IA
       const extractedData = await this._extractWithAI(textContent);
 
-      // Construir objeto CV con los datos extraídos
+      // Construir objeto currículo con los datos extraídos
       const cvData = {
         userId,
         originalFileName,
@@ -131,16 +131,16 @@ class AIExtractorService {
       // Guardar en base de datos
       const cv = await this._saveOrUpdateCV(userId, cvData);
 
-      // Enviar notificación In-App de CV procesado exitosamente
+      // Enviar notificación In-App de currículo procesado exitosamente
       // Reutilizamos la variable 'user' que ya obtuvimos al inicio para validar consentimiento
       const userName = user?.name || 'Usuario';
       cvNotificationHelper.notifyCVProcessed(userId, userName, cv._id).catch(err => {
-        console.error('Error enviando notificación de CV procesado:', err);
+        console.error('Error enviando notificación de currículo procesado:', err);
       });
 
       return cv;
     } catch (error) {
-      console.error('Error procesando CV con IA:', error);
+      console.error('Error procesando currículo con IA:', error);
       
       // Intentar enviar notificación de fallo
       try {
@@ -150,11 +150,11 @@ class AIExtractorService {
             userId, 
             userForNotification.name || 'Usuario', 
             null, 
-            'Error al procesar el CV con IA'
+            'Error al procesar el currículo con IA'
           ).catch(err => console.error('Error enviando notificación de fallo:', err));
         }
       } catch (notifyError) {
-        console.error('Error al notificar fallo de CV:', notifyError);
+        console.error('Error al notificar fallo de currículo:', notifyError);
       }
       
       throw new Error('ERROR_PROCESSING_CV');
@@ -162,7 +162,7 @@ class AIExtractorService {
   }
 
   /**
-   * Extrae información del CV usando la API de Gemini
+   * Extrae información del currículo usando la API de Gemini
    * Implementa retry automático con cambio de modelo
    */
   async _extractWithAI(textContent) {
@@ -199,7 +199,7 @@ class AIExtractorService {
               temperature: 0.1,
               topK: 1,
               topP: 1,
-              maxOutputTokens: 8192, // Aumentado para CVs largos
+              maxOutputTokens: 8192, // Aumentado para currículos largos
               responseMimeType: "application/json" // Forzar respuesta en JSON
             }
           })
@@ -301,7 +301,7 @@ class AIExtractorService {
     }
 
     console.error('❌ Todos los modelos fallaron');
-    throw lastError || new Error('Could not process CV with any available model');
+    throw lastError || new Error('Could not process curriculum with any available model');
   }
 
   /**
@@ -416,18 +416,18 @@ class AIExtractorService {
    * Construye el prompt para la IA
    */
   _buildPrompt(cvText) {
-    return `Eres un experto en análisis y extracción de información de CVs. Tu tarea es extraer TODA la información relevante del siguiente CV y estructurarla en formato JSON válido.
+    return `Eres un experto en análisis y extracción de información de currículos. Tu tarea es extraer TODA la información relevante del siguiente currículo y estructurarla en formato JSON válido.
 
 REGLAS CRÍTICAS:
 - SOLO devuelve un objeto JSON válido, sin texto adicional
 - NO uses comas finales en arrays u objetos
 - CIERRA todos los arrays [] y objetos {} correctamente
 - Si un campo no tiene información, usa null o array vacío []
-- NO inventes información que no esté en el CV
+- NO inventes información que no esté en el currículo
 - Mantén los nombres originales tal como aparecen
 - IMPORTANTE: Para campos enum, usa EXACTAMENTE los valores especificados
 
-CV A ANALIZAR:
+CURRÍCULO A ANALIZAR:
 ${cvText}
 
 FORMATO DE SALIDA REQUERIDO (respeta EXACTAMENTE esta estructura):
@@ -594,7 +594,7 @@ Devuelve ÚNICAMENTE el JSON válido sin bloques de código markdown ni explicac
   async getAllCVs(filters = {}, user = null) {
     const query = {};
     
-    // Si el usuario es org_admin, solo mostrar CVs de su organización
+    // Si el usuario es org_admin, solo mostrar currículos de su organización
     if (user && user.role === 'org_admin' && user.organization) {
       query.organization = user.organization;
     }
@@ -631,13 +631,13 @@ Devuelve ÚNICAMENTE el JSON válido sin bloques de código markdown ni explicac
     if (!cv) {
       throw new Error('CV_NOT_FOUND');
     }
-    return { message: 'CV eliminado exitosamente' };
+    return { message: 'Currículo eliminado exitosamente' };
   }
 
   async searchCVs(criteria, user = null) {
     const query = {};
 
-    // Si el usuario es org_admin, solo buscar en CVs de su organización
+    // Si el usuario es org_admin, solo buscar en currículos de su organización
     if (user && user.role === 'org_admin' && user.organization) {
       query.organization = user.organization;
     }

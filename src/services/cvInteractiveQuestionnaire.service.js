@@ -1,5 +1,5 @@
 /**
- * Interactive CV Questionnaire Service
+ * Interactive Curriculum Questionnaire Service
  * Manages the interactive flow of questions based on user responses
  * Following SOLID principles: Single Responsibility Principle
  */
@@ -103,7 +103,7 @@ function generateSessionId() {
 
 /**
  * Get the first set of questions for a questionnaire session
- * @param {Object} cv - CV object
+ * @param {Object} cv - Curriculum object
  * @param {string} language - Language code
  * @param {Object} session - Questionnaire session
  * @returns {Object} Questions and session data
@@ -140,7 +140,7 @@ function getInitialQuestions(cv, language = 'en', session = null) {
     }
   }
 
-  // If no phase has questions, CV is complete
+  // If no phase has questions, curriculum is complete
   if (!selectedPhase) {
     return {
       session: sess,
@@ -173,7 +173,7 @@ function getInitialQuestions(cv, language = 'en', session = null) {
 
 /**
  * Process user responses and get the next set of questions
- * @param {Object} cv - CV object
+ * @param {Object} cv - Curriculum object
  * @param {Object} responses - User's answers to current questions
  * @param {string} currentPhase - Current phase ID
  * @param {string} language - Language code
@@ -182,7 +182,7 @@ function getInitialQuestions(cv, language = 'en', session = null) {
 function processResponsesAndGetNext(cv, responses, currentPhase, language = 'en') {
   const lang = ['en', 'es'].includes(language) ? language : 'en';
 
-  // Merge responses with CV
+  // Merge responses with curriculum
   const updatedCV = { ...cv };
   Object.entries(responses).forEach(([key, value]) => {
     const keys = key.split('.');
@@ -264,10 +264,10 @@ function processResponsesAndGetNext(cv, responses, currentPhase, language = 'en'
 }
 
 /**
- * Finalize the questionnaire and return final CV state
- * @param {Object} cv - CV object
+ * Finalize the questionnaire and return final curriculum state
+ * @param {Object} cv - Curriculum object
  * @param {Object} finalResponses - Final set of responses
- * @returns {Object} Final CV state and completion status
+ * @returns {Object} Final curriculum state and completion status
  */
 function finalizeQuestionnaire(cv, finalResponses) {
   // Merge final responses
@@ -296,11 +296,11 @@ function finalizeQuestionnaire(cv, finalResponses) {
     missingByPriority: completeness.missingByPriority,
     summary: {
       en: completeness.isComplete
-        ? 'Your CV is now complete and ready for use!'
-        : `Your CV is ${completeness.completenessScore}% complete. ${completeness.missingFields.length} fields still need attention.`,
+        ? 'Your curriculum is now complete and ready for use!'
+        : `Your curriculum is ${completeness.completenessScore}% complete. ${completeness.missingFields.length} fields still need attention.`,
       es: completeness.isComplete
-        ? '¡Tu CV ahora está completo y listo para usar!'
-        : `Tu CV está ${completeness.completenessScore}% completo. ${completeness.missingFields.length} campos aún necesitan atención.`
+        ? '¡Tu currículo ahora está completo y listo para usar!'
+        : `Tu currículo está ${completeness.completenessScore}% completo. ${completeness.missingFields.length} campos aún necesitan atención.`
     }
   };
 }

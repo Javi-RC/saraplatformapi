@@ -54,7 +54,7 @@ describe('OrganizationNotificationHelper - Unit Tests', () => {
     expect(notificationService.create).toHaveBeenCalledWith(
       expect.objectContaining({
         recipientId: 'admin-1',
-        title: 'New CV Received',
+        title: 'New Curriculum Received',
         channels: ['in_app'],
         metadata: expect.objectContaining({ organizationName: 'Org', userEmail: 'alice@test.com', cvId: 'cv-1' })
       })

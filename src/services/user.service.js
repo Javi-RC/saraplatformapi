@@ -136,7 +136,7 @@ class UserService {
    * @private
    */
   async _deletePersonalData(userId, session) {
-    // Delete CVs (sensitive personal information)
+    // Delete curricula (sensitive personal information)
     await cvRepository.deleteMany({ user: userId }, { session });
 
     // Delete notifications (user communications)
@@ -323,7 +323,7 @@ class UserService {
         type: 'data_deletion',
         message: 'The following data will be permanently deleted:',
         items: [
-          cvCount > 0 ? `${cvCount} CV(s)` : null,
+          cvCount > 0 ? `${cvCount} currículo(s)` : null,
           notificationCount > 0 ? `${notificationCount} notification(s)` : null,
           hasBFI44 ? 'BFI-44 personality profile' : null,
           'All personal information and account data'

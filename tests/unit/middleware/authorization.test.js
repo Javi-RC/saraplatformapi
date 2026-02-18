@@ -5,7 +5,8 @@ const {
   requireCompleteProfile,
   requireOwnerOrOrgAdmin,
   requireOrganizationAdmin,
-  requireOrganizationMember
+  requireOrganizationMember,
+  requireOrgAdminOrProjectManager
 } = require('../../../src/middleware/authorization');
 
 describe('Authorization Middleware - Unit Tests', () => {
@@ -230,6 +231,37 @@ describe('Authorization Middleware - Unit Tests', () => {
         success: false,
         error: 'Not authenticated'
       });
+    });
+  });
+
+  describe('requireOrgAdminOrProjectManager', () => {
+    it('debería permitir acceso a org_admin', async () => {
+      req.user = { id: 'admin-1', role: 'org_admin' };
+
+      await requireOrgAdminOrProjectManager(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+      expect(req.isProjectManager).toBe(false);
+    });
+
+    it('debería denegar acceso sin autenticación', async () => {
+      await requireOrgAdminOrProjectManager(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        error: 'Not authenticated'
+      });
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('debería denegar acceso a empleado sin rol de project manager', async () => {
+      req.user = { id: 'emp-1', role: 'employee', organization: null };
+
+      await requireOrgAdminOrProjectManager(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(next).not.toHaveBeenCalled();
     });
   });
 });

@@ -27,7 +27,8 @@ describe('JWT Utils - Unit Tests', () => {
           userId: user._id,
           email: user.email,
           name: user.name,
-          role: user.role
+          role: user.role,
+          organization: null
         },
         'test-jwt-secret-for-testing-only-32-chars', // ✅ Usar el mismo secret
         { expiresIn: '7d' } // ✅ Usar el mismo expiresIn

@@ -1,6 +1,6 @@
-// Comprehensive Seed CVs with Complete Data for ALL Employees
+// Comprehensive Seed Currículos with Complete Data for ALL Employees
 const seedCVs = async (users, organizations) => {
-  console.log('\n📄 Creating comprehensive CVs with complete data for ALL employees...');
+  console.log('\n📄 Creating comprehensive currículos with complete data for ALL employees...');
   
   const CV = require('../../src/models/cv.model');
   
@@ -406,7 +406,7 @@ const seedCVs = async (users, organizations) => {
       isComplete: true,
       lastProcessedAt: new Date()
     },
-    // Pending users with CVs waiting review
+    // Pending users with currículos waiting review
     {
       userId: users.find(u => u.email === 'pending.user1@example.com')._id,
       organization: organizations[0]._id,
@@ -464,7 +464,7 @@ const seedCVs = async (users, organizations) => {
   ];
   
   const createdCVs = await CV.insertMany(cvs);
-  console.log(`✅ Created ${createdCVs.length} CVs`);
+  console.log(`✅ Created ${createdCVs.length} currículos`);
   return createdCVs;
 };
 

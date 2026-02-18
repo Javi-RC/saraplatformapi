@@ -63,7 +63,7 @@ function getOrganizationId(organization) {
 
 /**
  * Main prediction function - orchestrates Decision Tree + CBR
- * Now includes full team analysis (CVs, BFI-44, organization context)
+ * Now includes full team analysis (curricula, BFI-44, organization context)
  * @param {string} projectId - Project ID
  * @param {string} lang - Language code for translations (es, en)
  */
@@ -352,13 +352,6 @@ function combineRisks(treeRisks, cbrRisks, lang = 'es') {
   const dtRisks = treeRisks.map(risk => {
     const translated = i18n.translateRisk(risk.type, lang);
     return {
-      type: risk.type,
-      title: translated?.title || risk.title,
-      description: translated?.description || risk.description,
-      category: risk.category,
-      severity: risk.severity,  // No similarity - just severity
-      source: 'expert_rules',
-      reasoning: risk.reasoning,
       type: risk.type,
       title: translated?.title || risk.title,
       description: translated?.description || risk.description,

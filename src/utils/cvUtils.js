@@ -1,5 +1,5 @@
 /**
- * Utilidades para extracción de información de CVs
+ * Utilidades para extracción de información de currículos
  * Contiene funciones para extraer y normalizar datos usando regex
  */
 

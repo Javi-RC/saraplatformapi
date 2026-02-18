@@ -2,7 +2,7 @@ const cvUtils = require('../../utils/cvUtils');
 
 /**
  * Extractor de experiencia laboral
- * Responsabilidad única: extraer historial laboral del CV
+ * Responsabilidad única: extraer historial laboral del currículo
  */
 class ExperienceExtractor {
   /**

@@ -27,8 +27,8 @@ class ResponseHandler {
       'PASSWORD_TOO_SHORT': { status: 400, message: 'Password must be at least 6 characters long' },
       'MISSING_CREDENTIALS': { status: 400, message: 'Email and password are required' },
       'MISSING_EMAIL_OR_NAME': { status: 400, message: 'Email and name are required' },
-      'ERROR_PROCESSING_CV': { status: 500, message: 'Error processing the CV. Check the Gemini API configuration.' },
-      'CV_NOT_FOUND': { status: 404, message: 'CV not found' },
+      'ERROR_PROCESSING_CV': { status: 500, message: 'Error processing the curriculum. Check the Gemini API configuration.' },
+      'CV_NOT_FOUND': { status: 404, message: 'Curriculum not found' },
       'INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
       'BFI44_INVALID_RESPONSES_FORMAT': { status: 400, message: 'Invalid responses format' },
       'BFI44_INVALID_RESPONSE_COUNT': { status: 400, message: 'There must be exactly 44 responses' },
@@ -38,7 +38,8 @@ class ResponseHandler {
       'Organization not found': { status: 404, message: 'Organization not found' },
       'Project manager not found': { status: 404, message: 'Project manager not found' },
       'Notificación no encontrada': { status: 404, message: 'Notification not found' },
-      'Usuario receptor no encontrado': { status: 404, message: 'Notification recipient not found' }
+      'Usuario receptor no encontrado': { status: 404, message: 'Notification recipient not found' },
+      'ORGANIZATION_NAME_ALREADY_EXISTS': { status: 409, message: 'An organization with that name already exists' }
     };
 
     const errorMessage = error && error.message ? error.message : null;

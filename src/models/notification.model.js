@@ -14,7 +14,7 @@ const NotificationTypes = {
   ACCOUNT_DELETION_REQUIREMENTS: 'account_deletion_requirements',
   ROLE_CHANGED: 'role_changed',
   
-  // Notificaciones de CV
+  // Notificaciones de currículo
   CV_UPLOADED: 'cv_uploaded',
   CV_PROCESSED: 'cv_processed',
   CV_ANALYSIS_READY: 'cv_analysis_ready',

@@ -1,6 +1,6 @@
 /**
- * CV Completeness Validator Service
- * Validates CV completeness and identifies missing or incomplete fields
+ * Curriculum Completeness Validator Service
+ * Validates curriculum completeness and identifies missing or incomplete fields
  * Following SOLID principles: Single Responsibility Principle
  */
 
@@ -192,8 +192,8 @@ const CRITICAL_FIELDS = {
 };
 
 /**
- * Validates CV completeness and returns detailed report
- * @param {Object} cv - CV object to validate
+ * Validates curriculum completeness and returns detailed report
+ * @param {Object} cv - Curriculum object to validate
  * @returns {Object} Validation report with missing fields by category and priority
  */
 function validateCVCompleteness(cv) {
@@ -264,7 +264,7 @@ function getFieldConfig(fieldPath) {
 
 /**
  * Validates if a specific field is complete
- * @param {Object} cv - CV object
+ * @param {Object} cv - Curriculum object
  * @param {string} fieldPath - Field path to validate
  * @returns {boolean} True if field is complete, false otherwise
  */
@@ -278,7 +278,7 @@ function isFieldComplete(cv, fieldPath) {
 
 /**
  * Get completeness status for each category
- * @param {Object} cv - CV object
+ * @param {Object} cv - Curriculum object
  * @returns {Object} Category-wise completeness status
  */
 function getCategoryCompleteness(cv) {

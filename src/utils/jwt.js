@@ -12,7 +12,8 @@ exports.generateToken = (user) => {
     userId: user._id.toString(),
     email: user.email,
     name: user.name,
-    role: user.role
+    role: user.role,
+    organization: user.organization ? user.organization.toString() : null
   };
 
   return jwt.sign(payload, JWT_SECRET, {

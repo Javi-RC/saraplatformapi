@@ -1,8 +1,8 @@
 // ============================================================================
-// COMPREHENSIVE SEED CVs - AUTO-GENERATED COMPLETE DATA FOR ALL EMPLOYEES
+// COMPREHENSIVE SEED CURRÍCULOS - AUTO-GENERATED COMPLETE DATA FOR ALL EMPLOYEES
 // ============================================================================
-// This module automatically generates complete, realistic CV data for all employees
-// Each CV includes: education, experience, skills, certifications, projects, etc.
+// This module automatically generates complete, realistic currículo data for all employees
+// Each currículo includes: education, experience, skills, certifications, projects, etc.
 // ============================================================================
 
 const { COMPLETE_EMPLOYEE_DATA } = require('./employee-profiles');
@@ -32,16 +32,16 @@ const generators = {
     if (profile.level === 'senior') {
       education.push({
         institution: uni,
-        degree: 'Master of Science',
+        degree: 'Máster en Ciencias',
         fieldOfStudy: profile.specialty,
         startDate: String(2022 - profile.years + 4),
         endDate: String(2022 - profile.years + 6),
         current: false,
         grade: `${(8.5 + Math.random() * 1.3).toFixed(1)}/10`,
         achievements: [
-          'Graduated with honors',
-          'Research publication',
-          'Best thesis award'
+          'Graduado con honores',
+          'Publicación de investigación',
+          'Premio a la mejor tesis'
         ]
       });
     }
@@ -49,23 +49,23 @@ const generators = {
     // Bachelor's degree
     education.push({
       institution: uni,
-      degree: profile.level === 'senior' ? 'Computer Science Degree' : 'Bachelor of Computer Science',
-      fieldOfStudy: 'Computer Science',
+      degree: profile.level === 'senior' ? 'Grado en Ingeniería Informática' : 'Grado en Ingeniería Informática',
+      fieldOfStudy: 'Informática',
       startDate: String(2022 - profile.years),
       endDate: String(2022 - profile.years + 4),
       current: false,
       grade: `${(8.0 + Math.random() * 1.5).toFixed(1)}/10`,
       achievements: [
-        'Dean\'s list',
-        'Best student project',
-        'Academic excellence award'
+        'Lista de honor',
+        'Mejor proyecto de estudiante',
+        'Premio a la excelencia académica'
       ]
     });
     
     // Additional certifications/courses
     education.push({
-      institution: 'Online Learning Platform',
-      degree: `Professional Certificate in ${profile.specialty}`,
+      institution: 'Plataforma de aprendizaje online',
+      degree: `Certificado profesional en ${profile.specialty}`,
       fieldOfStudy: profile.specialty,
       startDate: String(2022 - Math.floor(profile.years / 2)),
       endDate: String(2022 - Math.floor(profile.years / 2) + 1),
@@ -88,46 +88,46 @@ const generators = {
       startDate: String(startYear + Math.floor(profile.years * 0.6)),
       endDate: '',
       current: true,
-      description: `Leading ${profile.specialty.toLowerCase()} initiatives and delivering high-impact projects for enterprise clients.`,
+      description: `Liderando iniciativas de ${profile.specialty.toLowerCase()} y entregando proyectos de alto impacto para clientes enterprise.`,
       responsibilities: [
-        `Developing and maintaining ${profile.mainTech[0]} applications`,
-        `Collaborating with cross-functional teams`,
-        `Code review and mentoring junior developers`,
-        `Implementing best practices and design patterns`,
-        `Participating in architecture and design decisions`,
-        `Performance optimization and bug fixing`,
-        `Writing comprehensive technical documentation`,
-        `Leading sprint planning and retrospectives`
+        `Desarrollar y mantener aplicaciones en ${profile.mainTech[0]}`,
+        `Colaborar con equipos multifuncionales`,
+        `Revisión de código y mentoring a perfiles junior`,
+        `Implementar buenas prácticas y patrones de diseño`,
+        `Participar en decisiones de arquitectura y diseño`,
+        `Optimización de rendimiento y corrección de bugs`,
+        `Redactar documentación técnica completa`,
+        `Liderar la planificación de sprints y retrospectivas`
       ],
       technologies: [...profile.mainTech, 'Git', 'Docker', 'CI/CD', 'Agile', 'Scrum'],
       achievements: [
-        'Improved system performance by 40%',
-        'Led successful migration project',
-        'Mentored 3+ junior developers',
-        'Delivered 5+ major features on time'
+        'Mejoró el rendimiento del sistema en un 40%',
+        'Lideró un proyecto de migración exitoso',
+        'Mentorizó a 3+ desarrolladores junior',
+        'Entregó 5+ funcionalidades importantes a tiempo'
       ]
     });
     
     // Previous position(s)
     if (profile.years >= 3) {
       experience.push({
-        company: 'Previous Tech Company',
+        company: 'Empresa tecnológica anterior',
         position: profile.level === 'senior' ? profile.position.replace('Senior ', '') : 'Junior ' + profile.position,
         startDate: String(startYear),
         endDate: String(startYear + Math.floor(profile.years * 0.5)),
         current: false,
-        description: `Developed software solutions using ${profile.mainTech[0]} and related technologies.`,
+        description: `Desarrolló soluciones de software usando ${profile.mainTech[0]} y tecnologías relacionadas.`,
         responsibilities: [
-          'Built and maintained software applications',
-          'Collaborated with team members',
-          'Participated in code reviews',
-          'Fixed bugs and optimized performance',
-          'Wrote unit and integration tests'
+          'Construyó y mantuvo aplicaciones de software',
+          'Colaboró con miembros del equipo',
+          'Participó en revisiones de código',
+          'Corrigió bugs y optimizó rendimiento',
+          'Escribió pruebas unitarias e integración'
         ],
         technologies: profile.mainTech,
         achievements: [
-          'Delivered multiple successful projects',
-          'Improved code quality through refactoring'
+          'Entregó múltiples proyectos exitosos',
+          'Mejoró la calidad del código mediante refactorización'
         ]
       });
     }
@@ -136,15 +136,15 @@ const generators = {
     if (profile.years >= 5 && profile.level !== 'junior') {
       experience.push({
         company: 'Tech Startup',
-        position: 'Software Developer Intern',
+        position: 'Becario de desarrollo de software',
         startDate: String(startYear - 1),
         endDate: String(startYear),
         current: false,
-        description: 'Internship focusing on software development and learning industry best practices.',
+        description: 'Prácticas enfocadas en desarrollo de software y aprendizaje de buenas prácticas de la industria.',
         responsibilities: [
-          'Assisted in developing features',
-          'Participated in team meetings',
-          'Learned company codebase and practices'
+          'Ayudó en el desarrollo de funcionalidades',
+          'Participó en reuniones de equipo',
+          'Aprendió el codebase y las prácticas de la empresa'
         ],
         technologies: profile.mainTech.slice(0, 2)
       });
@@ -156,7 +156,7 @@ const generators = {
   // Generate technical skills with realistic levels
   generateTechnicalSkills(profile) {
     const skillsBySpecialty = {
-      'Full Stack Development': [
+      'Desarrollo Full Stack': [
         { name: 'JavaScript', level: 'expert', category: 'language', years: profile.years },
         { name: 'TypeScript', level: 'advanced', category: 'language', years: Math.floor(profile.years * 0.7) },
         { name: 'Node.js', level: 'expert', category: 'runtime', years: Math.floor(profile.years * 0.8) },
@@ -170,7 +170,7 @@ const generators = {
         { name: 'GraphQL', level: 'intermediate', category: 'tool', years: Math.floor(profile.years * 0.4) },
         { name: 'Jest', level: 'advanced', category: 'testing', years: Math.floor(profile.years * 0.6) }
       ],
-      'Frontend & UX/UI': [
+      'Frontend y UX/UI': [
         { name: 'React', level: 'expert', category: 'framework', years: profile.years },
         { name: 'TypeScript', level: 'advanced', category: 'language', years: Math.floor(profile.years * 0.8) },
         { name: 'JavaScript', level: 'expert', category: 'language', years: profile.years + 1 },
@@ -187,7 +187,7 @@ const generators = {
         { name: 'Webpack', level: 'intermediate', category: 'tool', years: Math.floor(profile.years * 0.6) },
         { name: 'Git', level: 'advanced', category: 'tool', years: profile.years }
       ],
-      'Backend Development': [
+      'Desarrollo Backend': [
         { name: 'Java', level: 'expert', category: 'language', years: profile.years },
         { name: 'Spring Boot', level: 'expert', category: 'framework', years: Math.floor(profile.years * 0.8) },
         { name: 'Python', level: 'advanced', category: 'language', years: Math.floor(profile.years * 0.6) },
@@ -203,7 +203,7 @@ const generators = {
         { name: 'JUnit', level: 'advanced', category: 'testing', years: Math.floor(profile.years * 0.8) },
         { name: 'REST APIs', level: 'expert', category: 'tool', years: profile.years }
       ],
-      'Quality Assurance & Test Automation': [
+      'Aseguramiento de Calidad y Automatización de Pruebas': [
         { name: 'Selenium', level: 'expert', category: 'testing', years: profile.years },
         { name: 'Cypress', level: 'advanced', category: 'testing', years: Math.floor(profile.years * 0.6) },
         { name: 'JMeter', level: 'intermediate', category: 'testing', years: Math.floor(profile.years * 0.6) },
@@ -218,7 +218,7 @@ const generators = {
         { name: 'TestNG', level: 'advanced', category: 'testing', years: Math.floor(profile.years * 0.8) },
         { name: 'Cucumber', level: 'intermediate', category: 'testing', years: Math.floor(profile.years * 0.4) }
       ],
-      'DevOps & Cloud Infrastructure': [
+      'DevOps e Infraestructura Cloud': [
         { name: 'AWS', level: 'expert', category: 'cloud', years: profile.years },
         { name: 'Kubernetes', level: 'expert', category: 'devops', years: Math.floor(profile.years * 0.8) },
         { name: 'Docker', level: 'expert', category: 'devops', years: profile.years },
@@ -234,7 +234,7 @@ const generators = {
         { name: 'Linux', level: 'expert', category: 'other', years: profile.years },
         { name: 'Helm', level: 'advanced', category: 'tool', years: Math.floor(profile.years * 0.6) }
       ],
-      'Software Architecture & System Design': [
+      'Arquitectura de Software y Diseño de Sistemas': [
         { name: 'Java', level: 'expert', category: 'language', years: profile.years },
         { name: 'Python', level: 'advanced', category: 'language', years: Math.floor(profile.years * 0.7) },
         { name: 'AWS', level: 'expert', category: 'cloud', years: profile.years },
@@ -250,7 +250,7 @@ const generators = {
         { name: 'REST APIs', level: 'expert', category: 'tool', years: profile.years },
         { name: 'Git', level: 'expert', category: 'tool', years: profile.years }
       ],
-      'Mobile Development': [
+      'Desarrollo Móvil': [
         { name: 'React Native', level: 'expert', category: 'framework', years: profile.years },
         { name: 'Swift', level: 'advanced', category: 'language', years: Math.floor(profile.years * 0.8) },
         { name: 'Kotlin', level: 'advanced', category: 'language', years: Math.floor(profile.years * 0.7) },
@@ -264,7 +264,7 @@ const generators = {
         { name: 'Jest', level: 'intermediate', category: 'testing', years: Math.floor(profile.years * 0.6) },
         { name: 'Git', level: 'advanced', category: 'tool', years: profile.years }
       ],
-      'Data Science & ML': [
+      'Ciencia de Datos y ML': [
         { name: 'Python', level: 'expert', category: 'language', years: profile.years },
         { name: 'TensorFlow', level: 'advanced', category: 'framework', years: Math.floor(profile.years * 0.7) },
         { name: 'PyTorch', level: 'advanced', category: 'framework', years: Math.floor(profile.years * 0.6) },
@@ -281,23 +281,23 @@ const generators = {
       ]
     };
     
-    return skillsBySpecialty[profile.specialty] || skillsBySpecialty['Full Stack Development'];
+    return skillsBySpecialty[profile.specialty] || skillsBySpecialty['Desarrollo Full Stack'];
   },
   
   // Generate soft skills
   generateSoftSkills(profile) {
     const allSoftSkills = [
-      'Communication', 'Problem Solving', 'Teamwork', 'Leadership', 
-      'Time Management', 'Adaptability', 'Critical Thinking', 'Creativity',
-      'Attention to Detail', 'Collaboration', 'Mentoring', 'Agile Methodologies',
-      'Project Planning', 'Stakeholder Management', 'Analytical Thinking'
+      'Comunicación', 'Resolución de problemas', 'Trabajo en equipo', 'Liderazgo',
+      'Gestión del tiempo', 'Adaptabilidad', 'Pensamiento crítico', 'Creatividad',
+      'Atención al detalle', 'Colaboración', 'Mentoría', 'Metodologías ágiles',
+      'Planificación de proyecto', 'Gestión de stakeholders', 'Pensamiento analítico'
     ];
     
     // Senior gets more leadership skills
     if (profile.level === 'senior') {
-      return ['Leadership', 'Mentoring', 'Communication', 'Problem Solving', 
-              'Team Collaboration', 'Project Planning', 'Time Management', 
-              'Critical Thinking', 'Stakeholder Management', 'Adaptability'];
+          return ['Liderazgo', 'Mentoría', 'Comunicación', 'Resolución de problemas',
+            'Colaboración de equipo', 'Planificación de proyecto', 'Gestión del tiempo',
+            'Pensamiento crítico', 'Gestión de stakeholders', 'Adaptabilidad'];
     }
     
     // Mid-level and junior
@@ -307,76 +307,76 @@ const generators = {
   // Generate certifications
   generateCertifications(profile) {
     const certsBySpecialty = {
-      'Full Stack Development': [
+      'Desarrollo Full Stack': [
         { name: 'AWS Certified Developer', issuer: 'AWS', date: '2022', expiryDate: '2025' },
         { name: 'MongoDB Certified Developer', issuer: 'MongoDB', date: '2021' },
         { name: 'Node.js Application Developer', issuer: 'OpenJS Foundation', date: '2023' }
       ],
-      'Frontend & UX/UI': [
+      'Frontend y UX/UI': [
         { name: 'React Professional Certification', issuer: 'Meta', date: '2022' },
         { name: 'Web Accessibility Specialist', issuer: 'IAAP', date: '2023' },
         { name: 'UX Design Professional Certificate', issuer: 'IDF', date: '2021' }
       ],
-      'Backend Development': [
+      'Desarrollo Backend': [
         { name: 'Oracle Certified Professional Java SE 11', issuer: 'Oracle', date: '2021', expiryDate: '2026' },
         { name: 'Spring Professional Certification', issuer: 'VMware', date: '2022' },
         { name: 'AWS Certified Solutions Architect', issuer: 'AWS', date: '2023', expiryDate: '2026' }
       ],
-      'Quality Assurance & Test Automation': [
+      'Aseguramiento de Calidad y Automatización de Pruebas': [
         { name: 'ISTQB Certified Tester Foundation Level', issuer: 'ISTQB', date: '2020' },
         { name: 'ISTQB Advanced Level Test Analyst', issuer: 'ISTQB', date: '2021' },
         { name: 'Selenium WebDriver Certification', issuer: 'Udemy', date: '2020' }
       ],
-      'DevOps & Cloud Infrastructure': [
+      'DevOps e Infraestructura Cloud': [
         { name: 'AWS Certified Solutions Architect Professional', issuer: 'AWS', date: '2022', expiryDate: '2025' },
         { name: 'Certified Kubernetes Administrator', issuer: 'CNCF', date: '2021', expiryDate: '2024' },
         { name: 'HashiCorp Certified Terraform Associate', issuer: 'HashiCorp', date: '2022' }
       ],
-      'Software Architecture & System Design': [
+      'Arquitectura de Software y Diseño de Sistemas': [
         { name: 'AWS Certified Solutions Architect Professional', issuer: 'AWS', date: '2021', expiryDate: '2024' },
         { name: 'TOGAF 9 Certified', issuer: 'The Open Group', date: '2022' },
         { name: 'Google Cloud Professional Architect', issuer: 'Google', date: '2023' }
       ],
-      'Mobile Development': [
+      'Desarrollo Móvil': [
         { name: 'iOS App Development Certification', issuer: 'Apple', date: '2022' },
         { name: 'Android Associate Developer', issuer: 'Google', date: '2021' },
         { name: 'React Native Certification', issuer: 'Meta', date: '2023' }
       ],
-      'Data Science & ML': [
+      'Ciencia de Datos y ML': [
         { name: 'TensorFlow Developer Certificate', issuer: 'Google', date: '2022' },
         { name: 'AWS Certified Machine Learning', issuer: 'AWS', date: '2023' },
         { name: 'Data Science Professional Certificate', issuer: 'IBM', date: '2021' }
       ]
     };
     
-    return (certsBySpecialty[profile.specialty] || certsBySpecialty['Full Stack Development']).slice(0, profile.level === 'senior' ? 4 : 2);
+    return (certsBySpecialty[profile.specialty] || certsBySpecialty['Desarrollo Full Stack']).slice(0, profile.level === 'senior' ? 4 : 2);
   },
   
   // Generate projects
   generateProjects(profile) {
     const projectTypes = {
-      'Full Stack Development': 'E-commerce Platform',
-      'Frontend & UX/UI': 'Design System Library',
-      'Backend Development': 'Microservices Backend',
-      'Quality Assurance & Test Automation': 'Test Automation Framework',
-      'DevOps & Cloud Infrastructure': 'Cloud Infrastructure Platform',
-      'Software Architecture & System Design': 'Enterprise Architecture',
-      'Mobile Development': 'Mobile App',
-      'Data Science & ML': 'Machine Learning Pipeline'
+      'Desarrollo Full Stack': 'Plataforma de e-commerce',
+      'Frontend y UX/UI': 'Librería de Design System',
+      'Desarrollo Backend': 'Backend de microservicios',
+      'Aseguramiento de Calidad y Automatización de Pruebas': 'Framework de automatización de pruebas',
+      'DevOps e Infraestructura Cloud': 'Plataforma de infraestructura cloud',
+      'Arquitectura de Software y Diseño de Sistemas': 'Arquitectura enterprise',
+      'Desarrollo Móvil': 'Aplicación móvil',
+      'Ciencia de Datos y ML': 'Pipeline de machine learning'
     };
     
     return [
       {
-        name: projectTypes[profile.specialty] || 'Software Project',
-        description: `Comprehensive project showcasing ${profile.specialty.toLowerCase()} expertise`,
-        role: profile.level === 'senior' ? 'Tech Lead' : 'Developer',
+        name: projectTypes[profile.specialty] || 'Proyecto de software',
+        description: `Proyecto completo que demuestra experiencia en ${profile.specialty.toLowerCase()}`,
+        role: profile.level === 'senior' ? 'Líder técnico' : 'Desarrollador',
         technologies: profile.mainTech,
         startDate: '2022',
         endDate: '2023',
         highlights: [
-          'Delivered on time and within budget',
-          'Improved performance significantly',
-          'Received positive user feedback'
+          'Entregado a tiempo y dentro de presupuesto',
+          'Mejoró significativamente el rendimiento',
+          'Recibió feedback positivo de usuarios'
         ]
       }
     ];
@@ -385,28 +385,28 @@ const generators = {
   // Generate languages
   generateLanguages(profile) {
     const nativeLanguages = {
-      'Spain': 'Spanish',
-      'Mexico': 'Spanish',
-      'Argentina': 'Spanish',
-      'United States': 'English',
-      'Canada': 'English',
-      'United Kingdom': 'English',
-      'Japan': 'Japanese',
-      'China': 'Mandarin',
+      'Spain': 'Español',
+      'Mexico': 'Español',
+      'Argentina': 'Español',
+      'United States': 'Inglés',
+      'Canada': 'Inglés',
+      'United Kingdom': 'Inglés',
+      'Japan': 'Japonés',
+      'China': 'Mandarín',
       'India': 'Hindi',
-      'Brazil': 'Portuguese',
-      'France': 'French'
+      'Brazil': 'Portugués',
+      'France': 'Francés'
     };
     
     const languages = [
-      { language: nativeLanguages[profile.country] || 'English', level: 'native' },
-      { language: 'English', level: profile.country === 'United States' || profile.country === 'United Kingdom' || profile.country === 'Canada' ? 'native' : 'C1' }
+      { language: nativeLanguages[profile.country] || 'Inglés', level: 'native' },
+      { language: 'Inglés', level: profile.country === 'United States' || profile.country === 'United Kingdom' || profile.country === 'Canada' ? 'native' : 'C1' }
     ];
     
     // Add third language for some profiles
     if (profile.level === 'senior' || profile.years >= 6) {
-      const thirdLang = { language: 'Spanish', level: 'B1' };
-      if (!languages.find(l => l.language === 'Spanish')) {
+      const thirdLang = { language: 'Español', level: 'B1' };
+      if (!languages.find(l => l.language === 'Español')) {
         languages.push(thirdLang);
       }
     }
@@ -417,7 +417,7 @@ const generators = {
 
 // Main seed function
 const seedCVs = async (users, organizations) => {
-  console.log('\n📄 Creating auto-generated comprehensive CVs for ALL employees...');
+  console.log('\n📄 Creating auto-generated comprehensive currículos for ALL employees...');
   
   const CV = require('../../src/models/cv.model');
   const cvs = [];
@@ -449,7 +449,7 @@ const seedCVs = async (users, organizations) => {
           city: profile.city,
           country: profile.country,
           postalCode: String(Math.floor(Math.random() * 90000 + 10000)),
-          address: `${Math.floor(Math.random() * 999 + 1)} Main Street`
+          address: `${Math.floor(Math.random() * 999 + 1)} Calle Principal`
         }
       },
       education: generators.generateEducation(profile),
@@ -463,29 +463,29 @@ const seedCVs = async (users, organizations) => {
       projects: generators.generateProjects(profile),
       volunteerWork: profile.level === 'senior' || profile.years >= 5 ? [
         {
-          organization: 'Tech Community',
+          organization: 'Comunidad tecnológica',
           role: 'Mentor',
-          description: 'Mentoring junior developers',
+          description: 'Mentorización de desarrolladores junior',
           startDate: '2022',
           current: true
         }
       ] : [],
       awards: profile.level === 'senior' ? [
         {
-          title: 'Excellence Award',
-          issuer: 'Company',
+          title: 'Premio a la Excelencia',
+          issuer: 'Empresa',
           date: '2023',
-          description: 'Recognition for outstanding performance'
+          description: 'Reconocimiento por un rendimiento destacado'
         }
       ] : [],
-      summary: `${profile.level === 'senior' ? 'Senior' : profile.level === 'mid' ? 'Mid-level' : 'Junior'} ${profile.position} with ${profile.years}+ years of experience in ${profile.specialty.toLowerCase()}. Specialized in ${profile.mainTech.join(', ')}. Proven track record of delivering high-quality solutions and collaborating effectively with cross-functional teams. Passionate about continuous learning and best practices.`,
-      interests: ['Technology', 'Innovation', 'Open Source', 'Learning', 'Problem Solving'],
-      hobbies: ['Reading', 'Coding', 'Music', 'Travel'],
+      summary: `${profile.level === 'senior' ? 'Senior' : profile.level === 'mid' ? 'Intermedio' : 'Junior'} ${profile.position} con ${profile.years}+ años de experiencia en ${profile.specialty.toLowerCase()}. Especializado en ${profile.mainTech.join(', ')}. Con experiencia demostrable entregando soluciones de alta calidad y colaborando eficazmente con equipos multifuncionales. Apasionado por el aprendizaje continuo y las buenas prácticas.`,
+      interests: ['Tecnología', 'Innovación', 'Open Source', 'Aprendizaje', 'Resolución de problemas'],
+      hobbies: ['Lectura', 'Programación', 'Música', 'Viajes'],
       availability: {
-        noticePeriod: profile.level === 'senior' ? '1 month' : '2 weeks',
+        noticePeriod: profile.level === 'senior' ? '1 mes' : '2 semanas',
         availableFrom: new Date(Date.now() + (profile.level === 'senior' ? 30 : 14) * 24 * 60 * 60 * 1000),
         willingToRelocate: false,
-        remoteWork: 'yes'
+        remoteWork: 'sí'
       },
       completenessScore: profile.completenessScore,
       isComplete: true,
@@ -493,11 +493,11 @@ const seedCVs = async (users, organizations) => {
     };
     
     cvs.push(cv);
-    console.log(`  ✓ Generated complete CV for ${profile.name} (${profile.position})`);
+    console.log(`  ✓ Generated complete currículo for ${profile.name} (${profile.position})`);
   }
   
   const createdCVs = await CV.insertMany(cvs);
-  console.log(`\n✅ Created ${createdCVs.length} auto-generated comprehensive CVs with complete data`);
+  console.log(`\n✅ Created ${createdCVs.length} auto-generated comprehensive currículos with complete data`);
   console.log(`   Average completeness score: ${Math.round(cvs.reduce((sum, cv) => sum + cv.completenessScore, 0) / cvs.length)}%`);
   
   return createdCVs;

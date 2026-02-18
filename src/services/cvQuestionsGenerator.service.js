@@ -1,6 +1,6 @@
 /**
- * CV Questions Generator Service
- * Generates dynamic questions based on missing CV fields
+ * Curriculum Questions Generator Service
+ * Generates dynamic questions based on missing curriculum fields
  * Following SOLID principles: Single Responsibility Principle
  */
 
@@ -462,7 +462,7 @@ function generateQuestionsForMissingFields(missingFields, language = 'en') {
 /**
  * Generates conditional questions based on user's previous answers
  * @param {Array} missingFields - Array of missing field paths
- * @param {Object} currentAnswers - Current CV data
+ * @param {Object} currentAnswers - Current curriculum data
  * @param {string} language - Language code
  * @returns {Array} Array of conditional question objects
  */
@@ -485,7 +485,7 @@ function generateConditionalQuestions(missingFields, currentAnswers, language = 
 /**
  * Determines if a question should be asked based on dependencies
  * @param {string} fieldPath - Field path
- * @param {Object} currentAnswers - Current CV data
+ * @param {Object} currentAnswers - Current curriculum data
  * @returns {boolean} True if question should be asked
  */
 function shouldAskQuestion(fieldPath, currentAnswers) {

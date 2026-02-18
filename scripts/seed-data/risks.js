@@ -41,44 +41,8 @@ const seedRisksAndCases = async (projects, organizations) => {
           },
           {
             strategy: 'Schedule overlapping working hours',
-            type: 'quality_degradation',
+            description: 'Define common working hours across time zones',
             expectedEffectiveness: 'medium'
-          }
-        ],
-        status: 'predicted',
-        identifiedAt: new Date()
-      },
-      {
-        project: ecommerceProject._id,
-        organization: ecommerceProject.organization,
-        type: 'technical_infrastructure',
-        title: 'Shared Infrastructure Contention',
-        description: 'Competition for shared AWS resources may cause deployment delays',
-        category: 'technical',
-        severity: 'medium-high',
-        probability: 0.58,
-        confidence: 0.72,
-        source: 'expert_rules',
-        reasoning: [
-          'AWS infrastructure shared with other teams',
-          'High system complexity requires significant compute resources',
-          'Specialized tools (Kubernetes, ArgoCD) need careful orchestration'
-        ],
-        indicators: [
-          'Increased deployment queue times',
-          'Resource allocation conflicts',
-          'Performance degradation in shared environments'
-        ],
-        mitigationStrategies: [
-          {
-            strategy: 'Implement resource quotas',
-            description: 'Define and enforce resource limits per team',
-            expectedEffectiveness: 'high'
-          },
-          {
-            strategy: 'Dedicated staging environment',
-            description: 'Create isolated environment for this project',
-            expectedEffectiveness: 'high'
           }
         ],
         status: 'predicted',
@@ -404,48 +368,6 @@ const seedRisksAndCases = async (projects, organizations) => {
       {
         project: cloudProject._id,
         organization: cloudProject.organization,
-        type: 'technical_infrastructure',
-        title: 'Zero-Downtime Migration Complexity',
-        description: 'Zero downtime requirement significantly increases technical complexity',
-        category: 'technical',
-        severity: 'critical',
-        probability: 0.65,
-        confidence: 0.82,
-        source: 'expert_rules',
-        reasoning: [
-          'Zero downtime requirement is highly challenging',
-          'Shared AWS account increases coordination needs',
-          'Multiple teams involved (3 teams)',
-          'High system complexity'
-        ],
-        indicators: [
-          'Migration testing taking longer than expected',
-          'Rollback procedures not yet validated',
-          'Data synchronization challenges'
-        ],
-        mitigationStrategies: [
-          {
-            strategy: 'Phased migration approach',
-            description: 'Migrate in small, reversible increments',
-            expectedEffectiveness: 'high'
-          },
-          {
-            strategy: 'Extensive testing in staging',
-            description: 'Validate every step in production-like environment',
-            expectedEffectiveness: 'high'
-          },
-          {
-            strategy: 'Automated rollback procedures',
-            description: 'Prepare and test rollback for each phase',
-            expectedEffectiveness: 'high'
-          }
-        ],
-        status: 'predicted',
-        identifiedAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000)
-      },
-      {
-        project: cloudProject._id,
-        organization: cloudProject.organization,
         type: 'knowledge_management_gap',
         title: 'Tribal Knowledge Risk',
         description: 'Complex infrastructure knowledge not adequately documented',
@@ -523,42 +445,6 @@ const seedRisksAndCases = async (projects, organizations) => {
             strategy: 'Team training program',
             description: 'Invest in ML production best practices training',
             expectedEffectiveness: 'medium'
-          }
-        ],
-        status: 'predicted',
-        identifiedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-      },
-      {
-        project: aiProject._id,
-        organization: aiProject.organization,
-        type: 'quality_degradation',
-        title: 'Training Data Quality Risk',
-        description: 'Shared data warehouse may have data quality issues',
-        category: 'technical',
-        severity: 'critical',
-        probability: 0.72,
-        confidence: 0.80,
-        source: 'cbr',
-        reasoning: [
-          'ML models highly dependent on data quality',
-          'Shared data warehouse increases contamination risk',
-          'Training data pipeline is a critical dependency'
-        ],
-        indicators: [
-          'Unexpected model behavior',
-          'Poor model accuracy on validation data',
-          'Data inconsistencies discovered during EDA'
-        ],
-        mitigationStrategies: [
-          {
-            strategy: 'Data quality assessment',
-            description: 'Comprehensive audit of training data before use',
-            expectedEffectiveness: 'high'
-          },
-          {
-            strategy: 'Data validation pipeline',
-            description: 'Automated checks for data quality issues',
-            expectedEffectiveness: 'high'
           }
         ],
         status: 'predicted',

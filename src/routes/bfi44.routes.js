@@ -2,7 +2,7 @@ const { Router } = require('express');
 const router = Router();
 const BFI44Controller = require('../controllers/bfi44.controller');
 const { authMiddleware } = require('../utils/jwt');
-const { requireRole } = require('../middleware/authorization');
+const { requireRole, requireOrgAdminOrProjectManager } = require('../middleware/authorization');
 
 /**
  * BFI-44 Routes
@@ -13,6 +13,7 @@ const { requireRole } = require('../middleware/authorization');
 /**
  * GET /api/bfi-44/questions
  * Obtener el cuestionario completo
+ * Query params: ?language=es (or ?lang=es)
  * Acceso: Usuarios autenticados
  */
 router.get(
@@ -78,27 +79,50 @@ router.post(
 );
 
 /**
+ * GET /api/bfi-44/consent-status
+ * Verificar si el usuario tiene consentimiento para el BFI-44
+ * Acceso: Usuario autenticado
+ */
+router.get(
+  '/consent-status',
+  authMiddleware,
+  BFI44Controller.getConsentStatus
+);
+
+/**
  * POST /api/bfi-44/notify-pending
  * Notificar a empleados que no han completado el test
- * Acceso: Solo administradores de organización
+ * Acceso: Administradores de organización y jefes de proyecto
  */
 router.post(
   '/notify-pending',
   authMiddleware,
-  requireRole('org_admin'),
+  requireOrgAdminOrProjectManager,
   BFI44Controller.notifyPendingEmployees
 );
 
 /**
  * GET /api/bfi-44/employees-without-test
  * Obtener lista de empleados sin test
- * Acceso: Solo administradores de organización
+ * Acceso: Administradores de organización y jefes de proyecto
  */
 router.get(
   '/employees-without-test',
   authMiddleware,
-  requireRole('org_admin'),
+  requireOrgAdminOrProjectManager,
   BFI44Controller.getEmployeesWithoutTest
+);
+
+/**
+ * POST /api/bfi-44/notify-pending/:userId
+ * Notificar a un empleado específico que no ha completado el test
+ * Acceso: Administradores de organización y jefes de proyecto
+ */
+router.post(
+  '/notify-pending/:userId',
+  authMiddleware,
+  requireOrgAdminOrProjectManager,
+  BFI44Controller.notifySpecificUser
 );
 
 /**

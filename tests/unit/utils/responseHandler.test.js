@@ -211,7 +211,7 @@ describe('ResponseHandler', () => {
       });
     });
 
-    it('should handle CV processing errors', () => {
+    it('should handle curriculum processing errors', () => {
       const error = new Error('ERROR_PROCESSING_CV');
       
       responseHandler.handleError(error, mockRes);
@@ -219,7 +219,7 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error processing the CV. Check the Gemini API configuration.'
+        error: 'Error processing the curriculum. Check the Gemini API configuration.'
       });
     });
 

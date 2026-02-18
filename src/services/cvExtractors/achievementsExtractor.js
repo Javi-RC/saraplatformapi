@@ -2,7 +2,7 @@ const cvUtils = require('../../utils/cvUtils');
 
 /**
  * Extractor de logros, publicaciones y premios
- * Responsabilidad única: extraer achievements del CV
+ * Responsabilidad única: extraer achievements del currículo
  */
 class AchievementsExtractor {
   /**

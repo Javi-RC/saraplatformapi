@@ -122,7 +122,7 @@ class UserNotificationHelper {
             <h3>What has been deleted:</h3>
             <ul>
               <li>Your account and profile information</li>
-              <li>All uploaded CVs and documents</li>
+              <li>All uploaded curricula and documents</li>
               <li>Your personality assessment (BFI-44) results</li>
               <li>All notifications and personal communications</li>
               <li>Your preferences and settings</li>

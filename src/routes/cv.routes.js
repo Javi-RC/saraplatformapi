@@ -33,77 +33,77 @@ const isAdmin = (req, res, next) => {
 
 /**
  * @route   POST /api/cv/upload
- * @desc    Sube y procesa un CV
+ * @desc    Sube y procesa un currículo
  * @access  Private (requiere autenticación)
  */
 router.post('/upload', authenticate, upload.single('cv'), cvController.uploadCV);
 
 /**
  * @route   GET /api/cv/my-cv
- * @desc    Obtiene el CV del usuario autenticado
+ * @desc    Obtiene el currículo del usuario autenticado
  * @access  Private
  */
 router.get('/my-cv', authenticate, cvController.getMyCV);
 
 /**
  * @route   POST /api/cv/submit-to-organization
- * @desc    Envía el CV a una organización
+ * @desc    Envía el currículo a una organización
  * @access  Private
  */
 router.post('/submit-to-organization', authenticate, cvController.submitToOrganization);
 
 /**
  * @route   GET /api/cv/stats
- * @desc    Obtiene estadísticas del CV del usuario
+ * @desc    Obtiene estadísticas del currículo del usuario
  * @access  Private
  */
 router.get('/stats', authenticate, cvController.getCVStats);
 
 /**
  * @route   GET /api/cv/:cvId
- * @desc    Obtiene un CV específico por ID
+ * @desc    Obtiene un currículo específico por ID
  * @access  Private (propietario o admin)
  */
 router.get('/:cvId', authenticate, cvController.getCVById);
 
 /**
  * @route   PUT /api/cv/:cvId
- * @desc    Actualiza el CV del usuario
+ * @desc    Actualiza el currículo del usuario
  * @access  Private
  */
 router.put('/:cvId', authenticate, cvController.updateCV);
 
 /**
  * @route   DELETE /api/cv/:cvId
- * @desc    Elimina el CV del usuario
+ * @desc    Elimina el currículo del usuario
  * @access  Private
  */
 router.delete('/:cvId', authenticate, cvController.deleteCV);
 
 /**
  * @route   GET /api/cv/admin/all
- * @desc    Obtiene todos los CVs (con filtros opcionales)
+ * @desc    Obtiene todos los currículos (con filtros opcionales)
  * @access  Private (solo admin)
  */
 router.get('/admin/all', authenticate, isAdmin, cvController.getAllCVs);
 
 /**
  * @route   POST /api/cv/admin/search
- * @desc    Busca CVs por criterios
+ * @desc    Busca currículos por criterios
  * @access  Private (solo admin)
  */
 router.post('/admin/search', authenticate, isAdmin, cvController.searchCVs);
 
 /**
  * @route   GET /api/cv/completeness
- * @desc    Obtiene el estado de completitud del CV del usuario
+ * @desc    Obtiene el estado de completitud del currículo del usuario
  * @access  Private
  */
 router.get('/completeness', authenticate, cvController.getCompleteness);
 
 /**
  * @route   GET /api/cv/missing-fields-questions
- * @desc    Obtiene preguntas dinámicas para completar los campos faltantes del CV
+ * @desc    Obtiene preguntas dinámicas para completar los campos faltantes del currículo
  * @access  Private
  * @query   language - Idioma de las preguntas ('en' o 'es', por defecto 'en')
  * @query   groupByCategory - Si es 'true', agrupa las preguntas por categoría
@@ -112,7 +112,7 @@ router.get('/missing-fields-questions', authenticate, cvController.getMissingFie
 
 /**
  * @route   PATCH /api/cv/complete-fields
- * @desc    Completa los campos faltantes del CV
+ * @desc    Completa los campos faltantes del currículo
  * @access  Private
  */
 router.patch('/complete-fields', authenticate, cvController.completeFields);

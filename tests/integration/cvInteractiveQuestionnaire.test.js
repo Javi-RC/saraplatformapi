@@ -1,5 +1,5 @@
 /**
- * Integration Tests for CV Interactive Questionnaire Flow
+ * Integration Tests for Curriculum Interactive Questionnaire Flow
  */
 
 const {
@@ -10,8 +10,8 @@ const {
   validateResponse
 } = require('../../src/services/cvInteractiveQuestionnaire.service');
 
-describe('CV Interactive Questionnaire Flow', () => {
-  // Sample CVs for testing
+describe('Curriculum Interactive Questionnaire Flow', () => {
+  // Sample curricula for testing
   const emptyCV = {
     toObject: () => ({})
   };
@@ -125,7 +125,7 @@ describe('CV Interactive Questionnaire Flow', () => {
       expect(questionnaire.questions.length).toBeGreaterThan(0);
     });
 
-    test('should return no questions if CV is already complete', () => {
+    test('should return no questions if curriculum is already complete', () => {
       const questionnaire = getInitialQuestions(completedCV, 'en');
 
       expect(questionnaire.noQuestionsNeeded).toBe(true);
@@ -253,7 +253,7 @@ describe('CV Interactive Questionnaire Flow', () => {
     });
 
     test('should include conditional questions when conditions are met', () => {
-      // Create CV with availability partially filled
+      // Create curriculum with availability partially filled
       const partialAvailabilityCV = {
         ...emptyCV,
         availability: {

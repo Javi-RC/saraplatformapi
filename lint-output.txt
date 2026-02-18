@@ -1,0 +1,198 @@
+
+> tfg-backend@1.0.0 lint
+> eslint src/
+
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\app.js
+  139:27  warning  'next' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\config\passport.js
+   3:7  warning  'GitHubStrategy' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  60:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\cv.controller.js
+    8:9  warning  'generateQuestionsForMissingFields' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+   16:3  warning  'getPhaseById' is assigned a value but never used. Allowed unused vars must match /^_/u                       no-unused-vars
+   17:3  warning  'validateResponse' is assigned a value but never used. Allowed unused vars must match /^_/u                   no-unused-vars
+  863:9  error    Duplicate name 'submitQuestionnaire'                                                                          no-dupe-class-members
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\notification.controller.js
+  2:50  warning  'NotificationPriority' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  3:7   warning  'responseHandler' is assigned a value but never used. Allowed unused vars must match /^_/u       no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\organization.controller.js
+  569:13  warning  'filters' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\project.controller.js
+  872:21  warning  'validatedCount' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  873:28  warning  'error' is defined but never used                                                          no-unused-vars
+  877:21  warning  'skippedCount' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\controllers\risk.controller.js
+  676:13  warning  'projectFeatures' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  905:13  warning  'Risk' is assigned a value but never used. Allowed unused vars must match /^_/u             no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\jobs\cleanupUnverifiedUsers.js
+  46:9  warning  'lastError' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\middleware\authorization.js
+  123:13  warning  'User' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\routes\auth.routes.js
+   31:13  warning  'state' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  110:14  warning  'error' is defined but never used                                                 no-unused-vars
+  181:12  warning  'error' is defined but never used                                                 no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\aiExtractor.service.js
+   83:14  warning  Unexpected constant condition  no-constant-condition
+  214:20  warning  'e' is defined but never used  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\cbr.service.js
+  645:32  warning  'dimension' is defined but never used. Allowed unused args must match /^_/u                   no-unused-vars
+  720:10  warning  'getImpactRange' is defined but never used. Allowed unused vars must match /^_/u              no-unused-vars
+  733:10  warning  'getMostCommonQualityImpact' is defined but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\cvCompletenessValidator.service.js
+  220:45  warning  'fieldName' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  287:45  warning  'fieldName' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\cvExtractors\educationExtractor.js
+  40:26  warning  'index' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\cvExtractors\experienceExtractor.js
+   40:26  warning  'index' is defined but never used. Allowed unused args must match /^_/u               no-unused-vars
+  196:11  warning  'textLower' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\cvExtractors\projectsExtractor.js
+  40:26  warning  'index' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\cvInteractiveQuestionnaire.service.js
+    8:39  warning  'shouldAskQuestion' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  376:37  warning  Unnecessary escape character: \+                                                              no-useless-escape
+  376:39  warning  Unnecessary escape character: \(                                                              no-useless-escape
+  376:41  warning  Unnecessary escape character: \)                                                              no-useless-escape
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\decisionTree.service.js
+     7:7    warning  'Project' is assigned a value but never used. Allowed unused vars must match /^_/u                   no-unused-vars
+     8:7    warning  'User' is assigned a value but never used. Allowed unused vars must match /^_/u                      no-unused-vars
+   599:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+   620:22   error    'complexity' is not defined                                                                          no-undef
+   717:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+   845:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+   958:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+  1063:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+  1111:7    warning  'riskScore' is assigned a value but never used. Allowed unused vars must match /^_/u                 no-unused-vars
+  1261:9    warning  'mainTechs' is assigned a value but never used. Allowed unused vars must match /^_/u                 no-unused-vars
+  1275:9    warning  'teamSkills' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+  1303:66   error    'complexity' is not defined                                                                          no-undef
+  1312:73   error    'complexity' is not defined                                                                          no-undef
+  1342:99   error    'complexity' is not defined                                                                          no-undef
+  1347:22   error    'complexity' is not defined                                                                          no-undef
+  1382:61   warning  'otherProjects' is defined but never used. Allowed unused args must match /^_/u                      no-unused-vars
+  1490:9    warning  'timelineBufferPercentage' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  1507:24   warning  Empty block statement                                                                                no-empty
+  1511:25   warning  Empty block statement                                                                                no-empty
+  1515:27   warning  Empty block statement                                                                                no-empty
+  1572:9    warning  'experienceLevel' is assigned a value but never used. Allowed unused vars must match /^_/u           no-unused-vars
+  1595:46   error    'complexity' is not defined                                                                          no-undef
+  1596:28   warning  Empty block statement                                                                                no-empty
+  1599:28   warning  Empty block statement                                                                                no-empty
+  1630:22   error    'complexity' is not defined                                                                          no-undef
+  1666:9    warning  'methodology' is assigned a value but never used. Allowed unused vars must match /^_/u               no-unused-vars
+  1670:9    warning  'actualMaturity' is assigned a value but never used. Allowed unused vars must match /^_/u            no-unused-vars
+  1865:22   warning  Empty block statement                                                                                no-empty
+  1869:9    warning  'adjustedConfidence' is assigned a value but never used. Allowed unused vars must match /^_/u        no-unused-vars
+  2019:9    warning  'adjustedConfidence' is assigned a value but never used. Allowed unused vars must match /^_/u        no-unused-vars
+  2146:22   warning  Empty block statement                                                                                no-empty
+  2150:9    warning  'adjustedConfidence' is assigned a value but never used. Allowed unused vars must match /^_/u        no-unused-vars
+  2221:47   warning  'team' is defined but never used. Allowed unused args must match /^_/u                               no-unused-vars
+  2284:22   warning  Empty block statement                                                                                no-empty
+  2288:9    warning  'adjustedConfidence' is assigned a value but never used. Allowed unused vars must match /^_/u        no-unused-vars
+  2412:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+  2515:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+  2613:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+  2712:9    warning  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u                no-unused-vars
+  2753:45   warning  'teamAnalysis' is defined but never used. Allowed unused args must match /^_/u                       no-unused-vars
+  2786:14   warning  Empty block statement                                                                                no-empty
+  2807:58   warning  Empty block statement                                                                                no-empty
+  2807:95   warning  Empty block statement                                                                                no-empty
+  2807:105  warning  Empty block statement                                                                                no-empty
+  2890:12   warning  Empty block statement                                                                                no-empty
+  2916:58   warning  Empty block statement                                                                                no-empty
+  2916:95   warning  Empty block statement                                                                                no-empty
+  2916:105  warning  Empty block statement                                                                                no-empty
+  2920:55   warning  Empty block statement                                                                                no-empty
+  2959:41   warning  'teamAnalysis' is defined but never used. Allowed unused args must match /^_/u                       no-unused-vars
+  2965:9    warning  'recommendations' is assigned a value but never used. Allowed unused vars must match /^_/u           no-unused-vars
+  2990:58   warning  Empty block statement                                                                                no-empty
+  2990:95   warning  Empty block statement                                                                                no-empty
+  3024:48   warning  'teamAnalysis' is defined but never used. Allowed unused args must match /^_/u                       no-unused-vars
+  3030:9    warning  'recommendations' is assigned a value but never used. Allowed unused vars must match /^_/u           no-unused-vars
+  3055:58   warning  Empty block statement                                                                                no-empty
+  3055:95   warning  Empty block statement                                                                                no-empty
+  3089:47   warning  'teamAnalysis' is defined but never used. Allowed unused args must match /^_/u                       no-unused-vars
+  3095:9    warning  'recommendations' is assigned a value but never used. Allowed unused vars must match /^_/u           no-unused-vars
+  3120:58   warning  Empty block statement                                                                                no-empty
+  3120:95   warning  Empty block statement                                                                                no-empty
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\notification.service.js
+  3:3  warning  'NotificationTypes' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\notificationChannels\InAppChannel.js
+  16:14  warning  'notification' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  16:28  warning  'recipient' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\notificationChannels\NotificationChannel.js
+   1:9   warning  'NotificationChannels' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+   1:31  warning  'NotificationStatus' is assigned a value but never used. Allowed unused vars must match /^_/u    no-unused-vars
+  14:14  warning  'notification' is defined but never used. Allowed unused args must match /^_/u                   no-unused-vars
+  14:28  warning  'recipient' is defined but never used. Allowed unused args must match /^_/u                      no-unused-vars
+  24:17  warning  'notification' is defined but never used. Allowed unused args must match /^_/u                   no-unused-vars
+  24:31  warning  'recipient' is defined but never used. Allowed unused args must match /^_/u                      no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\notificationChannels\PushChannel.js
+  16:14  warning  'notification' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  16:28  warning  'recipient' is defined but never used. Allowed unused args must match /^_/u     no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\project.service.js
+  2:7  warning  'teamSelectionService' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\riskPrediction.service.js
+   10:7   warning  'User' is assigned a value but never used. Allowed unused vars must match /^_/u         no-unused-vars
+  362:7   error    Duplicate key 'type'                                                                    no-dupe-keys
+  363:7   error    Duplicate key 'title'                                                                   no-dupe-keys
+  364:7   error    Duplicate key 'description'                                                             no-dupe-keys
+  365:7   error    Duplicate key 'category'                                                                no-dupe-keys
+  366:7   error    Duplicate key 'severity'                                                                no-dupe-keys
+  367:7   error    Duplicate key 'source'                                                                  no-dupe-keys
+  368:7   error    Duplicate key 'reasoning'                                                               no-dupe-keys
+  428:10  warning  'mergeRecommendations' is defined but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  436:10  warning  'compareSeverity' is defined but never used. Allowed unused vars must match /^_/u       no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\teamAnalysis.service.js
+   9:7  warning  'User' is assigned a value but never used. Allowed unused vars must match /^_/u          no-unused-vars
+  12:7  warning  'Organization' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\teamSelection.service.js
+    2:7   warning  'User' is assigned a value but never used. Allowed unused vars must match /^_/u         no-unused-vars
+  414:9   warning  'matchCount' is assigned a value but never used. Allowed unused vars must match /^_/u   no-unused-vars
+  873:40  warning  'projectRequirements' is defined but never used. Allowed unused args must match /^_/u   no-unused-vars
+  877:13  warning  'severityMap' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+  978:9   error    Duplicate key 'confidence'                                                              no-dupe-keys
+  994:39  warning  'details' is assigned a value but never used. Allowed unused args must match /^_/u      no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\teamSynergy.service.js
+  863:3  error  Duplicate name '_getPreviousCollaborationsMessage'  no-dupe-class-members
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\services\user.service.js
+  1:7  warning  'mongoose' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\cvUtils.js
+  121:26  warning  'index' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+C:\Users\Javier\Documents\GitHub\TFGRepos\Back\tfg-backend\src\utils\responseHandler.js
+  1:7  warning  'AppError' is assigned a value but never used. Allowed unused vars must match /^_/u  no-unused-vars
+
+Ô£û 130 problems (17 errors, 113 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

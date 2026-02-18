@@ -12,10 +12,12 @@ class BFI44Controller {
   /**
    * GET /api/bfi-44/questions
    * Obtener el cuestionario completo del BFI-44
+   * @query language - Language code ('en' or 'es', default: 'en')
    */
   static getQuestions(req, res) {
     try {
-      const questionnaire = BFI44Service.getQuestionnaire();
+      const language = req.query.language || req.query.lang || 'en';
+      const questionnaire = BFI44Service.getQuestionnaire(language);
       
       return responseHandler.success(res, questionnaire);
     } catch (error) {
@@ -155,11 +157,14 @@ class BFI44Controller {
 
   /**
    * POST /api/bfi-44/notify-pending
-   * Notificar a empleados sin test (solo para org_admin)
+   * Notificar a empleados sin test (org_admin o project manager)
    */
   static async notifyPendingEmployees(req, res) {
     try {
-      if (req.user.role !== 'org_admin') {
+      const isOrgAdmin = req.user.role === 'org_admin';
+      const isProjectManager = req.isProjectManager === true;
+
+      if (!isOrgAdmin && !isProjectManager) {
         return responseHandler.error(res, 'No autorizado', 403);
       }
 
@@ -181,12 +186,48 @@ class BFI44Controller {
   }
 
   /**
+   * POST /api/bfi-44/notify-user/:userId
+   * Notificar a un empleado específico que complete el test
+   */
+  static async notifySpecificUser(req, res) {
+    try {
+      const { userId } = req.params;
+
+      if (!req.user.organization) {
+        return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
+      }
+
+      // Verify the target user belongs to the same organization
+      const targetUser = await User.findById(userId).select('organization role');
+
+      if (!targetUser) {
+        return responseHandler.error(res, 'Usuario no encontrado', 404);
+      }
+
+      if (!targetUser.organization || targetUser.organization.toString() !== req.user.organization.toString()) {
+        return responseHandler.error(res, 'El usuario no pertenece a tu organización', 403);
+      }
+
+      const result = await BFI44Service.checkAndNotifyUser(userId);
+
+      return responseHandler.success(res, result);
+
+    } catch (error) {
+      console.error('Error en notifySpecificUser:', error);
+      return responseHandler.handleError(error, res);
+    }
+  }
+
+  /**
    * GET /api/bfi-44/employees-without-test
-   * Obtener lista de empleados sin test (solo para org_admin)
+   * Obtener lista de empleados sin test (org_admin o project manager)
    */
   static async getEmployeesWithoutTest(req, res) {
     try {
-      if (req.user.role !== 'org_admin') {
+      const isOrgAdmin = req.user.role === 'org_admin';
+      const isProjectManager = req.isProjectManager === true;
+
+      if (!isOrgAdmin && !isProjectManager) {
         return responseHandler.error(res, 'No autorizado', 403);
       }
 
@@ -207,6 +248,30 @@ class BFI44Controller {
 
     } catch (error) {
       console.error('Error en getEmployeesWithoutTest:', error);
+      return responseHandler.handleError(error, res);
+    }
+  }
+
+  /**
+   * GET /api/bfi-44/consent-status
+   * Verificar si el usuario tiene consentimiento para el BFI-44
+   */
+  static async getConsentStatus(req, res) {
+    try {
+      const userId = req.user.id;
+      const user = await User.findById(userId).select('personalityDataConsent');
+
+      if (!user) {
+        return responseHandler.error(res, 'Usuario no encontrado', 404);
+      }
+
+      return responseHandler.success(res, {
+        hasConsent: user.hasPersonalityDataConsent(),
+        consent: user.personalityDataConsent || { accepted: false, version: '1.0' }
+      });
+
+    } catch (error) {
+      console.error('Error en getConsentStatus:', error);
       return responseHandler.handleError(error, res);
     }
   }

@@ -35,71 +35,94 @@ class BFI44Service {
 
     // Escala Likert
     scale: {
-      1: "Disagree strongly",
-      2: "Disagree a little",
-      3: "Neither agree nor disagree",
-      4: "Agree a little",
-      5: "Agree strongly"
+      en: {
+        1: "Disagree strongly",
+        2: "Disagree a little",
+        3: "Neither agree nor disagree",
+        4: "Agree a little",
+        5: "Agree strongly"
+      },
+      es: {
+        1: "Totalmente en desacuerdo",
+        2: "En desacuerdo",
+        3: "Ni de acuerdo ni en desacuerdo",
+        4: "De acuerdo",
+        5: "Totalmente de acuerdo"
+      }
+    },
+
+    // Prefijo para las preguntas
+    prefix: {
+      en: "I see myself as someone who",
+      es: "Me veo a mí mismo/a como alguien que"
     },
 
     // Los 44 ítems del BFI-44
     questions: [
-      { id: 1, text: "Is talkative" },
-      { id: 2, text: "Tends to find fault with others" },
-      { id: 3, text: "Does a thorough job" },
-      { id: 4, text: "Is depressed, blue" },
-      { id: 5, text: "Is original, comes up with new ideas" },
-      { id: 6, text: "Is reserved" },
-      { id: 7, text: "Is helpful and unselfish with others" },
-      { id: 8, text: "Can be somewhat careless" },
-      { id: 9, text: "Is relaxed, handles stress well" },
-      { id: 10, text: "Is curious about many different things" },
-      { id: 11, text: "Is full of energy" },
-      { id: 12, text: "Starts quarrels with others" },
-      { id: 13, text: "Is a reliable worker" },
-      { id: 14, text: "Can be tense" },
-      { id: 15, text: "Is ingenious, a deep thinker" },
-      { id: 16, text: "Generates a lot of enthusiasm" },
-      { id: 17, text: "Has a forgiving nature" },
-      { id: 18, text: "Tends to be disorganized" },
-      { id: 19, text: "Worries a lot" },
-      { id: 20, text: "Has an active imagination" },
-      { id: 21, text: "Tends to be quiet" },
-      { id: 22, text: "Is generally trusting" },
-      { id: 23, text: "Tends to be lazy" },
-      { id: 24, text: "Is emotionally stable, not easily upset" },
-      { id: 25, text: "Is inventive" },
-      { id: 26, text: "Has an assertive personality" },
-      { id: 27, text: "Can be cold and aloof" },
-      { id: 28, text: "Perseveres until the task is finished" },
-      { id: 29, text: "Can be moody" },
-      { id: 30, text: "Values artistic, aesthetic experiences" },
-      { id: 31, text: "Is sometimes shy, inhibited" },
-      { id: 32, text: "Is considerate and kind to almost everyone" },
-      { id: 33, text: "Does things efficiently" },
-      { id: 34, text: "Remains calm in tense situations" },
-      { id: 35, text: "Prefers work that is routine" },
-      { id: 36, text: "Is outgoing, sociable" },
-      { id: 37, text: "Is sometimes rude to others" },
-      { id: 38, text: "Makes plans and follows through with them" },
-      { id: 39, text: "Gets nervous easily" },
-      { id: 40, text: "Likes to reflect, play with ideas" },
-      { id: 41, text: "Has few artistic interests" },
-      { id: 42, text: "Likes to cooperate with others" },
-      { id: 43, text: "Is easily distracted" },
-      { id: 44, text: "Is sophisticated in art, music, or literature" }
+      { id: 1, text: { en: "Is talkative", es: "Es conversador/a" } },
+      { id: 2, text: { en: "Tends to find fault with others", es: "Tiende a buscar defectos en los demás" } },
+      { id: 3, text: { en: "Does a thorough job", es: "Hace un trabajo concienzudo" } },
+      { id: 4, text: { en: "Is depressed, blue", es: "Es depresivo/a, triste" } },
+      { id: 5, text: { en: "Is original, comes up with new ideas", es: "Es original, se le ocurren ideas nuevas" } },
+      { id: 6, text: { en: "Is reserved", es: "Es reservado/a" } },
+      { id: 7, text: { en: "Is helpful and unselfish with others", es: "Es servicial y desinteresado/a con los demás" } },
+      { id: 8, text: { en: "Can be somewhat careless", es: "Puede ser algo descuidado/a" } },
+      { id: 9, text: { en: "Is relaxed, handles stress well", es: "Es relajado/a, maneja bien el estrés" } },
+      { id: 10, text: { en: "Is curious about many different things", es: "Es curioso/a sobre muchas cosas diferentes" } },
+      { id: 11, text: { en: "Is full of energy", es: "Está lleno/a de energía" } },
+      { id: 12, text: { en: "Starts quarrels with others", es: "Inicia peleas con otros" } },
+      { id: 13, text: { en: "Is a reliable worker", es: "Es un/a trabajador/a confiable" } },
+      { id: 14, text: { en: "Can be tense", es: "Puede estar tenso/a" } },
+      { id: 15, text: { en: "Is ingenious, a deep thinker", es: "Es ingenioso/a, piensa profundamente" } },
+      { id: 16, text: { en: "Generates a lot of enthusiasm", es: "Genera mucho entusiasmo" } },
+      { id: 17, text: { en: "Has a forgiving nature", es: "Tiene una naturaleza indulgente" } },
+      { id: 18, text: { en: "Tends to be disorganized", es: "Tiende a ser desorganizado/a" } },
+      { id: 19, text: { en: "Worries a lot", es: "Se preocupa mucho" } },
+      { id: 20, text: { en: "Has an active imagination", es: "Tiene una imaginación activa" } },
+      { id: 21, text: { en: "Tends to be quiet", es: "Tiende a ser callado/a" } },
+      { id: 22, text: { en: "Is generally trusting", es: "Es generalmente confiado/a" } },
+      { id: 23, text: { en: "Tends to be lazy", es: "Tiende a ser perezoso/a" } },
+      { id: 24, text: { en: "Is emotionally stable, not easily upset", es: "Es emocionalmente estable, no se altera fácilmente" } },
+      { id: 25, text: { en: "Is inventive", es: "Es inventivo/a" } },
+      { id: 26, text: { en: "Has an assertive personality", es: "Tiene una personalidad asertiva" } },
+      { id: 27, text: { en: "Can be cold and aloof", es: "Puede ser frío/a y distante" } },
+      { id: 28, text: { en: "Perseveres until the task is finished", es: "Persevera hasta terminar la tarea" } },
+      { id: 29, text: { en: "Can be moody", es: "Puede ser temperamental" } },
+      { id: 30, text: { en: "Values artistic, aesthetic experiences", es: "Valora las experiencias artísticas y estéticas" } },
+      { id: 31, text: { en: "Is sometimes shy, inhibited", es: "Es a veces tímido/a, cohibido/a" } },
+      { id: 32, text: { en: "Is considerate and kind to almost everyone", es: "Es considerado/a y amable con casi todos" } },
+      { id: 33, text: { en: "Does things efficiently", es: "Hace las cosas eficientemente" } },
+      { id: 34, text: { en: "Remains calm in tense situations", es: "Se mantiene calmado/a en situaciones tensas" } },
+      { id: 35, text: { en: "Prefers work that is routine", es: "Prefiere el trabajo rutinario" } },
+      { id: 36, text: { en: "Is outgoing, sociable", es: "Es extrovertido/a, sociable" } },
+      { id: 37, text: { en: "Is sometimes rude to others", es: "Es a veces grosero/a con los demás" } },
+      { id: 38, text: { en: "Makes plans and follows through with them", es: "Hace planes y los lleva a cabo" } },
+      { id: 39, text: { en: "Gets nervous easily", es: "Se pone nervioso/a fácilmente" } },
+      { id: 40, text: { en: "Likes to reflect, play with ideas", es: "Le gusta reflexionar, jugar con ideas" } },
+      { id: 41, text: { en: "Has few artistic interests", es: "Tiene pocos intereses artísticos" } },
+      { id: 42, text: { en: "Likes to cooperate with others", es: "Le gusta cooperar con otros" } },
+      { id: 43, text: { en: "Is easily distracted", es: "Se distrae fácilmente" } },
+      { id: 44, text: { en: "Is sophisticated in art, music, or literature", es: "Es sofisticado/a en arte, música o literatura" } }
     ]
   };
 
   /**
    * Obtener el cuestionario completo
+   * @param {string} language - Language code ('en' or 'es')
    * @returns {Object} Estructura del cuestionario BFI-44
    */
-  static getQuestionnaire() {
+  static getQuestionnaire(language = 'en') {
+    const lang = ['en', 'es'].includes(language) ? language : 'en';
+    
     return {
       inventory: "BFI-44",
-      scale: this.BFI44_CONFIG.scale,
-      questions: this.BFI44_CONFIG.questions
+      totalQuestions: 44,
+      prefix: this.BFI44_CONFIG.prefix[lang],
+      scale: this.BFI44_CONFIG.scale[lang],
+      questions: this.BFI44_CONFIG.questions.map(q => ({
+        id: q.id,
+        text: q.text[lang]
+      }))
     };
   }
 
@@ -192,6 +215,17 @@ class BFI44Service {
    * @returns {Promise<Object>} Resultado guardado
    */
   static async submitResponses(userId, responses) {
+    // Verify personality data consent before processing
+    const user = await userRepository.findById(userId, { select: 'name personalityDataConsent' });
+    
+    if (!user) {
+      throw new Error('USER_NOT_FOUND');
+    }
+
+    if (!user.hasPersonalityDataConsent()) {
+      throw new Error('PERSONALITY_CONSENT_REQUIRED');
+    }
+
     // Validar respuestas
     this.validateResponses(responses);
 
@@ -210,9 +244,7 @@ class BFI44Service {
       results
     });
 
-    // Obtener nombre del usuario para la notificación
-    const user = await userRepository.findById(userId, { select: 'name' });
-    const userName = user ? user.name : 'Usuario';
+    const userName = user.name || 'Usuario';
 
     // Enviar notificación de test completado (asíncrono, no bloquea)
     bfi44NotificationHelper.notifyTestCompleted(userId, userName).catch(err => {
@@ -232,7 +264,10 @@ class BFI44Service {
    * @returns {Promise<Object|null>} Perfil del usuario o null
    */
   static async getUserProfile(userId) {
-    const profile = await BFI44Response.getLatestProfile(userId);
+    const profile = await bfi44Repository.findOne(
+      { userId },
+      { sort: { completedAt: -1 } }
+    );
     
     if (!profile) {
       return null;
@@ -269,7 +304,7 @@ class BFI44Service {
     await response.save();
 
     return {
-      userId: response.user,
+      userId: response.userId,
       results: newResults,
       recalculatedAt: new Date()
     };
@@ -300,8 +335,8 @@ class BFI44Service {
     );
 
     // Obtener IDs de empleados con test completado
-    const employeesWithTest = await bfi44Repository.distinct('user', {
-      user: { $in: employees.map(e => e._id) }
+    const employeesWithTest = await bfi44Repository.distinct('userId', {
+      userId: { $in: employees.map(e => e._id) }
     });
 
     // Filtrar empleados sin test
@@ -362,8 +397,8 @@ class BFI44Service {
       { select: '_id' }
     );
 
-    const employeesWithTest = await bfi44Repository.distinct('user', {
-      user: { $in: employeeIds.map(e => e._id) }
+    const employeesWithTest = await bfi44Repository.distinct('userId', {
+      userId: { $in: employeeIds.map(e => e._id) }
     });
 
     const completedCount = employeesWithTest.length;

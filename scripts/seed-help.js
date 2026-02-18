@@ -16,7 +16,7 @@ console.log('  npm run seed:help  - Show this help message\n');
 console.log('What gets created:');
 console.log('  ✓ 15 Users (3 admins, 10 employees, 2 pending)');
 console.log('  ✓ 3 Organizations (Tech Innovators, Global Solutions, Asian Tech Hub)');
-console.log('  ✓ 6+ CVs (with complete profiles and skills)');
+console.log('  ✓ 6+ Currículos (with complete profiles and skills)');
 console.log('  ✓ 12 BFI-44 Profiles (personality assessments)');
 console.log('  ✓ 6 Projects (planning, active, completed, cancelled)');
 console.log('  ✓ 15+ Risks (various types and severities)');
@@ -39,7 +39,7 @@ console.log('    📧 And 5 more employees...\n');
 
 console.log('Features Demonstrated:');
 console.log('  • User authentication and roles');
-console.log('  • CV upload and AI processing');
+console.log('  • Currículo upload and AI processing');
 console.log('  • BFI-44 personality assessment');
 console.log('  • Project lifecycle management');
 console.log('  • Risk prediction (CBR + Decision Tree)');

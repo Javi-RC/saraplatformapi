@@ -58,7 +58,7 @@ class TeamSelectionService {
       organizationStatus: 'accepted'
     }).populate('userId', 'name email avatar');
 
-    // Filter out CVs where userId populate failed (deleted users)
+    // Filter out curricula where userId populate failed (deleted users)
     const validCvs = cvs.filter(cv => cv.userId != null);
 
     if (validCvs.length === 0) {
@@ -192,11 +192,11 @@ class TeamSelectionService {
       organizationStatus: 'accepted'
     }).populate('userId', 'name email avatar');
 
-    // Filter out CVs where userId populate failed (deleted users)
+    // Filter out curricula where userId populate failed (deleted users)
     const validCvs = cvs.filter(cv => cv.userId != null);
 
     if (validCvs.length === 0) {
-      console.warn(`No valid CVs found for organization ${organizationId}. Total CVs: ${cvs.length}, Valid: ${validCvs.length}`);
+      console.warn(`No valid curricula found for organization ${organizationId}. Total curricula: ${cvs.length}, Valid: ${validCvs.length}`);
       return {
         suggestions: [],
         metadata: {
@@ -237,7 +237,11 @@ class TeamSelectionService {
 
     scoredEmployees.sort((a, b) => a.score - b.score);
 
-    const candidatePoolSize = Math.min(remainingSlots * 2, scoredEmployees.length);
+    // Use configurable candidate pool multiplier (same as Phase 1 selectOptimalTeam)
+    const candidatePoolSize = Math.min(
+      remainingSlots * phase1Config.candidatePoolMultiplier,
+      scoredEmployees.length
+    );
     const topCandidates = scoredEmployees.slice(0, candidatePoolSize);
 
     let finalSuggestions;
@@ -315,7 +319,7 @@ class TeamSelectionService {
    * Calcula el score de un empleado usando distancia Manhattan
    * NOW USES: Configurable weights from project configuration
    * 
-   * @param {Object} cv - CV del empleado
+   * @param {Object} cv - Currículo del empleado
    * @param {Array} requiredTechs - Tecnologías requeridas normalizadas
    * @param {string} experienceLevel - Nivel de experiencia requerido
    * @param {string} complexity - Complejidad del proyecto
@@ -326,10 +330,10 @@ class TeamSelectionService {
   async calculateEmployeeScore(cv, requiredTechs, experienceLevel, complexity, weeklyHours, config) {
     // Validate input
     if (!cv || !cv.userId) {
-      console.error('Invalid CV or missing userId in calculateEmployeeScore');
+      console.error('Invalid curriculum or missing userId in calculateEmployeeScore');
       return {
         total: Infinity,
-        details: { error: 'Invalid CV data' },
+        details: { error: 'Invalid curriculum data' },
         matchedSkills: [],
         missingSkills: requiredTechs || []
       };
@@ -483,7 +487,7 @@ class TeamSelectionService {
   /**
    * Calcula la distancia por complejidad del sistema
    * NOW USES: config.complexityMultiplier
-   * @param {Object} cv - CV del empleado
+   * @param {Object} cv - Currículo del empleado
    * @param {string} complexity - Complejidad requerida
    * @param {Object} config - Configuration object
    * @returns {number} Distancia
@@ -507,7 +511,7 @@ class TeamSelectionService {
   /**
    * Estima el nivel de complejidad que puede manejar un empleado
    * NOW USES: config.complexityFactors for bonuses
-   * @param {Object} cv - CV del empleado
+   * @param {Object} cv - Currículo del empleado
    * @param {Object} config - Configuration object
    * @returns {number} Score de complejidad (1-3)
    */
@@ -541,7 +545,7 @@ class TeamSelectionService {
   /**
    * Calcula la distancia por disponibilidad considerando múltiples factores
    * NOW USES: config.availabilityComponents for weights
-   * @param {Object} cv - CV del empleado
+   * @param {Object} cv - Currículo del empleado
    * @param {number} requiredHours - Horas semanales requeridas
    * @param {Object} config - Configuration object
    * @returns {Promise<number>} Distancia (0-5)
@@ -795,7 +799,7 @@ class TeamSelectionService {
         averageScore: 0,
         skillsCoverage: [],
         skillsGaps: [],
-        warnings: ['No employees available with accepted CVs']
+        warnings: ['No employees available with accepted curricula']
       };
     }
 
@@ -825,7 +829,7 @@ class TeamSelectionService {
       if (metadata.employeesWithAcceptedCV < metadata.allEmployeesInOrg) {
         const pending = metadata.allEmployeesInOrg - metadata.employeesWithAcceptedCV;
         warnings.push(
-          `There are ${pending} employee(s) in the organization without an accepted CV who were not considered`
+          `There are ${pending} employee(s) in the organization without an accepted curriculum who were not considered`
         );
       }
     }
@@ -958,7 +962,7 @@ class TeamSelectionService {
         title: 'Suboptimal Team Match',
         description: `The team has an average score of ${summary.averageScore}, indicating a significant distance between required and available skills`,
         severity: 'medium',
-        confidence: 0.80,
+        confidence: 0.75,
         impact: {
           quality: 'Code quality lower than expected',
           schedule: 'Longer time to complete tasks',
@@ -966,12 +970,11 @@ class TeamSelectionService {
         },
         recommendations: [
           'Review if there are better candidates in the organization',
-          'Evaluate pending CV approvals',
+          'Evaluate pending curriculum approvals',
           'Consider intensive pre-project training',
           'Adjust development velocity expectations'
         ],
-        detectedBy: 'team_selection',
-        confidence: 0.75
+        detectedBy: 'team_selection'
       });
     }
 

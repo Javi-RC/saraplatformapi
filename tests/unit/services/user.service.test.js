@@ -373,7 +373,7 @@ describe('UserService - Unit Tests', () => {
   });
 
   describe('_deletePersonalData', () => {
-    it('should delete CVs, notifications and BFI44 data', async () => {
+    it('should delete curricula, notifications and BFI44 data', async () => {
       cvRepository.deleteMany = jest.fn().mockResolvedValue({});
       notificationRepository.deleteMany = jest.fn().mockResolvedValue({});
       bfi44Repository.deleteMany = jest.fn().mockResolvedValue({});

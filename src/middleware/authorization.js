@@ -256,6 +256,49 @@ const requireOrganizationMember = async (req, res, next) => {
   }
 };
 
+/**
+ * Middleware para verificar que el usuario es administrador de organización o jefe de proyecto
+ * Adjunta req.isProjectManager para uso posterior en el controlador
+ */
+const requireOrgAdminOrProjectManager = async (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Not authenticated'
+    });
+  }
+
+  // org_admin always allowed
+  if (req.user.role === 'org_admin') {
+    req.isProjectManager = false;
+    return next();
+  }
+
+  // Check if employee is a project manager in their organization
+  if (req.user.role === 'employee' && req.user.organization) {
+    try {
+      const Organization = require('../models/organization.model');
+      const organization = await Organization.findById(req.user.organization);
+
+      if (organization && organization.isProjectManager(req.user.id)) {
+        req.isProjectManager = true;
+        return next();
+      }
+    } catch (error) {
+      console.error('Error verificando rol de jefe de proyecto:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Error checking permissions'
+      });
+    }
+  }
+
+  return res.status(403).json({
+    success: false,
+    error: 'You must be an organization admin or project manager to access this resource'
+  });
+};
+
 module.exports = {
   requireRole,
   requireOrgAdmin,
@@ -263,5 +306,6 @@ module.exports = {
   requireCompleteProfile,
   requireOwnerOrOrgAdmin,
   requireOrganizationAdmin,
-  requireOrganizationMember
+  requireOrganizationMember,
+  requireOrgAdminOrProjectManager
 };

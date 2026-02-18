@@ -1,12 +1,12 @@
-// Enhanced Comprehensive Seed CVs with Complete Data for ALL Employees
-// This file contains complete CV data for every employee with all possible fields filled
+// Enhanced Comprehensive Seed Currículos with Complete Data for ALL Employees
+// This file contains complete currículo data for every employee with all possible fields filled
 
 const seedCVs = async (users, organizations) => {
-  console.log('\n📄 Creating enhanced comprehensive CVs with complete data for ALL employees...');
+  console.log('\n📄 Creating enhanced comprehensive currículos with complete data for ALL employees...');
   
   const CV = require('../../src/models/cv.model');
   
-  // Helper function to generate complete CV data
+  // Helper function to generate complete currículo data
   const generateCompleteCV = (userEmail, orgIndex, profile) => {
     const user = users.find(u => u.email === userEmail);
     if (!user) return null;
@@ -633,7 +633,7 @@ const seedCVs = async (users, organizations) => {
     }
   };
   
-  // Generate CVs for all employees with complete profiles
+  // Generate currículos for all employees with complete profiles
   const cvs = [];
   
   for (const [email, profile] of Object.entries(employeeProfiles)) {
@@ -642,10 +642,10 @@ const seedCVs = async (users, organizations) => {
   }
   
   // TODO: Add remaining employees (David, Laura, Sarah, Michael, Emma, Yuki, Li Wei, Priya, Pending users)
-  // For now, keeping original CVs for employees not yet migrated to new format
+  // For now, keeping original currículos for employees not yet migrated to new format
   
   const createdCVs = await CV.insertMany(cvs);
-  console.log(`✅ Created ${createdCVs.length} enhanced comprehensive CVs with complete data`);
+  console.log(`✅ Created ${createdCVs.length} enhanced comprehensive currículos with complete data`);
   return createdCVs;
 };
 

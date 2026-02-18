@@ -202,7 +202,7 @@ const seedOrganizations = async (users) => {
       position: profile.position,
       department: profile.specialty === 'QA' ? 'Quality Assurance' : 'Engineering',
       status: 'active',
-      isProjectManager: profile.level === 'senior' && Math.random() > 0.7
+      isProjectManager: profile.email === 'carlos.dev@example.com' || (profile.level === 'senior' && Math.random() > 0.7)
     };
     
     if (profile.orgIndex === 0) {
@@ -217,7 +217,7 @@ const seedOrganizations = async (users) => {
   const organizations = [
     {
       name: 'Tech Innovators',
-      description: 'Leading software development company specializing in web and mobile applications',
+      description: 'Empresa líder de desarrollo de software especializada en aplicaciones web y móviles',
       taxId: 'B12345678',
       contact: {
         email: 'contact@techinnovators.com',
@@ -240,7 +240,7 @@ const seedOrganizations = async (users) => {
     },
     {
       name: 'Global Solutions Inc',
-      description: 'International technology consulting and cloud solutions provider',
+      description: 'Consultoría tecnológica internacional y proveedor de soluciones cloud',
       taxId: 'US-987654321',
       contact: {
         email: 'info@globalsolutions.com',
@@ -263,7 +263,7 @@ const seedOrganizations = async (users) => {
     },
     {
       name: 'Asian Tech Hub',
-      description: 'Premier software development hub focusing on AI and machine learning solutions',
+      description: 'Hub líder de desarrollo de software enfocado en soluciones de IA y machine learning',
       taxId: 'JP-456789123',
       contact: {
         email: 'contact@asiantechhub.jp',
@@ -442,7 +442,7 @@ const main = async () => {
     console.log('Summary:');
     console.log(`  - Users: ${users.length}`);
     console.log(`  - Organizations: ${organizations.length}`);
-    console.log(`  - CVs: ${cvs.length}`);
+    console.log(`  - Currículos: ${cvs.length}`);
     console.log(`  - BFI-44 Profiles: ${bfi44Profiles.length}`);
     console.log(`  - Projects: ${projects.length}`);
     console.log(`  - Risks: ${risks.length}`);

@@ -162,7 +162,7 @@ const organizationSchema = new mongoose.Schema({
     allowPublicCVSubmission: {
       type: Boolean,
       default: true,
-      description: 'Allow external employees to submit CVs'
+      description: 'Allow external employees to submit curricula'
     },
     requireApproval: {
       type: Boolean,
@@ -172,12 +172,12 @@ const organizationSchema = new mongoose.Schema({
     notifyOnCVSubmission: {
       type: Boolean,
       default: true,
-      description: 'Notificar a administradores cuando se recibe un CV'
+      description: 'Notificar a administradores cuando se recibe un currículo'
     },
     autoProcessCV: {
       type: Boolean,
       default: true,
-      description: 'Procesar automáticamente CVs con IA'
+      description: 'Procesar automáticamente currículos con IA'
     }
   },
   // Work Mode Policy

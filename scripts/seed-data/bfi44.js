@@ -1,8 +1,10 @@
-// Seed BFI-44 Personality Profiles
+// Seed BFI-44 Personality Profiles for ALL employees
+const { COMPLETE_EMPLOYEE_DATA } = require('./employee-profiles');
+
 const seedBFI44 = async (users) => {
-  console.log('\n🧠 Creating BFI-44 personality profiles...');
+  console.log('\n🧠 Creating BFI-44 personality profiles for ALL employees...');
   
-  // Helper function to generate BFI-44 responses
+  // Helper function to generate BFI-44 responses from a trait profile
   const generateBFI44Responses = (profile) => {
     const responses = new Map();
     
@@ -40,7 +42,6 @@ const seedBFI44 = async (users) => {
   };
   
   const calculateResults = (responses) => {
-    // Calculate BFI-44 scores (simplified calculation)
     const extraversion = (
       responses.get('1') + (6 - responses.get('6')) + responses.get('11') + 
       responses.get('16') + (6 - responses.get('21')) + responses.get('26') + 
@@ -80,59 +81,69 @@ const seedBFI44 = async (users) => {
       Openness: parseFloat(openness.toFixed(2))
     };
   };
-  
-  const profiles = [
-    {
-      userId: users.find(u => u.email === 'carlos.dev@example.com')._id,
-      profile: { Extraversion: 'high', Agreeableness: 'high', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'ana.frontend@example.com')._id,
-      profile: { Extraversion: 'medium', Agreeableness: 'high', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'david.backend@example.com')._id,
-      profile: { Extraversion: 'low', Agreeableness: 'medium', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'medium' }
-    },
-    {
-      userId: users.find(u => u.email === 'laura.qa@example.com')._id,
-      profile: { Extraversion: 'medium', Agreeableness: 'high', Conscientiousness: 'high', Neuroticism: 'medium', Openness: 'medium' }
-    },
-    {
-      userId: users.find(u => u.email === 'sarah.devops@example.com')._id,
-      profile: { Extraversion: 'high', Agreeableness: 'medium', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'michael.arch@example.com')._id,
-      profile: { Extraversion: 'medium', Agreeableness: 'medium', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'emma.mobile@example.com')._id,
-      profile: { Extraversion: 'high', Agreeableness: 'high', Conscientiousness: 'medium', Neuroticism: 'medium', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'yuki.fullstack@example.com')._id,
-      profile: { Extraversion: 'low', Agreeableness: 'high', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'medium' }
-    },
-    {
-      userId: users.find(u => u.email === 'li.wei@example.com')._id,
-      profile: { Extraversion: 'medium', Agreeableness: 'medium', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'priya.data@example.com')._id,
-      profile: { Extraversion: 'medium', Agreeableness: 'high', Conscientiousness: 'high', Neuroticism: 'medium', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'pending.user1@example.com')._id,
-      profile: { Extraversion: 'high', Agreeableness: 'medium', Conscientiousness: 'medium', Neuroticism: 'medium', Openness: 'high' }
-    },
-    {
-      userId: users.find(u => u.email === 'pending.user2@example.com')._id,
-      profile: { Extraversion: 'medium', Agreeableness: 'high', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'medium' }
+
+  // Generate a deterministic personality profile based on specialty and level
+  const generateTraitProfile = (specialty, level) => {
+    const levels = ['low', 'medium', 'high'];
+
+    // Base profiles by specialty for realistic variety
+    const specialtyProfiles = {
+      'Full Stack Development':        { E: 'medium', A: 'high',   C: 'high',   N: 'low',    O: 'high' },
+      'Frontend & UX/UI':              { E: 'high',   A: 'high',   C: 'medium', N: 'medium', O: 'high' },
+      'Backend Development':           { E: 'low',    A: 'medium', C: 'high',   N: 'low',    O: 'medium' },
+      'Quality Assurance & Test Automation': { E: 'medium', A: 'high', C: 'high', N: 'medium', O: 'medium' },
+      'DevOps & Cloud Infrastructure': { E: 'medium', A: 'medium', C: 'high',   N: 'low',    O: 'high' },
+      'Software Architecture & System Design': { E: 'medium', A: 'medium', C: 'high', N: 'low', O: 'high' },
+      'Mobile Development':            { E: 'high',   A: 'high',   C: 'medium', N: 'medium', O: 'high' },
+      'Data Science & ML':             { E: 'medium', A: 'high',   C: 'high',   N: 'low',    O: 'high' },
+      'Frontend Development':          { E: 'high',   A: 'high',   C: 'medium', N: 'medium', O: 'high' },
+    };
+
+    const base = specialtyProfiles[specialty] || { E: 'medium', A: 'medium', C: 'medium', N: 'medium', O: 'medium' };
+
+    // Seniors tend to have higher conscientiousness and lower neuroticism
+    if (level === 'senior') {
+      base.C = 'high';
+      base.N = 'low';
     }
+
+    return {
+      Extraversion: base.E,
+      Agreeableness: base.A,
+      Conscientiousness: base.C,
+      Neuroticism: base.N,
+      Openness: base.O
+    };
+  };
+
+  // Build profiles for ALL employees (admins excluded, they are org_admin role)
+  const allProfiles = [];
+
+  for (const [key, employeeProfile] of Object.entries(COMPLETE_EMPLOYEE_DATA)) {
+    const user = users.find(u => u.email === employeeProfile.email);
+    if (!user) continue;
+
+    const traitProfile = generateTraitProfile(employeeProfile.specialty, employeeProfile.level);
+    allProfiles.push({ userId: user._id, profile: traitProfile });
+  }
+
+  // Also include the 3 admins with a balanced profile
+  const adminEmails = [
+    'admin.techinnov@example.com',
+    'admin.globalsol@example.com',
+    'admin.asiantech@example.com'
   ];
+  for (const email of adminEmails) {
+    const admin = users.find(u => u.email === email);
+    if (admin) {
+      allProfiles.push({
+        userId: admin._id,
+        profile: { Extraversion: 'high', Agreeableness: 'high', Conscientiousness: 'high', Neuroticism: 'low', Openness: 'high' }
+      });
+    }
+  }
   
-  const bfi44Records = profiles.map(p => {
+  const bfi44Records = allProfiles.map(p => {
     const responses = generateBFI44Responses(p.profile);
     const results = calculateResults(responses);
     
@@ -145,7 +156,7 @@ const seedBFI44 = async (users) => {
   });
   
   const createdProfiles = await require('../../src/models/bfi44.model').insertMany(bfi44Records);
-  console.log(`✅ Created ${createdProfiles.length} BFI-44 profiles`);
+  console.log(`✅ Created ${createdProfiles.length} BFI-44 profiles (all employees + admins)`);
   return createdProfiles;
 };
 

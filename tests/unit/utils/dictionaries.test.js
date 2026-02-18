@@ -147,7 +147,7 @@ describe('Dictionaries - Unit Tests', () => {
   });
 
   describe('sectionKeywords', () => {
-    it('should have keywords for all common CV sections', () => {
+    it('should have keywords for all common curriculum sections', () => {
       expect(dictionaries.sectionKeywords.contact).toBeDefined();
       expect(dictionaries.sectionKeywords.education).toBeDefined();
       expect(dictionaries.sectionKeywords.experience).toBeDefined();

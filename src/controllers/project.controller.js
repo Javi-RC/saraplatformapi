@@ -8,6 +8,8 @@ const {
   DEFAULT_TEAM_SELECTION_CONFIG 
 } = require('../config/teamSelectionDefaults');
 const Project = require('../models/project.model');
+const { toStableBfi44Profile } = require('../utils/bfi44ProfileMapper');
+const { getLanguageFromRequest, translateSynergyObject, translateSynergyValidation, translateSynergyValidations, translateHiringRecommendations } = require('../i18n/i18n.service');
 
 /**
  * Project Controller
@@ -568,6 +570,7 @@ class ProjectController {
       };
 
       const phase2Config = getConfigSection(project, 'phase2');
+      const lang = getLanguageFromRequest(req);
       const synergyRequirements = {
         projectType: project.projectType,
         requiredExperienceLevel: project.requiredExperienceLevel,
@@ -590,7 +593,7 @@ class ProjectController {
           organizationStatus: 'accepted'
         }).populate('userId', 'name email avatar');
 
-        // Filter out CVs where userId populate failed (deleted users)
+        // Filter out curricula where userId populate failed (deleted users)
         const validCvs = cvs.filter(cv => cv.userId != null);
 
         // Obtener perfiles BFI-44 del equipo actual
@@ -624,15 +627,7 @@ class ProjectController {
               userId: cv.userId._id,
               user: {
                 ...cv.userId.toObject(),
-                bfi44Profile: (bfi44Profile && bfi44Profile.results && bfi44Profile.results.facets) ? {
-                  traits: {
-                    extraversion: bfi44Profile.results.facets.extraversion,
-                    agreeableness: bfi44Profile.results.facets.agreeableness,
-                    conscientiousness: bfi44Profile.results.facets.conscientiousness,
-                    neuroticism: bfi44Profile.results.facets.neuroticism,
-                    openness: bfi44Profile.results.facets.openness
-                  }
-                } : null
+                bfi44Profile: bfi44Profile ? toStableBfi44Profile(bfi44Profile.results) : null
               },
               cv: cv,
               score: score.total,
@@ -651,10 +646,11 @@ class ProjectController {
 
         // Phase 2: Personality synergy analysis (role diversity, complementarity, project fit, conflict risk, balance)
         try {
-          response.data.currentTeamSynergy = await teamSynergyService.explainTeamSynergy(
+          const rawSynergy = await teamSynergyService.explainTeamSynergy(
             project.assignedEmployees,
             synergyRequirements
           );
+          response.data.currentTeamSynergy = translateSynergyObject(rawSynergy, lang);
         } catch (synergyError) {
           console.error('Error calculating current team synergy:', synergyError);
         }
@@ -701,15 +697,7 @@ class ProjectController {
             ...suggestion,
             user: {
               ...suggestion.user,
-              bfi44Profile: (bfi44Profile && bfi44Profile.results && bfi44Profile.results.facets) ? {
-                traits: {
-                  extraversion: bfi44Profile.results.facets.extraversion,
-                  agreeableness: bfi44Profile.results.facets.agreeableness,
-                  conscientiousness: bfi44Profile.results.facets.conscientiousness,
-                  neuroticism: bfi44Profile.results.facets.neuroticism,
-                  openness: bfi44Profile.results.facets.openness
-                }
-              } : null
+              bfi44Profile: bfi44Profile ? toStableBfi44Profile(bfi44Profile.results) : null
             },
             matchScore,
             synergyBonus
@@ -722,7 +710,9 @@ class ProjectController {
         response.data.suggestions = result.suggestions;
         response.data.suggestionsSummary = suggestionsSummary;
         response.data.suggestionsMetadata = result.metadata;
-        response.data.synergyValidation = result.synergyValidation || undefined;
+        response.data.synergyValidation = result.synergyValidation
+          ? translateSynergyValidations(result.synergyValidation, lang)
+          : undefined;
 
         // Phase 2: Projected team synergy if suggested members are added
         try {
@@ -731,9 +721,12 @@ class ProjectController {
             ...(result.suggestions || []).map(s => ({ user: s.userId }))
           ];
 
-          response.data.projectedTeamSynergy = await teamSynergyService.explainTeamSynergy(
-            projectedTeamMembers,
-            synergyRequirements
+          response.data.projectedTeamSynergy = translateSynergyObject(
+            await teamSynergyService.explainTeamSynergy(
+              projectedTeamMembers,
+              synergyRequirements
+            ),
+            lang
           );
         } catch (synergyError) {
           console.error('Error calculating projected team synergy:', synergyError);
@@ -778,7 +771,7 @@ class ProjectController {
             .filter(userId => !consideredUserIds.has(userId.toString()));
 
           if (allEmployeeIds.length > 0) {
-            // Obtener CVs aceptados de empleados disponibles
+            // Obtener currículos aceptados de empleados disponibles
             const availableCvs = await CV.find({
               userId: { $in: allEmployeeIds },
               organization: organizationId,
@@ -816,15 +809,7 @@ class ProjectController {
                   userId: cv.userId._id,
                   user: {
                     ...cv.userId.toObject(),
-                    bfi44Profile: (bfi44Profile && bfi44Profile.results && bfi44Profile.results.facets) ? {
-                      traits: {
-                        extraversion: bfi44Profile.results.facets.extraversion,
-                        agreeableness: bfi44Profile.results.facets.agreeableness,
-                        conscientiousness: bfi44Profile.results.facets.conscientiousness,
-                        neuroticism: bfi44Profile.results.facets.neuroticism,
-                        openness: bfi44Profile.results.facets.openness
-                      }
-                    } : null
+                    bfi44Profile: bfi44Profile ? toStableBfi44Profile(bfi44Profile.results) : null
                   },
                   cv: cv,
                   score: score.total,
@@ -879,7 +864,10 @@ class ProjectController {
                     employee.synergyValidation = {
                       recommended: validation.recommended,
                       improvement: validation.improvement,
-                      message: validation.message
+                      message: translateSynergyValidation(
+                        { synergyImpact: validation.improvement, message: validation.message },
+                        lang
+                      ).message
                     };
                     validatedCount++;
                   } catch (error) {
@@ -962,7 +950,7 @@ class ProjectController {
         .filter(emp => emp.user != null)
         .map(emp => emp.user._id);
 
-      // Get CVs
+      // Get curricula
       const cvs = await CV.find({
         userId: { $in: teamMemberIds },
         organization: organizationId,
@@ -1018,12 +1006,12 @@ class ProjectController {
               issue: technicalMatch.noProjectTechnologies 
                 ? 'Project has no technologies defined in mainTechnologies field'
                 : technicalMatch.noTeamSkills 
-                  ? 'Team has no technical skills in their CVs'
+                  ? 'Team has no technical skills in their curricula'
                   : null,
               recommendation: technicalMatch.noProjectTechnologies
                 ? 'Add technologies to the project using PUT /api/projects/:id with mainTechnologies array'
                 : technicalMatch.noTeamSkills
-                  ? 'Ensure team members have uploaded CVs with technical skills'
+                  ? 'Ensure team members have uploaded curricula with technical skills'
                   : 'Comparison is valid'
             }
           },
@@ -1086,10 +1074,12 @@ class ProjectController {
 
       // OPTIMIZATION: Use cached synergy or calculate (lazy loading)
       const forceRefresh = refresh === 'true';
-      const synergyAnalysis = await teamSynergyService.getCachedOrCalculate(id, forceRefresh);
+      const rawSynergyAnalysis = await teamSynergyService.getCachedOrCalculate(id, forceRefresh);
+      const lang = getLanguageFromRequest(req);
+      const synergyAnalysis = translateSynergyObject(rawSynergyAnalysis, lang);
 
       // Get hiring recommendations (still computed on demand)
-      const hiringRecommendations = await personalityOptimizer.generateHiringRecommendations(
+      const rawHiringRecommendations = await personalityOptimizer.generateHiringRecommendations(
         project.assignedEmployees,
         {
           projectType: project.projectType,
@@ -1099,6 +1089,7 @@ class ProjectController {
           isMaintenance: project.isMaintenance
         }
       );
+      const hiringRecommendations = translateHiringRecommendations(rawHiringRecommendations, lang);
 
       return res.status(200).json({
         success: true,
@@ -1714,6 +1705,138 @@ class ProjectController {
       });
     } catch (error) {
       console.error('Error getting config summary:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Get candidate pool size configuration
+   * GET /api/projects/:id/candidate-pool-size
+   * 
+   * Returns the current candidatePoolMultiplier and the effective top N
+   * Accessible by project manager or organization admin
+   */
+  async getCandidatePoolSize(req, res) {
+    try {
+      const { id } = req.params;
+      const project = await Project.findById(id).populate('organization');
+
+      if (!project) {
+        return res.status(404).json({
+          success: false,
+          error: 'Project not found'
+        });
+      }
+
+      const isPM = project.isProjectManager(req.user.id);
+      const isOrgAdmin = project.organization?.isAdmin?.(req.user.id) || false;
+
+      if (!isPM && !isOrgAdmin) {
+        return res.status(403).json({
+          success: false,
+          error: 'Only the project manager or organization admin can view this configuration'
+        });
+      }
+
+      const phase1Config = getConfigSection(project, 'phase1');
+      const multiplier = phase1Config.candidatePoolMultiplier;
+      const teamSize = project.teamSize || 5;
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          projectId: project._id,
+          projectName: project.projectName,
+          teamSize,
+          candidatePoolMultiplier: multiplier,
+          effectiveTopN: teamSize * multiplier,
+          description: `De los empleados evaluados en la Fase 1, se seleccionan los ${teamSize * multiplier} mejores (teamSize ${teamSize} × multiplicador ${multiplier}) para pasar a la Fase 2 de optimización por personalidad.`
+        }
+      });
+    } catch (error) {
+      console.error('Error getting candidate pool size:', error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  }
+
+  /**
+   * Update candidate pool size (Top N) for team selection
+   * PATCH /api/projects/:id/candidate-pool-size
+   * 
+   * Sets how many top candidates from Phase 1 pass to Phase 2
+   * Body: { candidatePoolMultiplier: number }
+   * Accessible by project manager or organization admin
+   */
+  async updateCandidatePoolSize(req, res) {
+    try {
+      const { id } = req.params;
+      const { candidatePoolMultiplier } = req.body;
+      const project = await Project.findById(id).populate('organization');
+
+      if (!project) {
+        return res.status(404).json({
+          success: false,
+          error: 'Project not found'
+        });
+      }
+
+      const isPM = project.isProjectManager(req.user.id);
+      const isOrgAdmin = project.organization?.isAdmin?.(req.user.id) || false;
+
+      if (!isPM && !isOrgAdmin) {
+        return res.status(403).json({
+          success: false,
+          error: 'Only the project manager or organization admin can modify this configuration'
+        });
+      }
+
+      if (candidatePoolMultiplier == null) {
+        return res.status(400).json({
+          success: false,
+          error: 'candidatePoolMultiplier is required'
+        });
+      }
+
+      const multiplier = Number(candidatePoolMultiplier);
+      if (!Number.isFinite(multiplier) || multiplier < 1 || multiplier > 10) {
+        return res.status(400).json({
+          success: false,
+          error: 'candidatePoolMultiplier must be a number between 1 and 10'
+        });
+      }
+
+      // Ensure teamSelectionConfig and phase1 exist
+      if (!project.teamSelectionConfig) {
+        project.teamSelectionConfig = { ...DEFAULT_TEAM_SELECTION_CONFIG };
+      }
+      if (!project.teamSelectionConfig.phase1) {
+        project.teamSelectionConfig.phase1 = { ...DEFAULT_TEAM_SELECTION_CONFIG.phase1 };
+      }
+
+      project.teamSelectionConfig.phase1.candidatePoolMultiplier = multiplier;
+      project.markModified('teamSelectionConfig.phase1');
+      await project.save();
+
+      const teamSize = project.teamSize || 5;
+
+      return res.status(200).json({
+        success: true,
+        message: `Candidate pool size updated. Top ${teamSize * multiplier} candidates will advance to Phase 2.`,
+        data: {
+          candidatePoolMultiplier: multiplier,
+          teamSize,
+          effectiveTopN: teamSize * multiplier,
+          description: `De los empleados evaluados en la Fase 1, se seleccionan los ${teamSize * multiplier} mejores (teamSize ${teamSize} × multiplicador ${multiplier}) para pasar a la Fase 2 de optimización por personalidad.`
+        }
+      });
+    } catch (error) {
+      console.error('Error updating candidate pool size:', error);
       return res.status(500).json({
         success: false,
         error: error.message

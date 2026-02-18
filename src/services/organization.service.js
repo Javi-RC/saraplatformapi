@@ -38,6 +38,16 @@ class OrganizationService {
       throw new Error('User already administers an active organization');
     }
 
+    // Verificar nombre duplicado
+    if (organizationData.name) {
+      const existingByName = await organizationRepository.findOne({
+        name: organizationData.name.trim()
+      });
+      if (existingByName) {
+        throw new Error('ORGANIZATION_NAME_ALREADY_EXISTS');
+      }
+    }
+
     // Crear la organización
     const organization = await organizationRepository.create({
       ...organizationData,
@@ -47,8 +57,9 @@ class OrganizationService {
       lastActivityAt: Date.now()
     });
 
-    // Actualizar el rol del usuario a org_admin
+    // Actualizar el rol del usuario y asignar organización
     admin.role = 'org_admin';
+    admin.organization = organization._id;
     await admin.save();
 
     // Poblar los datos del administrador
@@ -335,7 +346,7 @@ class OrganizationService {
       { select: 'user results completedAt' }
     );
 
-    // Crear un mapa de userId -> CV para búsqueda rápida
+    // Crear un mapa de userId -> currículo para búsqueda rápida
     const cvMap = new Map();
     cvs.forEach(cv => {
       cvMap.set(cv.userId.toString(), cv);
@@ -357,7 +368,7 @@ class OrganizationService {
       }
     }
 
-    // Agregar el CV a cada empleado
+    // Agregar el currículo a cada empleado
     const employeesWithCV = employees.map(emp => {
       const employeeObj = emp.toObject ? emp.toObject() : emp;
       const cv = cvMap.get(emp.user._id.toString());

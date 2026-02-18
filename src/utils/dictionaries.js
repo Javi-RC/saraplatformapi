@@ -1,5 +1,5 @@
 /**
- * Diccionarios de datos para extracción de CVs
+ * Diccionarios de datos para extracción de currículos
  * Contiene listas de tecnologías, ciudades, idiomas y secciones comunes
  */
 

@@ -17,7 +17,7 @@ Este script puebla completamente la base de datos con datos de ejemplo que muest
 - **Global Solutions Inc** (Estados Unidos) - Consulting
 - **Asian Tech Hub** (Japón) - AI/ML
 
-### 📄 **6+ CVs Completos**
+### 📄 **6+ Currículos Completos**
 - Diferentes niveles de experiencia (junior, mid, senior, expert)
 - Skills técnicas y soft skills
 - Educación, experiencia laboral, certificaciones
@@ -66,7 +66,7 @@ Estados:
 
 ### 🔔 **20+ Notificaciones**
 - Email confirmation
-- CV submissions
+- Currículo submissions
 - Project assignments
 - Project status changes
 - Organization updates
@@ -98,7 +98,7 @@ El script:
 1. ✅ Limpia la base de datos existente
 2. ✅ Crea usuarios con diferentes roles
 3. ✅ Crea organizaciones completas
-4. ✅ Genera CVs detallados
+4. ✅ Genera currículos detallados
 5. ✅ Completa perfiles BFI-44
 6. ✅ Crea proyectos en diferentes estados
 7. ✅ Genera riesgos realistas
@@ -140,7 +140,7 @@ Todos los empleados tienen la misma contraseña: `Password123!`
 
 ### Usuarios Pendientes
 
-- `pending.user1@example.com` - CV enviado a Tech Innovators
+- `pending.user1@example.com` - Currículo enviado a Tech Innovators
 - `pending.user2@example.com` - Sin organización
 
 ## Casos de Uso Cubiertos
@@ -151,7 +151,7 @@ Todos los empleados tienen la misma contraseña: `Password123!`
 - OAuth y autenticación local
 - Preferencias y configuración
 
-### ✅ Gestión de CVs
+### ✅ Gestión de Currículos
 - Carga y procesamiento con IA
 - Diferentes niveles de completitud
 - Envío a organizaciones
@@ -230,7 +230,7 @@ Todos los empleados tienen la misma contraseña: `Password123!`
 Para actualizar o extender los datos de seed:
 
 1. **Usuarios**: Edita `scripts/comprehensive-seed.js` (función `seedUsers`)
-2. **CVs**: Edita `scripts/seed-data/cvs.js`
+2. **Currículos**: Edita `scripts/seed-data/cvs.js`
 3. **BFI-44**: Edita `scripts/seed-data/bfi44.js`
 4. **Proyectos**: Edita `scripts/seed-data/projects.js`
 5. **Riesgos**: Edita `scripts/seed-data/risks.js`

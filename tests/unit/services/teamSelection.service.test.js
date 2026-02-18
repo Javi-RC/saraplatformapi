@@ -248,7 +248,7 @@ describe('TeamSelectionService - Unit Tests', () => {
       }
     };
 
-    it('should return base score for minimal CV', () => {
+    it('should return base score for minimal curriculum', () => {
       const cv = {
         skills: { technical: [] },
         certifications: [],
@@ -391,19 +391,19 @@ describe('TeamSelectionService - Unit Tests', () => {
       availabilityComponents: {}
     };
 
-    it('should return Infinity for invalid CV input', async () => {
+    it('should return Infinity for invalid curriculum input', async () => {
       const score = await teamSelectionService.calculateEmployeeScore(null, ['node'], 'mid', 'medium', 40, config);
       expect(score.total).toBe(Infinity);
       expect(score.details.error).toBeDefined();
     });
 
-    it('should return Infinity for CV without userId', async () => {
+    it('should return Infinity for curriculum without userId', async () => {
       const cv = { skills: {} };
       const score = await teamSelectionService.calculateEmployeeScore(cv, ['node'], 'mid', 'medium', 40, config);
       expect(score.total).toBe(Infinity);
     });
 
-    it('should calculate score for valid CV', async () => {
+    it('should calculate score for valid curriculum', async () => {
       const cv = {
         userId: { _id: 'user-123' },
         skills: {
@@ -482,7 +482,7 @@ describe('TeamSelectionService - Unit Tests', () => {
       expect(result).toEqual([]);
     });
 
-    it('should return empty array if no valid CVs', async () => {
+    it('should return empty array if no valid curricula', async () => {
       const mockOrg = {
         employees: [
           { user: 'user-1', status: 'active' },

@@ -268,7 +268,7 @@ router.get(
  * 
  * Returns comprehensive debugging information about:
  * - Project technologies configuration
- * - Team members and their CVs
+ * - Team members and their curricula
  * - Technical skills inventory
  * - Technical match analysis with diagnosis
  */
@@ -276,6 +276,42 @@ router.get(
   '/:id/debug-technical-match',
   authenticate,
   projectController.debugTechnicalMatch
+);
+
+/**
+ * Candidate Pool Size (Top N) Endpoint
+ * Dedicated endpoint for PM or Org Admin to configure how many top candidates
+ * from Phase 1 advance to Phase 2 personality optimization
+ */
+
+/**
+ * Get current candidate pool size configuration
+ * GET /api/projects/:id/candidate-pool-size
+ * 
+ * Returns the candidatePoolMultiplier and effective top N value
+ * Accessible by project manager or organization admin
+ */
+router.get(
+  '/:id/candidate-pool-size',
+  authenticate,
+  projectController.getCandidatePoolSize
+);
+
+/**
+ * Update candidate pool size (Top N)
+ * PATCH /api/projects/:id/candidate-pool-size
+ * 
+ * Body: { candidatePoolMultiplier: number (1-10) }
+ * Sets how many top candidates from Phase 1 pass to Phase 2
+ * Accessible by project manager or organization admin
+ */
+router.patch(
+  '/:id/candidate-pool-size',
+  authenticate,
+  body('candidatePoolMultiplier')
+    .isFloat({ min: 1, max: 10 })
+    .withMessage('candidatePoolMultiplier must be a number between 1 and 10'),
+  projectController.updateCandidatePoolSize
 );
 
 /**

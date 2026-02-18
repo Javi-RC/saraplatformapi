@@ -2,7 +2,7 @@ const cvUtils = require('../../utils/cvUtils');
 
 /**
  * Extractor de información de educación
- * Responsabilidad única: extraer estudios académicos del CV
+ * Responsabilidad única: extraer estudios académicos del currículo
  */
 class EducationExtractor {
   /**
