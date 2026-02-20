@@ -144,7 +144,7 @@ const RISK_CATALOG = {
   schedule_flexibility_risk: {
     type: 'schedule_flexibility_risk',
     title: 'Riesgo de flexibilidad horaria',
-    description: 'Si el proyecto requiere alta flexibilidad horaria, pueden surgir problemas de coordinación y disponibilidad',
+    description: 'Si el proyecto requiere flexibilidad horaria por haber distintos husos horarios pueden surgir problemas de coordinación y de poca disponibilidad horaria de los empleados.',
     category: 'management',
     typicalSeverities: ['low', 'medium', 'high'],
     possibleSources: ['expert_rules_project_requirements'],
@@ -157,9 +157,9 @@ const RISK_CATALOG = {
       'Coordinación en diferentes zonas horarias'
     ],
     typicalRecommendations: [
-      'Evaluar la flexibilidad del equipo',
-      'Establecer horas centrales',
-      'Definir ventanas de disponibilidad'
+      'Establecer las reuniones en horas comunes',
+      'Cada miembro del equipo tiene que definir su ventana de disponibilidad',
+      'Premiar, si es posible, a las personas que estén disponibles fuera del horario de trabajo'
     ]
   },
 
