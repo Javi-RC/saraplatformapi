@@ -97,15 +97,15 @@ module.exports = {
 
     schedule_flexibility_risk: {
       title: 'Riesgo de flexibilidad horaria',
-      description: 'Si el proyecto requiere alta flexibilidad horaria, pueden surgir problemas de coordinación y disponibilidad',
+      description: 'Si el proyecto requiere flexibilidad horaria por haber distintos husos horarios pueden surgir problemas de coordinación y de poca disponibilidad horaria de los empleados.',
       indicators: {
         flexibilityMismatch: 'Flexibilidad horaria requerida vs disponible',
         timezoneCoordination: 'Coordinación en diferentes zonas horarias'
       },
       recommendations: {
-        evaluateFlexibility: 'Evaluar la flexibilidad del equipo',
-        coreHours: 'Establecer horas centrales',
-        availabilityWindows: 'Definir ventanas de disponibilidad'
+        evaluateFlexibility: 'Establecer las reuniones en horas comunes',
+        coreHours: 'Cada miembro del equipo tiene que definir su ventana de disponibilidad',
+        availabilityWindows: 'Premiar, si es posible, a las personas que estén disponibles fuera del horario de trabajo'
       }
     },
 
