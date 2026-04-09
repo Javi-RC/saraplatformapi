@@ -28,7 +28,7 @@ function getTermsEN() {
 
 **Last updated:** ${TERMS_LAST_UPDATED}
 
-> Notice: this is a generic text for an academic project (Bachelor's Thesis / TFG) and does not constitute legal advice.
+> Notice: this is a text for an academic project (Bachelor's Thesis / TFG) and does not constitute legal advice.
 
 ## 1. Identification
 
@@ -78,8 +78,7 @@ You must not:
 - Impersonate others or provide false information.
 - Upload content that infringes third-party rights.
 
-## 7. User content (including curricula)
-
+## 7. User content
 ### 7.1 Ownership and responsibility
 
 - Content you upload (e.g., curricula, text, files) remains yours or belongs to the rights holder.
@@ -126,7 +125,7 @@ SARA may suspend or terminate access if it detects use contrary to these Terms o
 
 ## 14. Changes to these terms
 
-These Terms may be updated. The current version will be published via this endpoint along with its update date.
+These Terms may be updated. The current version will be published via this web along with its update date.
 
 ## 15. Governing law and jurisdiction
 
@@ -147,7 +146,7 @@ function getTermsES() {
 
 **Última actualización:** ${TERMS_LAST_UPDATED}
 
-> Aviso: este es un texto genérico para un proyecto académico (Trabajo de Fin de Grado / TFG) y no constituye asesoramiento legal.
+> Aviso: este es un texto para un proyecto académico (Trabajo de Fin de Grado / TFG) y no constituye asesoramiento legal.
 
 ## 1. Identificación
 
@@ -197,7 +196,7 @@ No deberá:
 - Suplantar la identidad de otros o proporcionar información falsa.
 - Subir contenido que infrinja derechos de terceros.
 
-## 7. Contenido del usuario (incluidos currículos)
+## 7. Contenido del usuario
 
 ### 7.1 Propiedad y responsabilidad
 
@@ -245,7 +244,7 @@ SARA podrá suspender o cancelar el acceso si detecta un uso contrario a estos T
 
 ## 14. Modificaciones de estos términos
 
-Estos Términos podrán ser actualizados. La versión vigente se publicará a través de este endpoint junto con su fecha de actualización.
+Estos Términos podrán ser actualizados. La versión vigente se publicará a través de esta web junto con su fecha de actualización.
 
 ## 15. Legislación aplicable y jurisdicción
 
