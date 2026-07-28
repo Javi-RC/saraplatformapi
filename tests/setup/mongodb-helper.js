@@ -1,54 +1,29 @@
 /**
- * Helper para gestionar conexión a MongoDB para tests
- * Usa base de datos real en lugar de MongoMemoryServer para mayor estabilidad
+ * Helper para gestionar conexión a MongoDB para tests usando MongoMemoryServer
  */
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
+let mongod;
 let isConnected = false;
 
-// URI base de base de datos de test desde variables de entorno o por defecto
-const MONGODB_TEST_URI = process.env.MONGODB_URI || 'mongodb+srv://javirodriguezcastellano_db_user:a896zX5g26clumAh@cluster0.pv5oin6.mongodb.net/test?appName=Cluster0';
-
-function getWorkerScopedMongoUri() {
-  const dbOverride = process.env.MONGODB_TEST_DB;
-  const workerId = process.env.JEST_WORKER_ID;
-  const processScope = workerId && workerId.trim() !== '' ? workerId : String(process.pid);
-  const databaseName = dbOverride || `jest_test_${processScope}`;
-
-  try {
-    const url = new URL(MONGODB_TEST_URI);
-    url.pathname = `/${databaseName}`;
-    return url.toString();
-  } catch {
-    // Fallback conservador si el parseo falla
-    return MONGODB_TEST_URI;
-  }
-}
-
 /**
- * Conecta a la base de datos de test
+ * Conecta a una base de datos in-memory
  */
 async function connect() {
   try {
-    // Si ya hay conexión activa, no hacer nada
     if (isConnected && mongoose.connection.readyState === 1) {
       return;
     }
 
-    // Si mongoose ya está conectado a otra DB, desconectar primero
     if (mongoose.connection.readyState !== 0) {
       await mongoose.disconnect();
     }
 
-    const uri = getWorkerScopedMongoUri();
+    mongod = await MongoMemoryServer.create();
+    const uri = mongod.getUri();
     await mongoose.connect(uri);
     isConnected = true;
-
-    // Evita interferencias entre suites y problemas de índices obsoletos.
-    // Cada worker usa su propia DB, y la limpiamos al conectar.
-    if (process.env.NODE_ENV === 'test') {
-      await mongoose.connection.db.dropDatabase();
-    }
   } catch (error) {
     console.error('MongoDB Helper - Failed to connect:', error.message);
     throw error;
@@ -56,13 +31,17 @@ async function connect() {
 }
 
 /**
- * Desconecta de MongoDB
+ * Desconecta de MongoDB y detiene el servidor in-memory
  */
 async function disconnect() {
   try {
     if (isConnected) {
       await mongoose.disconnect();
       isConnected = false;
+    }
+    if (mongod) {
+      await mongod.stop();
+      mongod = null;
     }
   } catch (error) {
     console.error('MongoDB Helper - Failed to disconnect:', error.message);

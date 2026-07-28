@@ -1,12 +1,13 @@
 const authController = require('../../../src/controllers/auth.controller');
-const authService = require('../../../src/services/auth.service');
+const authService = require('../../../src/services/auth/auth.service');
 const validators = require('../../../src/utils/validators');
 const responseHandler = require('../../../src/utils/responseHandler');
 
 // Mock de dependencias
-jest.mock('../../../src/services/auth.service');
+jest.mock('../../../src/services/auth/auth.service');
 jest.mock('../../../src/utils/validators');
 jest.mock('../../../src/utils/responseHandler');
+jest.mock('../../../src/utils/cookie');
 
 describe('Auth Controller - Unit Tests', () => {
   let req, res;
@@ -127,8 +128,7 @@ describe('Auth Controller - Unit Tests', () => {
       expect(responseHandler.success).toHaveBeenCalledWith(
         res,
         {
-          message: 'Login exitoso',
-          token: mockResult.token,
+          message: 'Login successful',
           user: mockResult.user
         }
       );
@@ -179,12 +179,14 @@ describe('Auth Controller - Unit Tests', () => {
       );
     });
 
-    it('debería manejar token faltante', async () => {
+    it('debería redirigir a error si falta el token', async () => {
       req.query = {};
 
       await authController.confirmAccount(req, res);
 
-      expect(responseHandler.handleError).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalled();
+      const redirectUrl = res.redirect.mock.calls[0][0];
+      expect(redirectUrl).toContain('/login?error=confirmation_failed');
     });
 
     it('debería redirigir a error si falla la confirmación', async () => {
@@ -197,7 +199,7 @@ describe('Auth Controller - Unit Tests', () => {
 
       expect(responseHandler.redirect).toHaveBeenCalledWith(
         res,
-        expect.stringContaining('/error?message=')
+        expect.stringContaining('/login?error=confirmation_failed')
       );
     });
   });

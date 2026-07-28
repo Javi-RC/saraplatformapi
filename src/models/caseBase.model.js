@@ -130,12 +130,7 @@ const caseBaseSchema = new mongoose.Schema({
       },
       description: String,
       impact: String,
-      detectedAt: Date,
-      mitigatedAt: Date,
-      rootCause: String,
-      actualImpact: {
-        qualityImpact: String
-      }
+      rootCause: String
     }],
     
     // Metrics during project
@@ -248,10 +243,6 @@ const caseBaseSchema = new mongoose.Schema({
     }
   }],
   
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
 }, {
   timestamps: true
 });
@@ -570,9 +561,6 @@ caseBaseSchema.pre('save', function(next) {
   if (!this.similarityIndex || !this.similarityIndex.technicalSignature) {
     this.generateSimilaritySignature();
   }
-  
-  // Update timestamp
-  this.updatedAt = new Date();
   
   next();
 });

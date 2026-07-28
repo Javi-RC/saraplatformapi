@@ -29,7 +29,7 @@ function translate(lang, keyPath, params = {}) {
   let value = translations[language];
   
   for (const key of keys) {
-    if (value && typeof value === 'object') {
+    if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, key)) {
       value = value[key];
     } else {
       console.warn(`[i18n] Translation key not found: ${keyPath} for language: ${language}`);
@@ -251,9 +251,10 @@ function getLanguageFromRequest(req) {
     return lang.toLowerCase().split('-')[0];
   };
 
-  // 1. Check query parameter
-  if (req.query && req.query.lang) {
-    const normalizedQueryLang = normalizeLanguage(req.query.lang);
+  // 1. Check query parameter (?lang is canonical, ?language accepted as a synonym)
+  const queryLang = req.query && (req.query.lang || req.query.language);
+  if (queryLang) {
+    const normalizedQueryLang = normalizeLanguage(queryLang);
     if (SUPPORTED_LANGUAGES.includes(normalizedQueryLang)) {
       return normalizedQueryLang;
     }
@@ -799,6 +800,78 @@ function _getAdditionMessageKey(improvement) {
   return 'warning';
 }
 
+/**
+ * Get all risk type identifiers
+ * @param {string} lang - Language code
+ * @returns {Array<string>} Array of risk type keys
+ */
+function getRiskTypes(lang = DEFAULT_LANGUAGE) {
+  const language = SUPPORTED_LANGUAGES.includes(lang) ? lang : DEFAULT_LANGUAGE;
+  return Object.keys(translations[language].risks || {});
+}
+
+/**
+ * Get full risk metadata (title, description, category, etc.) for a given type
+ * @param {string} type - Risk type identifier
+ * @param {string} lang - Language code
+ * @returns {Object|null} Risk metadata or null if not found
+ */
+function getRiskMetadata(type, lang = DEFAULT_LANGUAGE) {
+  const language = SUPPORTED_LANGUAGES.includes(lang) ? lang : DEFAULT_LANGUAGE;
+  const normalizedType = normalizeRiskType(type);
+  const riskData = translations[language].risks[normalizedType] ||
+                   translations[language].risks[type];
+  return riskData || null;
+}
+
+/**
+ * Get all Hofstede-related risks
+ * @param {string} lang - Language code
+ * @returns {Array<Object>} Array of risk metadata objects with `type` key added
+ */
+function getHofstedeRisks(lang = DEFAULT_LANGUAGE) {
+  const types = getRiskTypes(lang);
+  return types
+    .filter(type => getRiskMetadata(type, lang)?.isHofstedeRelated)
+    .map(type => ({ type, ...getRiskMetadata(type, lang) }));
+}
+
+/**
+ * Get all traditional (non-Hofstede) risks
+ * @param {string} lang - Language code
+ * @returns {Array<Object>} Array of risk metadata objects with `type` key added
+ */
+function getTraditionalRisks(lang = DEFAULT_LANGUAGE) {
+  const types = getRiskTypes(lang);
+  return types
+    .filter(type => !getRiskMetadata(type, lang)?.isHofstedeRelated)
+    .map(type => ({ type, ...getRiskMetadata(type, lang) }));
+}
+
+/**
+ * Get risks filtered by category
+ * @param {string} category - Category name
+ * @param {string} lang - Language code
+ * @returns {Array<Object>} Array of risk metadata objects with `type` key added
+ */
+function getRisksByCategory(category, lang = DEFAULT_LANGUAGE) {
+  const types = getRiskTypes(lang);
+  return types
+    .filter(type => getRiskMetadata(type, lang)?.category === category)
+    .map(type => ({ type, ...getRiskMetadata(type, lang) }));
+}
+
+/**
+ * Check if a risk type is Hofstede-related
+ * @param {string} type - Risk type identifier
+ * @param {string} lang - Language code
+ * @returns {boolean}
+ */
+function isHofstedeRisk(type, lang = DEFAULT_LANGUAGE) {
+  const metadata = getRiskMetadata(type, lang);
+  return metadata?.isHofstedeRelated === true;
+}
+
 module.exports = {
   translate,
   translateRisk,
@@ -820,6 +893,12 @@ module.exports = {
   getLanguageFromRequest,
   isValidLanguage,
   normalizeRiskType,
+  getRiskTypes,
+  getRiskMetadata,
+  getHofstedeRisks,
+  getTraditionalRisks,
+  getRisksByCategory,
+  isHofstedeRisk,
   SUPPORTED_LANGUAGES,
   DEFAULT_LANGUAGE
 };

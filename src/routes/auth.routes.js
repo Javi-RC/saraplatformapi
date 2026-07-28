@@ -10,9 +10,34 @@ const {
 } = require('../controllers/auth.controller');
 
 const { authMiddleware } = require('../utils/jwt');
+const { setTokenCookie, clearTokenCookie, getTokenFromCookie } = require('../utils/cookie');
 
 const User = require('../models/user.model'); 
 const { generateToken } = require('../utils/jwt'); 
+const { getFrontendUrl } = require('../config/urls');
+const { ROLES } = require('../config/roles');
+
+function isAllowedRedirectUrl(url) {
+  try {
+    const frontendUrl = getFrontendUrl();
+    const parsed = new URL(url);
+    const allowed = new URL(frontendUrl);
+    return parsed.origin === allowed.origin;
+  } catch {
+    return false;
+  }
+}
+
+function safeRedirect(res, path, queryParams = {}) {
+  const base = getFrontendUrl();
+  const url = new URL(path, base);
+  Object.entries(queryParams).forEach(([k, v]) => url.searchParams.set(k, v));
+  const finalUrl = url.toString();
+  if (!isAllowedRedirectUrl(finalUrl)) {
+    return res.redirect(`${base}/login`);
+  }
+  return res.redirect(finalUrl);
+}
 
 router.post('/register', register);
 router.post('/login', login);
@@ -23,14 +48,16 @@ router.post('/send-confirmation', sendConfirmation);
 router.get(
   '/:provider/callback',
   (req, res, next) => {
+    const allowedProviders = ['google', 'github'];
+    if (!allowedProviders.includes(req.params.provider)) {
+      return safeRedirect(res, '/login', { oauth_error: 'Unsupported provider' });
+    }
     passport.authenticate(req.params.provider, { session: false })(req, res, next);
   },
   async (req, res) => {
     try {
       const { profile, provider } = req.user;
-      const state = JSON.parse(req.query.state || '{}');
 
-      // Buscar usuario existente
       let user = await User.findOne({
         $or: [
           { oauthProvider: provider, oauthId: profile.id },
@@ -39,7 +66,6 @@ router.get(
       });
 
       if (user) {
-        // Si el usuario existe pero no tiene datos OAuth, vincular la cuenta
         if (!user.oauthProvider || !user.oauthId) {
           user.oauthProvider = provider;
           user.oauthId = profile.id;
@@ -51,10 +77,11 @@ router.get(
         await user.save();
 
         const token = generateToken(user);
-        const redirectUrl = user.role === 'unassigned' 
-          ? `${process.env.FRONTEND_URL}/complete-profile?token=${token}`
-          : `${process.env.FRONTEND_URL}/auth/callback?token=${token}`;
-        return res.redirect(redirectUrl);
+        setTokenCookie(res, token);
+        const redirectPath = user.role === ROLES.UNASSIGNED 
+          ? '/complete-profile'
+          : '/auth/callback';
+        return safeRedirect(res, redirectPath);
       }
 
       user = new User({
@@ -63,7 +90,7 @@ router.get(
         oauthProvider: provider,
         oauthId: profile.id,
         avatar: profile.photos?.[0]?.value,
-        role: 'unassigned',
+        role: ROLES.UNASSIGNED,
         isConfirmed: true,
         lastLogin: new Date()
       });
@@ -71,23 +98,25 @@ router.get(
       await user.save();
 
       const token = generateToken(user);
-      res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
+      setTokenCookie(res, token);
+      safeRedirect(res, '/auth/callback');
 
-    } catch (error) {
-      res.redirect(
-        `${process.env.FRONTEND_URL}/login?oauth_error=${encodeURIComponent(error.message)}`
-      );
+    } catch (_error) {
+      return safeRedirect(res, '/login', { oauth_error: 'Authentication failed' });
     }
   }
 );
 
-// Endpoint para completar perfil después de OAuth (acepta token en body o header)
+// Endpoint para completar perfil después de OAuth (acepta token en cookie, body o header)
 router.put('/complete-profile', async (req, res) => {
   try {
-    const { role, token } = req.body;
-    
-    // Intentar obtener el token del body o del header Authorization
-    let authToken = token;
+    let authToken = getTokenFromCookie(req);
+
+    if (!authToken) {
+      const { token } = req.body;
+      authToken = token;
+    }
+
     if (!authToken) {
       const authHeader = req.headers.authorization;
       if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -102,12 +131,11 @@ router.put('/complete-profile', async (req, res) => {
       });
     }
 
-    // Verificar el token
     const { verifyToken } = require('../utils/jwt');
     let decoded;
     try {
       decoded = verifyToken(authToken);
-    } catch (error) {
+    } catch (_error) {
       return res.status(401).json({ 
         success: false, 
         error: 'Invalid or expired token' 
@@ -124,25 +152,22 @@ router.put('/complete-profile', async (req, res) => {
       });
     }
 
-    // Validar que el rol sea válido
-    const validRoles = ['employee', 'org_admin'];
-    if (!role || !validRoles.includes(role)) {
+    if (user.role !== ROLES.UNASSIGNED) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Invalid role. Must be one of: employee, org_admin' 
+        error: 'Profile already completed' 
       });
     }
 
-    user.role = role;
+    user.role = ROLES.EMPLOYEE;
     await user.save();
 
-    // Generar nuevo token con el rol actualizado
     const newToken = generateToken(user);
+    setTokenCookie(res, newToken);
 
     res.json({
       success: true,
       user: user.toJSON(),
-      token: newToken,
       message: 'Profile completed successfully'
     });
 
@@ -158,9 +183,7 @@ router.put('/complete-profile', async (req, res) => {
 // Endpoint para actualizar perfil (requiere autenticación)
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
-    const { role } = req.body;
     const userId = req.user?.userId || req.user?.id || req.user?._id;
-
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ 
@@ -169,19 +192,16 @@ router.put('/profile', authMiddleware, async (req, res) => {
       });
     }
 
-    user.role = role;
-    await user.save();
-
     res.json({
       success: true,
       user: user.toJSON(),
-      message: 'Profile updated successfully'
+      message: 'Profile retrieved successfully'
     });
 
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({
       success: false,
-      error: 'Error updating profile'
+      error: 'Error fetching profile'
     });
   }
 });
@@ -189,5 +209,10 @@ router.put('/profile', authMiddleware, async (req, res) => {
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+router.post('/logout', (req, res) => {
+  clearTokenCookie(res);
+  res.json({ success: true, message: 'Logged out successfully' });
+});
 
 module.exports = router;

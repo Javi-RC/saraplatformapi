@@ -49,7 +49,7 @@ class CleanupUnverifiedUsersJob {
                                error.code === 'ETIMEDOUT';
         
         if (isNetworkError && attempt < this.maxRetries) {
-          console.warn(`Network error in cleanup (attempt ${attempt}/${this.maxRetries}):`, error.message);
+          console.warn('Network error in cleanup (attempt %d/%d):', attempt, this.maxRetries, error.message);
           await this.delay(2000 * attempt);
         } else {
           console.error('Error in unverified users cleanup:', error);

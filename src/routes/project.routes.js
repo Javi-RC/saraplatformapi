@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const projectController = require('../controllers/project.controller');
 const { body } = require('express-validator');
+const { requireOrgAdminOrProjectManager } = require('../middleware/authorization');
 
 /**
  * Project Routes
@@ -138,6 +139,7 @@ router.get('/assigned-to-me', authenticate, projectController.getAssignedProject
 router.post(
   '/',
   authenticate,
+  requireOrgAdminOrProjectManager,
   validateProjectCreation,
   projectController.createProject
 );
@@ -157,6 +159,7 @@ router.get('/:id', authenticate, projectController.getProject);
 router.put(
   '/:id',
   authenticate,
+  requireOrgAdminOrProjectManager,
   validateProjectUpdate,
   projectController.updateProject
 );
@@ -165,25 +168,25 @@ router.put(
  * Delete a project
  * DELETE /api/projects/:id
  */
-router.delete('/:id', authenticate, projectController.deleteProject);
+router.delete('/:id', authenticate, requireOrgAdminOrProjectManager, projectController.deleteProject);
 
 /**
  * Activate a project (change from draft to active)
  * PATCH /api/projects/:id/activate
  */
-router.patch('/:id/activate', authenticate, projectController.activateProject);
+router.patch('/:id/activate', authenticate, requireOrgAdminOrProjectManager, projectController.activateProject);
 
 /**
  * Complete a project
  * PATCH /api/projects/:id/complete
  */
-router.patch('/:id/complete', authenticate, projectController.completeProject);
+router.patch('/:id/complete', authenticate, requireOrgAdminOrProjectManager, projectController.completeProject);
 
 /**
  * Cancel a project
  * PATCH /api/projects/:id/cancel
  */
-router.patch('/:id/cancel', authenticate, projectController.cancelProject);
+router.patch('/:id/cancel', authenticate, requireOrgAdminOrProjectManager, projectController.cancelProject);
 
 /**
  * Assign an employee to a project
@@ -193,6 +196,7 @@ router.patch('/:id/cancel', authenticate, projectController.cancelProject);
 router.post(
   '/:id/assign',
   authenticate,
+  requireOrgAdminOrProjectManager,
   validateEmployeeAssignment,
   projectController.assignEmployee
 );
@@ -201,7 +205,7 @@ router.post(
  * Remove an employee from a project
  * DELETE /api/projects/:id/employees/:employeeId
  */
-router.delete('/:id/employees/:employeeId', authenticate, projectController.removeEmployee);
+router.delete('/:id/employees/:employeeId', authenticate, requireOrgAdminOrProjectManager, projectController.removeEmployee);
 
 /**
  * Suggest optimal team based on project requirements
@@ -263,22 +267,6 @@ router.get(
 );
 
 /**
- * Debug endpoint - Get detailed technical match information
- * GET /api/projects/:id/debug-technical-match
- * 
- * Returns comprehensive debugging information about:
- * - Project technologies configuration
- * - Team members and their curricula
- * - Technical skills inventory
- * - Technical match analysis with diagnosis
- */
-router.get(
-  '/:id/debug-technical-match',
-  authenticate,
-  projectController.debugTechnicalMatch
-);
-
-/**
  * Candidate Pool Size (Top N) Endpoint
  * Dedicated endpoint for PM or Org Admin to configure how many top candidates
  * from Phase 1 advance to Phase 2 personality optimization
@@ -308,6 +296,7 @@ router.get(
 router.patch(
   '/:id/candidate-pool-size',
   authenticate,
+  requireOrgAdminOrProjectManager,
   body('candidatePoolMultiplier')
     .isFloat({ min: 1, max: 10 })
     .withMessage('candidatePoolMultiplier must be a number between 1 and 10'),
@@ -342,6 +331,7 @@ router.get(
 router.put(
   '/:id/team-config',
   authenticate,
+  requireOrgAdminOrProjectManager,
   projectController.updateTeamConfig
 );
 
@@ -355,6 +345,7 @@ router.put(
 router.patch(
   '/:id/team-config/phase1',
   authenticate,
+  requireOrgAdminOrProjectManager,
   projectController.updatePhase1Config
 );
 
@@ -368,6 +359,7 @@ router.patch(
 router.patch(
   '/:id/team-config/phase2',
   authenticate,
+  requireOrgAdminOrProjectManager,
   projectController.updatePhase2Config
 );
 
@@ -381,6 +373,7 @@ router.patch(
 router.patch(
   '/:id/team-config/cbr',
   authenticate,
+  requireOrgAdminOrProjectManager,
   projectController.updateCBRConfig
 );
 
@@ -394,6 +387,7 @@ router.patch(
 router.patch(
   '/:id/team-config/decision-tree',
   authenticate,
+  requireOrgAdminOrProjectManager,
   projectController.updateDecisionTreeConfig
 );
 
@@ -407,6 +401,7 @@ router.patch(
 router.post(
   '/:id/team-config/reset',
   authenticate,
+  requireOrgAdminOrProjectManager,
   projectController.resetTeamConfig
 );
 

@@ -38,7 +38,7 @@ class ProjectRepository extends BaseRepository {
    */
   async findByAssignedUser(userId, options = {}) {
     return this.find(
-      { 'team.assignedEmployees': userId },
+      { 'assignedEmployees.user': userId },
       options
     );
   }
@@ -92,7 +92,7 @@ class ProjectRepository extends BaseRepository {
   async updateTeam(projectId, teamData, options = {}) {
     return this.updateById(
       projectId,
-      { team: teamData, lastActivityAt: new Date() },
+      { assignedEmployees: teamData, lastActivityAt: new Date() },
       options
     );
   }
@@ -128,7 +128,7 @@ class ProjectRepository extends BaseRepository {
   async countActiveByOrganization(organizationId) {
     return this.count({
       organization: organizationId,
-      status: { $in: ['in_progress', 'planning'] }
+      status: { $in: ['active'] }
     });
   }
 
@@ -140,8 +140,8 @@ class ProjectRepository extends BaseRepository {
    */
   async findWithPopulate(criteria = {}, options = {}) {
     const defaultPopulate = [
-      { path: 'projectManager', select: 'firstName lastName email' },
-      { path: 'team.assignedEmployees', select: 'firstName lastName email' }
+      { path: 'projectManager', select: 'name email' },
+      { path: 'assignedEmployees.user', select: 'name email' }
     ];
     
     return this.find(criteria, {

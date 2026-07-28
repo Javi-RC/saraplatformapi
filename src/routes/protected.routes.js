@@ -35,7 +35,7 @@ router.get('/profile', authMiddleware, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error obteniendo perfil:', error);
+    console.error('Error fetching profile:', error);
     res.status(500).json({
       success: false,
       error: 'Error fetching profile'
@@ -59,8 +59,9 @@ router.patch('/profile', authMiddleware, validators.validateProfileUpdate, async
     ];
 
     const filteredUpdates = {};
+    const disallowedKeys = new Set(['__proto__', 'constructor', 'prototype', 'role', 'organization', 'passwordHash']);
     Object.keys(updates).forEach(key => {
-      if (allowedUpdates.includes(key)) {
+      if (allowedUpdates.includes(key) && !disallowedKeys.has(key)) {
         filteredUpdates[key] = updates[key];
       }
     });
@@ -81,10 +82,12 @@ router.patch('/profile', authMiddleware, validators.validateProfileUpdate, async
       });
     }
 
-    // Aplicar actualizaciones
-    Object.keys(filteredUpdates).forEach(key => {
-      user[key] = filteredUpdates[key];
-    });
+    // Apply updates
+    for (const key of Object.keys(filteredUpdates)) {
+      if (!disallowedKeys.has(key)) {
+        user[key] = filteredUpdates[key];
+      }
+    }
 
     await user.save();
 
@@ -95,7 +98,7 @@ router.patch('/profile', authMiddleware, validators.validateProfileUpdate, async
     });
 
   } catch (error) {
-    console.error('Error actualizando perfil:', error);
+    console.error('Error updating profile:', error);
     res.status(500).json({
       success: false,
       error: 'Error updating profile'
@@ -128,7 +131,7 @@ router.get('/cv-consent', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error obteniendo consentimiento:', error);
+    console.error('Error fetching consent:', error);
     res.status(500).json({
       success: false,
       error: 'Error fetching consent'
@@ -207,7 +210,7 @@ router.post('/cv-consent', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error actualizando consentimiento:', error);
+    console.error('Error updating consent:', error);
     res.status(500).json({
       success: false,
       error: 'Error updating consent'
@@ -242,7 +245,7 @@ router.get('/personality-consent', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error obteniendo consentimiento de personalidad:', error);
+    console.error('Error fetching personality consent:', error);
     res.status(500).json({
       success: false,
       error: 'Error fetching personality consent'
@@ -319,7 +322,7 @@ router.post('/personality-consent', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error actualizando consentimiento de personalidad:', error);
+    console.error('Error updating personality consent:', error);
     res.status(500).json({
       success: false,
       error: 'Error updating personality consent'
@@ -329,31 +332,31 @@ router.post('/personality-consent', authMiddleware, async (req, res) => {
 
 /**
  * GET /api/profile/language
- * Obtiene la preferencia de idioma del usuario
- * Acceso: Usuario autenticado
+ * Gets the user's language preference
+ * Access: Authenticated user
  */
 router.get('/profile/language', authMiddleware, userController.getLanguagePreference);
 
 /**
  * PATCH /api/profile/language
- * Actualiza la preferencia de idioma del usuario
+ * Updates the user's language preference
  * Body: { language: 'es' | 'en' }
- * Acceso: Usuario autenticado
+ * Access: Authenticated user
  */
 router.patch('/profile/language', authMiddleware, userController.updateLanguagePreference);
 
 /**
  * GET /api/profile/deletion-prerequisites
- * Verifica qué requisitos debe cumplir el usuario antes de eliminar su cuenta
- * Acceso: Usuario autenticado
+ * Checks what requirements the user must meet before deleting their account
+ * Access: Authenticated user
  */
 router.get('/profile/deletion-prerequisites', authMiddleware, userController.getDeletionPrerequisites);
 
 /**
  * DELETE /api/profile/account
- * Elimina la cuenta del usuario de forma permanente
+ * Permanently deletes the user's account
  * Body: { password: string (required for non-OAuth users), confirmation: "ELIMINAR" | "DELETE" }
- * Acceso: Usuario autenticado
+ * Access: Authenticated user
  */
 router.delete('/profile/account', authMiddleware, userController.deleteAccount);
 

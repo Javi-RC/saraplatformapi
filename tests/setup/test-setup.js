@@ -9,7 +9,7 @@ process.env.FRONTEND_URL = 'http://localhost:3001';
 process.env.EMAIL_SENDER_NAME = 'Test App';
 process.env.EMAIL_SENDER_EMAIL = 'test@example.com';
 process.env.BREVO_API_KEY = 'test-brevo-api-key';
-process.env.MONGODB_URI = 'mongodb+srv://javirodriguezcastellano_db_user:a896zX5g26clumAh@cluster0.pv5oin6.mongodb.net/test?appName=Cluster0';
+process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/tfg-test';
 
 // Mock global de fetch para evitar llamadas reales a Brevo
 global.fetch = jest.fn();

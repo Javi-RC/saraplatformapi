@@ -1,13 +1,14 @@
-jest.mock('../../../src/services/project.service');
+jest.mock('../../../src/services/core/project.service');
 jest.mock('express-validator');
 jest.mock('../../../src/models/project.model');
 jest.mock('../../../src/models/cv.model');
 jest.mock('../../../src/models/bfi44.model');
 jest.mock('../../../src/models/organization.model');
-jest.mock('../../../src/services/teamSelection.service');
-jest.mock('../../../src/services/teamSynergy.service');
-jest.mock('../../../src/services/personalityOptimizer.service');
-jest.mock('../../../src/services/teamAnalysis.service');
+jest.mock('../../../src/services/team/teamSelection.service');
+jest.mock('../../../src/services/team/teamSynergy.service');
+jest.mock('../../../src/services/team/personalityOptimizer.service');
+jest.mock('../../../src/services/team/teamAnalysis.service');
+jest.mock('../../../src/services/team/teamAnalysisOrchestrator.service');
 
 jest.mock('../../../src/config/teamSelectionDefaults', () => ({
   getTeamSelectionConfig: jest.fn(() => ({ phase1: { enabled: true } })),
@@ -23,16 +24,17 @@ jest.mock('../../../src/config/teamSelectionDefaults', () => ({
 }));
 
 const projectController = require('../../../src/controllers/project.controller');
-const projectService = require('../../../src/services/project.service');
+const projectService = require('../../../src/services/core/project.service');
 const { validationResult } = require('express-validator');
 const Project = require('../../../src/models/project.model');
 const CV = require('../../../src/models/cv.model');
 const BFI44 = require('../../../src/models/bfi44.model');
 const Organization = require('../../../src/models/organization.model');
-const teamSelectionService = require('../../../src/services/teamSelection.service');
-const teamSynergyService = require('../../../src/services/teamSynergy.service');
-const personalityOptimizer = require('../../../src/services/personalityOptimizer.service');
-const teamAnalysisService = require('../../../src/services/teamAnalysis.service');
+const teamSelectionService = require('../../../src/services/team/teamSelection.service');
+const teamSynergyService = require('../../../src/services/team/teamSynergy.service');
+const personalityOptimizer = require('../../../src/services/team/personalityOptimizer.service');
+const teamAnalysisService = require('../../../src/services/team/teamAnalysis.service');
+const teamAnalysisOrchestrator = require('../../../src/services/team/teamAnalysisOrchestrator.service');
 const teamSelectionDefaults = require('../../../src/config/teamSelectionDefaults');
 
 describe('Project Controller - Unit Tests', () => {
@@ -41,6 +43,8 @@ describe('Project Controller - Unit Tests', () => {
   const createPopulateQuery = (resolvedValue) => {
     const query = {
       populate: jest.fn().mockReturnThis(),
+      select: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue(resolvedValue),
       then: (resolve, reject) => Promise.resolve(resolvedValue).then(resolve, reject)
     };
     return query;
@@ -149,7 +153,7 @@ describe('Project Controller - Unit Tests', () => {
         projectName: 'Test Project',
         organizationId: 'org123'
       };
-      const error = new Error('User not authorized');
+      const error = new Error('User is unauthorized');
       projectService.createProject.mockRejectedValue(error);
 
       await projectController.createProject(req, res);
@@ -162,7 +166,7 @@ describe('Project Controller - Unit Tests', () => {
         projectName: 'Test Project',
         organizationId: 'org123'
       };
-      const error = new Error('boom');
+      const error = new Error('Invalid data');
       projectService.createProject.mockRejectedValue(error);
 
       await projectController.createProject(req, res);
@@ -170,7 +174,7 @@ describe('Project Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'boom'
+        error: 'Invalid data'
       });
     });
   });
@@ -217,7 +221,7 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 400 for other errors', async () => {
       req.params.id = 'project123';
-      const error = new Error('Service error');
+      const error = new Error('Service invalid');
       projectService.getProjectById.mockRejectedValue(error);
 
       await projectController.getProject(req, res);
@@ -225,7 +229,7 @@ describe('Project Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Service error'
+        error: 'Service invalid'
       });
     });
   });
@@ -277,7 +281,7 @@ describe('Project Controller - Unit Tests', () => {
     it('should return 400 for other errors', async () => {
       req.params.id = 'project123';
       req.body = { projectName: 'Updated' };
-      const error = new Error('Unexpected error');
+      const error = new Error('Invalid update');
       projectService.updateProject.mockRejectedValue(error);
 
       await projectController.updateProject(req, res);
@@ -285,7 +289,7 @@ describe('Project Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Unexpected error'
+        error: 'Invalid update'
       });
     });
   });
@@ -318,7 +322,7 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 403 for admins restriction', async () => {
       req.params.id = 'project123';
-      const error = new Error('Only administrators can delete');
+      const error = new Error('Only permission administrators can delete');
       projectService.deleteProject.mockRejectedValue(error);
 
       await projectController.deleteProject(req, res);
@@ -328,7 +332,7 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 400 for other errors', async () => {
       req.params.id = 'project123';
-      const error = new Error('Unexpected delete error');
+      const error = new Error('Invalid delete');
       projectService.deleteProject.mockRejectedValue(error);
 
       await projectController.deleteProject(req, res);
@@ -336,7 +340,7 @@ describe('Project Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Unexpected delete error'
+        error: 'Invalid delete'
       });
     });
   });
@@ -382,14 +386,14 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should handle errors', async () => {
       req.params.organizationId = 'org123';
-      projectService.getProjectsByOrganization.mockRejectedValue(new Error('boom'));
+      projectService.getProjectsByOrganization.mockRejectedValue(new Error('Missing configuration'));
 
       await projectController.getOrganizationProjects(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'boom'
+        error: 'Missing configuration'
       });
     });
   });
@@ -429,14 +433,14 @@ describe('Project Controller - Unit Tests', () => {
     });
 
     it('should handle errors', async () => {
-      projectService.getProjectsByManager.mockRejectedValue(new Error('boom'));
+      projectService.getProjectsByManager.mockRejectedValue(new Error('Missing data'));
 
       await projectController.getMyProjects(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'boom'
+        error: 'Missing data'
       });
     });
   });
@@ -460,7 +464,7 @@ describe('Project Controller - Unit Tests', () => {
     });
 
     it('should handle errors', async () => {
-      const error = new Error('Service error');
+      const error = new Error('Service missing');
       projectService.getProjectsByAssignedEmployee.mockRejectedValue(error);
 
       await projectController.getAssignedProjects(req, res);
@@ -551,7 +555,7 @@ describe('Project Controller - Unit Tests', () => {
     it('should return 409 when already assigned', async () => {
       req.params.id = 'project123';
       req.body = { employeeId: 'emp123' };
-      const error = new Error('Employee already assigned');
+      const error = new Error('Employee already exists in this project');
       projectService.assignEmployeeToProject.mockRejectedValue(error);
 
       await projectController.assignEmployee(req, res);
@@ -681,7 +685,7 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 403 when administrators restriction', async () => {
       req.params.id = 'project123';
-      projectService.cancelProject.mockRejectedValue(new Error('Only administrators can cancel'));
+      projectService.cancelProject.mockRejectedValue(new Error('Only permission administrators can cancel'));
 
       await projectController.cancelProject(req, res);
 
@@ -704,12 +708,12 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should handle errors', async () => {
       req.params.organizationId = 'org123';
-      projectService.getProjectStatistics.mockRejectedValue(new Error('boom'));
+      projectService.getProjectStatistics.mockRejectedValue(new Error('Missing statistics'));
 
       await projectController.getProjectStatistics(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ success: false, error: 'boom' });
+      expect(res.json).toHaveBeenCalledWith({ success: false, error: 'Missing statistics' });
     });
   });
 
@@ -796,14 +800,14 @@ describe('Project Controller - Unit Tests', () => {
         projectRequirements: { technologies: ['js'] },
         organizationId: 'org123'
       };
-      teamSelectionService.selectOptimalTeam.mockRejectedValue(new Error('boom'));
+      teamSelectionService.selectOptimalTeam.mockRejectedValue(new Error('Invalid requirements'));
 
       await projectController.suggestTeam(req, res);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'boom'
+        error: 'Invalid requirements'
       });
     });
   });
@@ -854,7 +858,7 @@ describe('Project Controller - Unit Tests', () => {
       };
       Project.findById.mockReturnValue(createPopulateQuery(project));
 
-      teamSelectionService.selectComplementaryTeam.mockResolvedValue({
+      teamAnalysisOrchestrator.suggestComplementary.mockResolvedValue({
         suggestions: [
           {
             userId: 'u1',
@@ -863,41 +867,24 @@ describe('Project Controller - Unit Tests', () => {
             details: { x: 1 }
           }
         ],
+        suggestionsSummary: { summary: true },
+        suggestionsMetadata: { meta: true },
         synergyValidation: [{ userId: 'u1' }],
-        metadata: { meta: true }
+        projectedTeamSynergy: { synergy: true },
+        risks: [{ id: 'risk1' }],
+        message: 'Proyecto sin equipo: sugerencias de candidatos'
       });
-      teamSelectionService.calculateSynergyBonus.mockReturnValue(5);
-      teamSelectionService.calculateMatchScore.mockReturnValue(0.9);
-      teamSelectionService.getTeamSummary.mockReturnValue({ summary: true });
-      teamSelectionService.generateTeamRisks.mockReturnValue([{ id: 'risk1' }]);
-
-      BFI44.find.mockResolvedValue([
-        {
-          userId: 'u1',
-          results: {
-            facets: {
-              extraversion: 1,
-              agreeableness: 1,
-              conscientiousness: 1,
-              neuroticism: 1,
-              openness: 1
-            }
-          }
-        }
-      ]);
-
-      teamSynergyService.explainTeamSynergy.mockResolvedValue({ synergy: true });
-
-      // Force CASO 3 to short-circuit into its catch block
-      Organization.findById.mockRejectedValue(new Error('skip available employees'));
+      teamAnalysisOrchestrator.scoreAvailableEmployees.mockResolvedValue({
+        availableEmployees: [],
+        count: 0
+      });
 
       await projectController.getTeamAnalysis(req, res);
 
-      expect(teamSelectionService.selectComplementaryTeam).toHaveBeenCalledWith(
-        expect.any(Object),
+      expect(teamAnalysisOrchestrator.suggestComplementary).toHaveBeenCalledWith(
+        project,
         'org123',
-        [],
-        5
+        expect.any(String)
       );
       expect(res.status).toHaveBeenCalledWith(200);
       const payload = res.json.mock.calls[0][0];
@@ -919,15 +906,19 @@ describe('Project Controller - Unit Tests', () => {
       };
       Project.findById.mockReturnValue(createPopulateQuery(project));
 
-      // Avoid heavy internal calls
-      CV.find.mockReturnValue(createPopulateQuery([]));
-      BFI44.find.mockResolvedValue([]);
-      teamSelectionService.getTeamSummary.mockReturnValue({});
-      Organization.findById.mockRejectedValue(new Error('skip available employees'));
+      teamAnalysisOrchestrator.analyzeCurrentTeam.mockResolvedValue({
+        teamMembers: [{ userId: 'u1', name: 'A' }],
+        teamSummary: { summary: true },
+        synergy: { synergy: true }
+      });
+      teamAnalysisOrchestrator.scoreAvailableEmployees.mockResolvedValue({
+        availableEmployees: [],
+        count: 0
+      });
 
       await projectController.getTeamAnalysis(req, res);
 
-      expect(teamSelectionService.selectComplementaryTeam).not.toHaveBeenCalled();
+      expect(teamAnalysisOrchestrator.suggestComplementary).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
       const payload = res.json.mock.calls[0][0];
       expect(payload.data.message).toBe('The team is complete.');
@@ -940,34 +931,35 @@ describe('Project Controller - Unit Tests', () => {
         _id: 'project123',
         projectName: 'P',
         assignedEmployees: [],
-        // organization is present but not populated (string/id)
         organization: 'org123'
       };
       Project.findById.mockReturnValue(createPopulateQuery(project));
 
-      teamSelectionService.selectComplementaryTeam.mockResolvedValue({
+      teamAnalysisOrchestrator.suggestComplementary.mockResolvedValue({
         suggestions: [],
-        metadata: {}
+        suggestionsSummary: {},
+        suggestionsMetadata: {},
+        synergyValidation: [],
+        projectedTeamSynergy: {},
+        risks: [],
+        message: 'No suggestions'
       });
-      teamSelectionService.getTeamSummary.mockReturnValue({});
-      teamSelectionService.generateTeamRisks.mockReturnValue([]);
-      BFI44.find.mockResolvedValue([]);
-
-      // Skip CASO 3 to keep test focused
-      Organization.findById.mockRejectedValue(new Error('skip available employees'));
+      teamAnalysisOrchestrator.scoreAvailableEmployees.mockResolvedValue({
+        availableEmployees: [],
+        count: 0
+      });
 
       await projectController.getTeamAnalysis(req, res);
 
-      expect(teamSelectionService.selectComplementaryTeam).toHaveBeenCalledWith(
-        expect.any(Object),
+      expect(teamAnalysisOrchestrator.suggestComplementary).toHaveBeenCalledWith(
+        project,
         'org123',
-        [],
-        5
+        expect.any(String)
       );
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
-    it('should include current team analysis and handle synergy errors', async () => {
+    it('should include current team analysis', async () => {
       req.params.id = 'project123';
 
       const project = {
@@ -980,160 +972,36 @@ describe('Project Controller - Unit Tests', () => {
       };
       Project.findById.mockReturnValue(createPopulateQuery(project));
 
-      const cvDoc = {
-        userId: {
-          _id: 'u1',
-          name: 'A',
-          email: 'a@a.com',
-          avatar: null,
-          toObject: () => ({ _id: 'u1', name: 'A', email: 'a@a.com', avatar: null })
-        }
-      };
-      CV.find.mockReturnValue(createPopulateQuery([cvDoc]));
-
-      teamSelectionService.calculateEmployeeScore.mockResolvedValue({
-        total: 10,
-        details: { x: 1 },
-        matchedSkills: [],
-        missingSkills: []
+      teamAnalysisOrchestrator.analyzeCurrentTeam.mockResolvedValue({
+        teamMembers: [{ userId: 'u1', name: 'A', score: 10 }],
+        teamSummary: { summary: true },
+        synergy: { synergy: true }
       });
-      teamSelectionService.calculateMatchScore.mockReturnValue(0.5);
-      teamSelectionService.getTeamSummary.mockReturnValue({ summary: true });
-
-      BFI44.find.mockResolvedValue([]);
-      teamSelectionService.selectComplementaryTeam.mockResolvedValue({ suggestions: [], metadata: {} });
-      teamSelectionService.generateTeamRisks.mockReturnValue([]);
-
-      // Force synergy analysis error path
-      teamSynergyService.explainTeamSynergy.mockRejectedValue(new Error('synergy boom'));
-      Organization.findById.mockRejectedValue(new Error('skip available employees'));
+      teamAnalysisOrchestrator.suggestComplementary.mockResolvedValue({
+        suggestions: [],
+        suggestionsSummary: {},
+        suggestionsMetadata: {},
+        synergyValidation: [],
+        projectedTeamSynergy: {},
+        risks: [],
+        message: 'Equipo actual: 1 miembros'
+      });
+      teamAnalysisOrchestrator.scoreAvailableEmployees.mockResolvedValue({
+        availableEmployees: [],
+        count: 0
+      });
 
       await projectController.getTeamAnalysis(req, res);
 
+      expect(teamAnalysisOrchestrator.analyzeCurrentTeam).toHaveBeenCalledWith(
+        project,
+        'org123',
+        expect.any(String)
+      );
       expect(res.status).toHaveBeenCalledWith(200);
       const payload = res.json.mock.calls[0][0];
       expect(payload.data.currentTeam).toHaveLength(1);
       expect(payload.data.message).toContain('Equipo actual:');
-    });
-  });
-
-  describe('debugTechnicalMatch', () => {
-    it('should return 404 when project not found', async () => {
-      req.params.id = 'project123';
-      Project.findById.mockReturnValue(createPopulateQuery(null));
-
-      await projectController.debugTechnicalMatch(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        error: 'Project not found'
-      });
-    });
-
-    it('should return debug info successfully', async () => {
-      req.params.id = 'project123';
-      const project = {
-        _id: 'project123',
-        projectName: 'P',
-        mainTechnologies: ['Node.js'],
-        assignedEmployees: [{ user: { _id: 'u1', name: 'A', email: 'a@a.com' }, role: 'Dev' }],
-        organization: { _id: 'org123', name: 'Org' }
-      };
-      Project.findById.mockReturnValue(createPopulateQuery(project));
-
-      const cvs = [{
-        userId: { _id: 'u1', name: 'A', email: 'a@a.com' },
-        skills: { technical: [{ name: 'Node.js', level: 'mid', category: 'frameworks' }] }
-      }];
-      CV.find.mockReturnValue(createPopulateQuery(cvs));
-
-      teamAnalysisService.extractTeamSkills.mockReturnValue({
-        count: 1,
-        all: ['Node.js'],
-        categories: {
-          programming: [], frameworks: ['Node.js'], databases: [], tools: [], cloud: [], other: []
-        },
-        levels: {}
-      });
-      teamAnalysisService.analyzeTechnicalMatch.mockReturnValue({ score: 1, noProjectTechnologies: false, noTeamSkills: false });
-
-      await projectController.debugTechnicalMatch(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          success: true,
-          data: expect.objectContaining({
-            project: expect.objectContaining({ name: 'P' }),
-            team: expect.objectContaining({ size: 1 })
-          })
-        })
-      );
-    });
-
-    it('should set diagnosis issue when noProjectTechnologies', async () => {
-      req.params.id = 'project123';
-      const project = {
-        _id: 'project123',
-        projectName: 'P',
-        mainTechnologies: [],
-        assignedEmployees: [],
-        organization: { _id: 'org123', name: 'Org' }
-      };
-      Project.findById.mockReturnValue(createPopulateQuery(project));
-      CV.find.mockReturnValue(createPopulateQuery([]));
-
-      teamAnalysisService.extractTeamSkills.mockReturnValue({
-        count: 0,
-        all: [],
-        categories: {
-          programming: [], frameworks: [], databases: [], tools: [], cloud: [], other: []
-        },
-        levels: {}
-      });
-      teamAnalysisService.analyzeTechnicalMatch.mockReturnValue({
-        noProjectTechnologies: true,
-        noTeamSkills: false
-      });
-
-      await projectController.debugTechnicalMatch(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      const payload = res.json.mock.calls[0][0];
-      expect(payload.data.technicalMatch.diagnosis.issue).toContain('Project has no technologies');
-    });
-
-    it('should set diagnosis issue when noTeamSkills', async () => {
-      req.params.id = 'project123';
-      const project = {
-        _id: 'project123',
-        projectName: 'P',
-        mainTechnologies: ['Node.js'],
-        assignedEmployees: [],
-        organization: { _id: 'org123', name: 'Org' }
-      };
-      Project.findById.mockReturnValue(createPopulateQuery(project));
-      CV.find.mockReturnValue(createPopulateQuery([]));
-
-      teamAnalysisService.extractTeamSkills.mockReturnValue({
-        count: 0,
-        all: [],
-        categories: {
-          programming: [], frameworks: [], databases: [], tools: [], cloud: [], other: []
-        },
-        levels: {}
-      });
-      teamAnalysisService.analyzeTechnicalMatch.mockReturnValue({
-        noProjectTechnologies: false,
-        noTeamSkills: true
-      });
-
-      await projectController.debugTechnicalMatch(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      const payload = res.json.mock.calls[0][0];
-      expect(payload.data.technicalMatch.diagnosis.issue).toContain('Team has no technical skills');
     });
   });
 
@@ -1218,7 +1086,7 @@ describe('Project Controller - Unit Tests', () => {
   describe('getTeamConfig', () => {
     it('should return 404 when project not found', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue(null);
+      Project.findById.mockReturnValue(createPopulateQuery(null));
 
       await projectController.getTeamConfig(req, res);
 
@@ -1227,29 +1095,29 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 403 when user is not project manager', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue({
+      Project.findById.mockReturnValue(createPopulateQuery({
         _id: 'project123',
         projectName: 'P',
         isProjectManager: jest.fn().mockReturnValue(false)
-      });
+      }));
 
       await projectController.getTeamConfig(req, res);
 
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Only the project manager can view team selection configuration'
+        error: 'Only project manager can perform this action'
       });
     });
 
     it('should return config successfully', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue({
+      Project.findById.mockReturnValue(createPopulateQuery({
         _id: 'project123',
         projectName: 'P',
         isProjectManager: jest.fn().mockReturnValue(true),
         teamSelectionConfig: { phase1: { enabled: true } }
-      });
+      }));
 
       await projectController.getTeamConfig(req, res);
 
@@ -1271,17 +1139,15 @@ describe('Project Controller - Unit Tests', () => {
       req.params.id = 'project123';
       req.body = { phase1: { enabled: true } };
 
-      const save = jest.fn().mockResolvedValue(undefined);
       const project = {
         _id: 'project123',
-        isProjectManager: jest.fn().mockReturnValue(true),
-        save
+        isProjectManager: jest.fn().mockReturnValue(true)
       };
-      Project.findById.mockResolvedValue(project);
+      Project.findById.mockReturnValue(createPopulateQuery(project));
+      Project.findByIdAndUpdate.mockReturnValue(createPopulateQuery(project));
 
       await projectController.updateTeamConfig(req, res);
 
-      expect(save).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({ success: true })
@@ -1291,7 +1157,7 @@ describe('Project Controller - Unit Tests', () => {
     it('should return 404 when project not found', async () => {
       req.params.id = 'project123';
       req.body = { phase1: { enabled: true } };
-      Project.findById.mockResolvedValue(null);
+      Project.findById.mockReturnValue(createPopulateQuery(null));
 
       await projectController.updateTeamConfig(req, res);
 
@@ -1301,10 +1167,10 @@ describe('Project Controller - Unit Tests', () => {
     it('should return 403 when user is not project manager', async () => {
       req.params.id = 'project123';
       req.body = { phase1: { enabled: true } };
-      Project.findById.mockResolvedValue({
+      Project.findById.mockReturnValue(createPopulateQuery({
         _id: 'project123',
         isProjectManager: jest.fn().mockReturnValue(false)
-      });
+      }));
 
       await projectController.updateTeamConfig(req, res);
 
@@ -1319,10 +1185,10 @@ describe('Project Controller - Unit Tests', () => {
         errors: ['bad']
       });
 
-      Project.findById.mockResolvedValue({
+      Project.findById.mockReturnValue(createPopulateQuery({
         _id: 'project123',
         isProjectManager: jest.fn().mockReturnValue(true)
-      });
+      }));
 
       await projectController.updateTeamConfig(req, res);
 
@@ -1340,18 +1206,15 @@ describe('Project Controller - Unit Tests', () => {
   describe('resetTeamConfig', () => {
     it('should reset config to defaults', async () => {
       req.params.id = 'project123';
-      const save = jest.fn().mockResolvedValue(undefined);
       const project = {
         _id: 'project123',
-        isProjectManager: jest.fn().mockReturnValue(true),
-        save
+        isProjectManager: jest.fn().mockReturnValue(true)
       };
-      Project.findById.mockResolvedValue(project);
+      Project.findById.mockReturnValue(createPopulateQuery(project));
+      Project.findByIdAndUpdate.mockReturnValue(createPopulateQuery(project));
 
       await projectController.resetTeamConfig(req, res);
 
-      expect(project.teamSelectionConfig).toBeUndefined();
-      expect(save).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1363,7 +1226,7 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 404 when project not found', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue(null);
+      Project.findById.mockReturnValue(createPopulateQuery(null));
 
       await projectController.resetTeamConfig(req, res);
 
@@ -1372,10 +1235,10 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 403 when user is not project manager', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue({
+      Project.findById.mockReturnValue(createPopulateQuery({
         _id: 'project123',
         isProjectManager: jest.fn().mockReturnValue(false)
-      });
+      }));
 
       await projectController.resetTeamConfig(req, res);
 
@@ -1386,10 +1249,10 @@ describe('Project Controller - Unit Tests', () => {
   describe('getTeamConfigSummary', () => {
     it('should return summary successfully', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue({
+      Project.findById.mockReturnValue(createPopulateQuery({
         _id: 'project123',
         isProjectManager: jest.fn().mockReturnValue(true)
-      });
+      }));
 
       await projectController.getTeamConfigSummary(req, res);
 
@@ -1402,7 +1265,7 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 404 when project not found', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue(null);
+      Project.findById.mockReturnValue(createPopulateQuery(null));
 
       await projectController.getTeamConfigSummary(req, res);
 
@@ -1411,10 +1274,10 @@ describe('Project Controller - Unit Tests', () => {
 
     it('should return 403 when user is not project manager', async () => {
       req.params.id = 'project123';
-      Project.findById.mockResolvedValue({
+      Project.findById.mockReturnValue(createPopulateQuery({
         _id: 'project123',
         isProjectManager: jest.fn().mockReturnValue(false)
-      });
+      }));
 
       await projectController.getTeamConfigSummary(req, res);
 

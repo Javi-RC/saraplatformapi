@@ -29,7 +29,7 @@ class UserRepository extends BaseRepository {
    * @returns {Promise<Object|null>}
    */
   async findByVerificationToken(token) {
-    return this.findOne({ verificationToken: token });
+    return this.findOne({ confirmationToken: token });
   }
 
   /**
@@ -37,12 +37,7 @@ class UserRepository extends BaseRepository {
    * @param {string} token - Password reset token
    * @returns {Promise<Object|null>}
    */
-  async findByPasswordResetToken(token) {
-    return this.findOne({
-      passwordResetToken: token,
-      passwordResetExpires: { $gt: Date.now() }
-    });
-  }
+  // NOTE: findByPasswordResetToken removed — User model has no passwordResetToken/passwordResetExpires fields.
 
   /**
    * Find users by organization
@@ -62,7 +57,7 @@ class UserRepository extends BaseRepository {
    */
   async findVerifiedByOrganization(organizationId, options = {}) {
     return this.find(
-      { organization: organizationId, isVerified: true },
+      { organization: organizationId, isConfirmed: true },
       options
     );
   }
@@ -74,7 +69,7 @@ class UserRepository extends BaseRepository {
    */
   async findUnverifiedOlderThan(date) {
     return this.find({
-      isVerified: false,
+      isConfirmed: false,
       createdAt: { $lt: date }
     });
   }
@@ -90,9 +85,8 @@ class UserRepository extends BaseRepository {
     return this.updateById(
       userId,
       {
-        isVerified,
-        verificationToken: null,
-        verifiedAt: isVerified ? new Date() : null
+        isConfirmed: isVerified,
+        confirmationToken: null
       },
       options
     );
@@ -109,9 +103,7 @@ class UserRepository extends BaseRepository {
     return this.updateById(
       userId,
       {
-        passwordHash,
-        passwordResetToken: null,
-        passwordResetExpires: null
+        passwordHash
       },
       options
     );
@@ -125,16 +117,7 @@ class UserRepository extends BaseRepository {
    * @param {Object} options - Query options
    * @returns {Promise<Object|null>}
    */
-  async setPasswordResetToken(userId, token, expires, options = {}) {
-    return this.updateById(
-      userId,
-      {
-        passwordResetToken: token,
-        passwordResetExpires: expires
-      },
-      options
-    );
-  }
+  // NOTE: setPasswordResetToken removed — User model has no passwordResetToken/passwordResetExpires fields.
 
   /**
    * Update user's last login

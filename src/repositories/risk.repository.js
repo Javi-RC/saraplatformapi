@@ -93,6 +93,52 @@ class RiskRepository extends BaseRepository {
   async updateStatus(riskId, status, options = {}) {
     return this.updateById(riskId, { status }, options);
   }
+
+  /**
+   * Get organization risk statistics
+   * @param {string} organizationId - Organization ID
+   * @returns {Promise<Object>}
+   */
+  async getOrganizationStats(organizationId) {
+    return this.model.getOrganizationStats(organizationId);
+  }
+
+  /**
+   * Get prediction accuracy report
+   * @param {string} organizationId - Organization ID
+   * @returns {Promise<Object>}
+   */
+  async getAccuracyReport(organizationId) {
+    return this.model.getAccuracyReport(organizationId);
+  }
+
+  /**
+   * Get all risks for a project
+   * @param {string} projectId - Project ID
+   * @param {Object} options - Query options (status, occurred)
+   * @returns {Promise<Array>}
+   */
+  async getProjectRisks(projectId, options = {}) {
+    return this.model.getProjectRisks(projectId, options);
+  }
+
+  /**
+   * Insert many documents
+   * @param {Array} docs - Array of document data
+   * @returns {Promise<Array>}
+   */
+  async insertMany(docs) {
+    return this.model.insertMany(docs);
+  }
+
+  /**
+   * Get schema enum values for a field
+   * @param {string} fieldName - Schema field name
+   * @returns {Array}
+   */
+  getSchemaEnumValues(fieldName) {
+    return this.model.schema.path(fieldName).enumValues;
+  }
 }
 
 module.exports = new RiskRepository();

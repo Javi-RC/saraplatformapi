@@ -15,10 +15,19 @@ jest.mock('../../../src/models/notification.model', () => ({
   }
 }));
 
-jest.mock('../../../src/services/notification.service');
+jest.mock('../../../src/config/roles', () => ({
+  ROLES: {
+    SUPER_ADMIN: 'super_admin',
+    ORG_ADMIN: 'org_admin',
+    EMPLOYEE: 'employee',
+    ADMIN: 'admin'
+  }
+}));
+
+jest.mock('../../../src/services/notification/notification.service');
 
 const notificationController = require('../../../src/controllers/notification.controller');
-const notificationService = require('../../../src/services/notification.service');
+const notificationService = require('../../../src/services/notification/notification.service');
 
 describe('Notification Controller - Unit Tests', () => {
   let req, res;
@@ -26,7 +35,7 @@ describe('Notification Controller - Unit Tests', () => {
   beforeEach(() => {
     
     req = {
-      user: { userId: 'user123' },
+      user: { id: 'user123', role: 'org_admin' },
       query: {},
       params: {},
       body: {}
@@ -102,7 +111,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al obtener notificaciones'
+        error: 'Service error'
       });
     });
 
@@ -146,7 +155,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al obtener el conteo'
+        error: 'boom'
       });
     });
   });
@@ -175,7 +184,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al obtener estadísticas'
+        error: 'boom'
       });
     });
   });
@@ -206,7 +215,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Notificación no encontrada'
+        error: 'Notification not found'
       });
     });
 
@@ -219,7 +228,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al marcar como leída'
+        error: 'boom'
       });
     });
   });
@@ -261,7 +270,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al marcar notificaciones'
+        error: 'boom'
       });
     });
   });
@@ -289,7 +298,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al marcar todas como leídas'
+        error: 'boom'
       });
     });
   });
@@ -320,7 +329,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Notificación no encontrada'
+        error: 'Notification not found'
       });
     });
 
@@ -333,7 +342,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al archivar notificación'
+        error: 'boom'
       });
     });
   });
@@ -376,7 +385,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error al eliminar notificación'
+        error: 'boom'
       });
     });
   });
@@ -456,7 +465,7 @@ describe('Notification Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Usuario receptor no encontrado'
+        error: 'Recipient user not found'
       });
     });
   });

@@ -7,7 +7,13 @@ class Validators {
   }
 
   validatePassword(password) {
-    return typeof password === 'string' && password.length >= 6;
+    if (typeof password !== 'string' || password.length < 8) {
+      return false;
+    }
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    return hasUpperCase && hasLowerCase && hasNumber;
   }
 
   validateRegistrationData(email, name, password) {
@@ -20,7 +26,7 @@ class Validators {
     }
 
     if (!this.validatePassword(password)) {
-      throw AppError.badRequest('PASSWORD_TOO_SHORT', 'Password must be at least 6 characters long');
+      throw AppError.badRequest('PASSWORD_TOO_WEAK', 'Password must be at least 8 characters and contain uppercase, lowercase, and a number');
     }
   }
 
@@ -36,61 +42,38 @@ class Validators {
     }
   }
 
-  /**
-   * Middleware para validar datos de creación de organización
-   */
   validateOrganizationCreation(req, res, next) {
     const { name, contact } = req.body;
 
     if (!name || !name.trim()) {
-      return res.status(400).json({
-        success: false,
-        error: 'Organization name is required'
-      });
+      return next(AppError.badRequest('ORGANIZATION_NAME_REQUIRED', 'Organization name is required'));
     }
 
     if (!contact || !contact.email) {
-      return res.status(400).json({
-        success: false,
-        error: 'Contact email is required'
-      });
+      return next(AppError.badRequest('CONTACT_EMAIL_REQUIRED', 'Contact email is required'));
     }
 
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(contact.email)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Contact email is not valid'
-      });
+      return next(AppError.badRequest('CONTACT_EMAIL_INVALID', 'Contact email is not valid'));
     }
 
     next();
   }
 
-  /**
-   * Middleware para validar datos de actualización de organización
-   */
   validateOrganizationUpdate(req, res, next) {
     const { contact } = req.body;
 
     if (contact && contact.email) {
       const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
       if (!emailRegex.test(contact.email)) {
-        return res.status(400).json({
-          success: false,
-          error: 'Contact email is not valid'
-        });
+        return next(AppError.badRequest('CONTACT_EMAIL_INVALID', 'Contact email is not valid'));
       }
     }
 
     next();
   }
 
-  /**
-   * Validar respuestas del BFI-44
-   * @param {Object} responses - Objeto con las respuestas del cuestionario
-   * @throws {Error} Si las respuestas no son válidas
-   */
   validateBFI44Responses(responses) {
     if (!responses || typeof responses !== 'object') {
       throw new Error('BFI44_INVALID_RESPONSES_FORMAT');
@@ -117,9 +100,6 @@ class Validators {
     return true;
   }
 
-  /**
-   * Middleware para validar actualización de perfil de usuario
-   */
   validateProfileUpdate(req, res, next) {
     const { 
       name, 
@@ -132,95 +112,62 @@ class Validators {
 
     if (name !== undefined) {
       if (typeof name !== 'string' || name.trim().length < 2 || name.trim().length > 50) {
-        return res.status(400).json({
-          success: false,
-          error: 'Name must be between 2 and 50 characters'
-        });
+        return next(AppError.badRequest('NAME_INVALID', 'Name must be between 2 and 50 characters'));
       }
     }
 
     if (country !== undefined) {
       if (typeof country !== 'string' || country.trim().length === 0) {
-        return res.status(400).json({
-          success: false,
-          error: 'Country must be a valid string'
-        });
+        return next(AppError.badRequest('COUNTRY_INVALID', 'Country must be a valid string'));
       }
     }
 
     if (timezone !== undefined) {
       if (typeof timezone !== 'string' || timezone.trim().length === 0) {
-        return res.status(400).json({
-          success: false,
-          error: 'Timezone must be a valid string'
-        });
+        return next(AppError.badRequest('TIMEZONE_INVALID', 'Timezone must be a valid string'));
       }
     }
 
     if (flexibleSchedule !== undefined) {
       if (typeof flexibleSchedule !== 'boolean') {
-        return res.status(400).json({
-          success: false,
-          error: 'flexibleSchedule must be a boolean'
-        });
+        return next(AppError.badRequest('FLEXIBLE_SCHEDULE_INVALID', 'flexibleSchedule must be a boolean'));
       }
     }
 
     if (preferredWorkingHours !== undefined) {
       if (typeof preferredWorkingHours !== 'object' || preferredWorkingHours === null) {
-        return res.status(400).json({
-          success: false,
-          error: 'preferredWorkingHours must be an object'
-        });
+        return next(AppError.badRequest('PREFERRED_WORKING_HOURS_INVALID', 'preferredWorkingHours must be an object'));
       }
 
       const { start, end } = preferredWorkingHours;
       const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 
       if (start !== undefined && (typeof start !== 'string' || !timeRegex.test(start))) {
-        return res.status(400).json({
-          success: false,
-          error: 'Start time must be in HH:MM format (24h)'
-        });
+        return next(AppError.badRequest('START_TIME_INVALID', 'Start time must be in HH:MM format (24h)'));
       }
 
       if (end !== undefined && (typeof end !== 'string' || !timeRegex.test(end))) {
-        return res.status(400).json({
-          success: false,
-          error: 'End time must be in HH:MM format (24h)'
-        });
+        return next(AppError.badRequest('END_TIME_INVALID', 'End time must be in HH:MM format (24h)'));
       }
     }
 
     if (notificationPreferences !== undefined) {
       if (typeof notificationPreferences !== 'object' || notificationPreferences === null) {
-        return res.status(400).json({
-          success: false,
-          error: 'notificationPreferences must be an object'
-        });
+        return next(AppError.badRequest('NOTIFICATION_PREFERENCES_INVALID', 'notificationPreferences must be an object'));
       }
 
       const { email, inApp, push } = notificationPreferences;
 
       if (email !== undefined && typeof email !== 'boolean') {
-        return res.status(400).json({
-          success: false,
-          error: 'Email preference must be a boolean'
-        });
+        return next(AppError.badRequest('EMAIL_PREFERENCE_INVALID', 'Email preference must be a boolean'));
       }
 
       if (inApp !== undefined && typeof inApp !== 'boolean') {
-        return res.status(400).json({
-          success: false,
-          error: 'In-app notifications preference must be a boolean'
-        });
+        return next(AppError.badRequest('IN_APP_PREFERENCE_INVALID', 'In-app notifications preference must be a boolean'));
       }
 
       if (push !== undefined && typeof push !== 'boolean') {
-        return res.status(400).json({
-          success: false,
-          error: 'Push notifications preference must be a boolean'
-        });
+        return next(AppError.badRequest('PUSH_PREFERENCE_INVALID', 'Push notifications preference must be a boolean'));
       }
     }
 

@@ -47,9 +47,7 @@ class CVRepository extends BaseRepository {
    * @param {Object} options - Query options
    * @returns {Promise<Object|null>}
    */
-  async updateCompletenessStatus(cvId, isComplete, options = {}) {
-    return this.updateById(cvId, { isComplete }, options);
-  }
+  // NOTE: updateCompletenessStatus removed — CV model has no isComplete field; completeness is computed dynamically.
 
   /**
    * Check if user has curriculum
@@ -75,12 +73,7 @@ class CVRepository extends BaseRepository {
    * @param {Object} options - Query options
    * @returns {Promise<Array>}
    */
-  async findCompleteByOrganization(organizationId, options = {}) {
-    return this.find(
-      { organization: organizationId, isComplete: true },
-      options
-    );
-  }
+  // NOTE: findCompleteByOrganization removed — CV model has no isComplete field; completeness is computed dynamically.
 }
 
 module.exports = new CVRepository();

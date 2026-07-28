@@ -91,6 +91,10 @@ class BaseRepository {
     if (options.skip) {
       query = query.skip(options.skip);
     }
+
+    if (options.lean) {
+      query = query.lean();
+    }
     
     return query.exec();
   }
@@ -192,7 +196,7 @@ class BaseRepository {
    * @returns {Promise<boolean>}
    */
   async exists(criteria) {
-    const count = await this.model.countDocuments(criteria).limit(1).exec();
+    const count = await this.model.countDocuments(criteria).exec();
     return count > 0;
   }
 

@@ -1,13 +1,16 @@
-const organizationService = require('../services/organization.service');
+const organizationService = require('../services/core/organization.service');
+const projectService = require('../services/core/project.service');
+const { handleErrorCatch } = require('../utils/errorHelper');
+const { ROLES } = require('../config/roles');
 
 /**
- * Controlador de Organizaciones
- * Maneja las peticiones HTTP relacionadas con organizaciones
- * Siguiendo principios SOLID: Single Responsibility
+ * Organization Controller
+ * Handles HTTP requests related to organizations
+ * Following SOLID principles: Single Responsibility
  */
 class OrganizationController {
   /**
-   * Crea una nueva organización
+   * Creates a new organization
    * POST /api/organizations
    */
   async createOrganization(req, res) {
@@ -26,34 +29,28 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al crear organización:', error);
-
-      const duplicateNameMessage = 'An organization with that name already exists';
+      console.error('Error creating organization:', error);
 
       if (error.code === 11000) {
         return res.status(409).json({
           success: false,
-          error: duplicateNameMessage
+          error: 'An organization with that name already exists'
         });
       }
 
       if (error.message === 'ORGANIZATION_NAME_ALREADY_EXISTS') {
         return res.status(409).json({
           success: false,
-          error: duplicateNameMessage
+          error: 'An organization with that name already exists'
         });
       }
 
-      const statusCode = error.message.includes('ya administra') ? 409 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Obtiene una organización por ID
+   * Gets an organization by ID
    * GET /api/organizations/:id
    */
   async getOrganization(req, res) {
@@ -73,30 +70,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al obtener organización:', error);
-      
-      const errorMessages = {
-        'Organization not found': 'Organización no encontrada',
-        'UNAUTHORIZED_ACCESS': 'No tienes permisos para ver esta organización'
-      };
-      
-      const statusCodes = {
-        'Organization not found': 404,
-        'UNAUTHORIZED_ACCESS': 403
-      };
-      
-      const message = errorMessages[error.message] || error.message;
-      const statusCode = statusCodes[error.message] || 400;
-      
-      return res.status(statusCode).json({
-        success: false,
-        error: message
-      });
+      console.error('Error getting organization:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Actualiza una organización
+   * Updates an organization
    * PUT /api/organizations/:id
    */
   async updateOrganization(req, res) {
@@ -117,18 +97,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al actualizar organización:', error);
-      const statusCode = error.message.includes('permisos') ? 403 : 
-                         error.message.includes('no encontrada') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error updating organization:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Obtiene las organizaciones del usuario autenticado
+   * Gets the authenticated user's organizations
    * GET /api/organizations/my-organizations
    */
   async getMyOrganizations(req, res) {
@@ -137,9 +112,9 @@ class OrganizationController {
       const role = req.user.role;
 
       let organizations;
-      if (role === 'org_admin') {
+      if (role === ROLES.ORG_ADMIN) {
         organizations = await organizationService.getOrganizationsByAdmin(userId);
-      } else if (role === 'employee') {
+      } else if (role === ROLES.EMPLOYEE) {
         organizations = await organizationService.getOrganizationsByEmployee(userId);
       } else {
         organizations = [];
@@ -150,16 +125,13 @@ class OrganizationController {
         data: organizations
       });
     } catch (error) {
-      console.error('Error al obtener organizaciones del usuario:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error getting user organizations:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Agrega un empleado a la organización
+   * Adds an employee to the organization
    * POST /api/organizations/:id/employees
    */
   async addEmployee(req, res) {
@@ -188,18 +160,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al agregar empleado:', error);
-      const statusCode = error.message.includes('permisos') ? 403 : 
-                         error.message.includes('no encontrad') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error adding employee:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Remueve un empleado de la organización
+   * Removes an employee from the organization
    * DELETE /api/organizations/:id/employees/:userId
    */
   async removeEmployee(req, res) {
@@ -219,18 +186,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al remover empleado:', error);
-      const statusCode = error.message.includes('permisos') ? 403 : 
-                         error.message.includes('no encontrad') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error removing employee:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Actualiza el estado de un empleado
+   * Updates an employee's status
    * PATCH /api/organizations/:id/employees/:userId/status
    */
   async updateEmployeeStatus(req, res) {
@@ -242,7 +204,7 @@ class OrganizationController {
       if (!status) {
         return res.status(400).json({
           success: false,
-          error: 'Se requiere el nuevo estado'
+          error: 'New status is required'
         });
       }
 
@@ -259,18 +221,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al actualizar estado del empleado:', error);
-      const statusCode = error.message.includes('permisos') ? 403 : 
-                         error.message.includes('no encontrad') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error updating employee status:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Agrega un administrador adicional
+   * Adds an additional administrator
    * POST /api/organizations/:id/admins
    */
   async addAdmin(req, res) {
@@ -298,18 +255,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al agregar administrador:', error);
-      const statusCode = error.message.includes('Solo el administrador principal') ? 403 : 
-                         error.message.includes('no encontrad') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error adding administrator:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Obtiene los empleados de la organización
+   * Gets the organization's employees
    * GET /api/organizations/:id/employees
    */
   async getEmployees(req, res) {
@@ -319,28 +271,27 @@ class OrganizationController {
       const filters = {
         status: req.query.status,
         department: req.query.department,
-        position: req.query.position
+        position: req.query.position,
+        page: req.query.page,
+        limit: req.query.limit
       };
 
-      const employees = await organizationService.getEmployees(id, filters, userId);
+      const result = await organizationService.getEmployees(id, filters, userId);
 
       return res.status(200).json({
         success: true,
-        data: employees
+        ...result.pagination ? { pagination: result.pagination } : {},
+        count: result.data.length,
+        data: result.data
       });
     } catch (error) {
-      console.error('Error al obtener empleados:', error);
-      const statusCode = error.message.includes('permisos') ? 403 : 
-                         error.message.includes('no encontrada') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error getting employees:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Busca organizaciones con filtros
+   * Searches organizations with filters
    * GET /api/organizations/search
    */
   async searchOrganizations(req, res) {
@@ -353,8 +304,8 @@ class OrganizationController {
       };
 
       const pagination = {
-        page: parseInt(req.query.page) || 1,
-        limit: parseInt(req.query.limit) || 20,
+        page: parseInt(req.query.page, 10) || 1,
+        limit: parseInt(req.query.limit, 10) || 20,
         sortBy: req.query.sortBy || 'createdAt',
         sortOrder: req.query.sortOrder || 'desc'
       };
@@ -366,16 +317,13 @@ class OrganizationController {
         data: result
       });
     } catch (error) {
-      console.error('Error al buscar organizaciones:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error searching organizations:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Desactiva una organización
+   * Deactivates an organization
    * PATCH /api/organizations/:id/deactivate
    */
   async deactivateOrganization(req, res) {
@@ -391,18 +339,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al desactivar organización:', error);
-      const statusCode = error.message.includes('Solo el administrador principal') ? 403 : 
-                         error.message.includes('no encontrada') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error deactivating organization:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Activa una organización
+   * Activates an organization
    * PATCH /api/organizations/:id/activate
    */
   async activateOrganization(req, res) {
@@ -418,18 +361,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al activar organización:', error);
-      const statusCode = error.message.includes('Solo el administrador principal') ? 403 : 
-                         error.message.includes('no encontrada') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error activating organization:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Actualiza la configuración de la organización
+   * Updates the organization settings
    * PATCH /api/organizations/:id/settings
    */
   async updateSettings(req, res) {
@@ -450,18 +388,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al actualizar configuración:', error);
-      const statusCode = error.message.includes('permisos') ? 403 : 
-                         error.message.includes('no encontrada') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error updating settings:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Obtiene estadísticas de la organización
+   * Gets organization statistics
    * GET /api/organizations/:id/stats
    */
   async getStats(req, res) {
@@ -476,18 +409,13 @@ class OrganizationController {
         data: stats
       });
     } catch (error) {
-      console.error('Error al obtener estadísticas:', error);
-      const statusCode = error.message.includes('permisos') ? 403 : 
-                         error.message.includes('no encontrada') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error getting statistics:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Asigna o remueve el rol de jefe de proyecto a un empleado
+   * Assigns or removes the project manager role from an employee
    * PATCH /api/organizations/:id/employees/:employeeId/project-manager
    */
   async setProjectManagerRole(req, res) {
@@ -518,24 +446,13 @@ class OrganizationController {
         data: organization
       });
     } catch (error) {
-      console.error('Error al asignar rol de jefe de proyecto:', error);
-      
-      let statusCode = 400;
-      if (error.message.includes('no encontrada') || error.message.includes('no pertenece')) {
-        statusCode = 404;
-      } else if (error.message.includes('permisos')) {
-        statusCode = 403;
-      }
-
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error assigning project manager role:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Obtiene todos los jefes de proyecto de una organización
+   * Gets all project managers of an organization
    * GET /api/organizations/:id/project-managers
    */
   async getProjectManagers(req, res) {
@@ -550,17 +467,13 @@ class OrganizationController {
         data: projectManagers
       });
     } catch (error) {
-      console.error('Error al obtener jefes de proyecto:', error);
-      const statusCode = error.message.includes('no encontrada') ? 404 : 400;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      console.error('Error getting project managers:', error);
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Obtiene todos los proyectos de una organización
+   * Gets all projects of an organization
    * GET /api/organizations/:id/projects
    */
   async getOrganizationProjects(req, res) {
@@ -568,42 +481,40 @@ class OrganizationController {
       const { id } = req.params;
       const filters = {
         status: req.query.status,
-        projectManager: req.query.projectManager
+        projectManager: req.query.projectManager,
+        page: req.query.page,
+        limit: req.query.limit
       };
 
-      // Importar el controlador de proyectos para reutilizar su lógica
-      const projectController = require('./project.controller');
-      req.params.organizationId = id;
-      
-      return await projectController.getOrganizationProjects(req, res);
-    } catch (error) {
-      console.error('Error al obtener proyectos de la organización:', error);
-      return res.status(400).json({
-        success: false,
-        error: error.message
+      const result = await projectService.getProjectsByOrganization(id, filters);
+
+      return res.status(200).json({
+        success: true,
+        ...result.pagination ? { pagination: result.pagination } : {},
+        count: result.data.length,
+        data: result.data
       });
+    } catch (error) {
+      return handleErrorCatch(error, res);
     }
   }
 
   /**
-   * Obtiene estadísticas de proyectos de una organización
+   * Gets project statistics for an organization
    * GET /api/organizations/:id/projects/statistics
    */
   async getProjectStatistics(req, res) {
     try {
       const { id } = req.params;
 
-      // Importar el controlador de proyectos para reutilizar su lógica
-      const projectController = require('./project.controller');
-      req.params.organizationId = id;
-      
-      return await projectController.getProjectStatistics(req, res);
-    } catch (error) {
-      console.error('Error al obtener estadísticas de proyectos:', error);
-      return res.status(400).json({
-        success: false,
-        error: error.message
+      const statistics = await projectService.getProjectStatistics(id);
+
+      return res.status(200).json({
+        success: true,
+        data: statistics
       });
+    } catch (error) {
+      return handleErrorCatch(error, res);
     }
   }
 }

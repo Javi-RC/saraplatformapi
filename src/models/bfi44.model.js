@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 /**
- * Schema para almacenar las respuestas del Big Five Inventory (BFI-44)
- * Siguiendo principios SOLID y arquitectura de modelos existente
+ * Schema to store Big Five Inventory (BFI-44) responses
+ * Following SOLID principles and existing model architecture
  */
 const bfi44ResponseSchema = new mongoose.Schema({
   userId: {
@@ -22,10 +22,10 @@ const bfi44ResponseSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function(responses) {
-        // Validar que existan exactamente 44 respuestas
+        // Validate that exactly 44 responses exist
         return responses.size === 44;
       },
-      message: 'Deben existir exactamente 44 respuestas'
+      message: 'Exactly 44 responses are required'
     }
   },
   results: {
@@ -67,7 +67,7 @@ bfi44ResponseSchema.index({ userId: 1, completedAt: -1 });
 bfi44ResponseSchema.index({ createdAt: -1 });
 
 /**
- * Método para obtener el perfil más reciente de un usuario
+ * Method to get the most recent profile for a user
  */
 bfi44ResponseSchema.statics.getLatestProfile = async function(userId) {
   return this.findOne({ userId })
@@ -76,7 +76,7 @@ bfi44ResponseSchema.statics.getLatestProfile = async function(userId) {
 };
 
 /**
- * Método para verificar si un usuario tiene un perfil completo
+ * Method to check if a user has a complete profile
  */
 bfi44ResponseSchema.statics.hasProfile = async function(userId) {
   const profile = await this.findOne({ userId });
@@ -84,12 +84,12 @@ bfi44ResponseSchema.statics.hasProfile = async function(userId) {
 };
 
 /**
- * Método de instancia para validar integridad de datos
+ * Instance method to validate data integrity
  */
 bfi44ResponseSchema.methods.validateIntegrity = function() {
-  // Verificar que todas las respuestas estén en el rango correcto
+  // Verify all responses are within the correct range
   for (const [key, value] of this.responses) {
-    const questionId = parseInt(key);
+    const questionId = parseInt(key, 10);
     if (questionId < 1 || questionId > 44) {
       return false;
     }

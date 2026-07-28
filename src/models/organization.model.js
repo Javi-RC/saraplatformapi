@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 
 /**
- * Modelo de Organización
- * Representa una empresa u organización dentro del sistema
- * Siguiendo principios SOLID: Single Responsibility
+ * Organization Model
+ * Represents a company or organization within the system
+ * Following SOLID principles: Single Responsibility
  */
 const organizationSchema = new mongoose.Schema({
-  // Información básica de la organización
+  // Basic organization information
   name: {
     type: String,
     required: [true, 'Organization name is required'],
     trim: true,
-    minlength: [2, 'El nombre debe tener al menos 2 caracteres'],
-    maxlength: [100, 'El nombre no puede exceder 100 caracteres'],
+    minlength: [2, 'Name must be at least 2 characters'],
+    maxlength: [100, 'Name cannot exceed 100 characters'],
     unique: true
   },
   
@@ -29,16 +29,16 @@ const organizationSchema = new mongoose.Schema({
     trim: true
   },
   
-  // Identificación fiscal/legal
+  // Tax/legal identification
   taxId: {
     type: String,
     trim: true,
     unique: true,
-    sparse: true, // Permite múltiples valores null pero valores únicos no-null
+    sparse: true, // Allows multiple null values but unique non-null values
     index: true
   },
   
-  // Información de contacto
+  // Contact information
   contact: {
     email: {
       type: String,
@@ -57,7 +57,7 @@ const organizationSchema = new mongoose.Schema({
     }
   },
   
-  // Dirección física
+  // Physical address
   address: {
     street: {
       type: String,
@@ -81,7 +81,7 @@ const organizationSchema = new mongoose.Schema({
     }
   },
   
-  // Industria/Sector
+  // Industry/Sector
   industry: {
     type: String,
     trim: true,
@@ -106,28 +106,28 @@ const organizationSchema = new mongoose.Schema({
     ]
   },
   
-  // Tamaño de la organización
+  // Organization size
   size: {
     type: String,
     enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'],
     default: '1-10'
   },
   
-  // Administrador principal de la organización
+  // Main organization administrator
   admin: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Se requiere un administrador'],
+    required: [true, 'An administrator is required'],
     index: true
   },
   
-  // Miembros adicionales del equipo administrativo
+  // Additional administrative team members
   additionalAdmins: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
   
-  // Empleados asociados a la organización
+  // Employees associated with the organization
   employees: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -157,7 +157,7 @@ const organizationSchema = new mongoose.Schema({
     }
   }],
   
-  // Configuración de la organización
+  // Organization settings
   settings: {
     allowPublicCVSubmission: {
       type: Boolean,
@@ -172,23 +172,23 @@ const organizationSchema = new mongoose.Schema({
     notifyOnCVSubmission: {
       type: Boolean,
       default: true,
-      description: 'Notificar a administradores cuando se recibe un currículo'
+      description: 'Notify administrators when a curriculum is received'
     },
     autoProcessCV: {
       type: Boolean,
       default: true,
-      description: 'Procesar automáticamente currículos con IA'
+      description: 'Automatically process curricula with AI'
     }
   },
   // Work Mode Policy
   workModePolicy: {
     type: String,
     enum: [
-      'office_mode',        // 100% presencial
-      'office_first',       // Presencial con remoto puntual
-      'office_remote_mix',  // Alternancia libre
-      'remote_first',       // Remoto con presencial excepcional
-      'remote_mode'         // 100% remoto
+      'office_mode',        // 100% on-site
+      'office_first',       // On-site with occasional remote
+      'office_remote_mix',  // Free alternation
+      'remote_first',       // Remote with exceptional on-site
+      'remote_mode'         // 100% remote
     ],
     default: 'office_mode',
     description: 'Default work mode policy for the organization'
@@ -303,7 +303,7 @@ const organizationSchema = new mongoose.Schema({
     }
   },
   
-  // Estado de la organización
+  // Organization status
   status: {
     type: String,
     enum: ['active', 'inactive', 'suspended'],
@@ -311,31 +311,21 @@ const organizationSchema = new mongoose.Schema({
     index: true
   },
   
-  // Logo de la organización
+  // Organization logo
   logo: {
     type: String,
     trim: true
   },
   
-  // Datos adicionales personalizables
+  // Custom additional data
   customFields: {
     type: mongoose.Schema.Types.Mixed,
     default: {}
   },
   
-  // Metadatos de auditoría
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    immutable: true
-  },
+  // Audit metadata
   
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  },
-  
-  // Última actividad
+  // Last activity
   lastActivityAt: {
     type: Date,
     default: Date.now
@@ -346,22 +336,22 @@ const organizationSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Índices compuestos para optimización de consultas
+// Compound indexes for query optimization
 organizationSchema.index({ admin: 1, status: 1 });
 organizationSchema.index({ 'employees.user': 1 });
 organizationSchema.index({ createdAt: -1 });
 
-// Virtual: Total de empleados activos
+// Virtual: Total active employees
 organizationSchema.virtual('activeEmployeesCount').get(function() {
   return this.employees ? this.employees.filter(emp => emp.status === 'active').length : 0;
 });
 
-// Virtual: Total de empleados
+// Virtual: Total employees
 organizationSchema.virtual('totalEmployeesCount').get(function() {
   return this.employees ? this.employees.length : 0;
 });
 
-// Virtual: Verificar si la organización está completamente configurada
+// Virtual: Check if organization is fully configured
 organizationSchema.virtual('isFullyConfigured').get(function() {
   return !!(
     this.name &&
@@ -371,11 +361,11 @@ organizationSchema.virtual('isFullyConfigured').get(function() {
   );
 });
 
-// Método: Verificar si un usuario es administrador
+// Method: Check if a user is an administrator
 organizationSchema.methods.isAdmin = function(userId) {
   const userIdStr = userId.toString();
   
-  // Manejar caso donde admin está poblado (es un objeto) o no poblado (es ObjectId)
+  // Handle case where admin is populated (is an object) or not populated (is ObjectId)
   const adminId = this.admin._id ? this.admin._id.toString() : this.admin.toString();
   
   if (adminId === userIdStr) {
@@ -388,7 +378,7 @@ organizationSchema.methods.isAdmin = function(userId) {
   }) : false;
 };
 
-// Método: Verificar si un usuario es empleado
+// Method: Check if a user is an employee
 organizationSchema.methods.isEmployee = function(userId) {
   if (!this.employees) return false;
   const userIdStr = userId.toString();
@@ -396,13 +386,13 @@ organizationSchema.methods.isEmployee = function(userId) {
     // Skip if emp.user is null (deleted user)
     if (!emp.user) return false;
     
-    // Manejar caso donde emp.user está poblado o no
+    // Handle case where emp.user is populated or not
     const empUserId = emp.user._id ? emp.user._id.toString() : emp.user.toString();
     return empUserId === userIdStr && emp.status === 'active';
   });
 };
 
-// Método: Verificar si un usuario es jefe de proyecto
+// Method: Check if a user is a project manager
 organizationSchema.methods.isProjectManager = function(userId) {
   if (!this.employees) return false;
   const userIdStr = userId.toString();
@@ -416,9 +406,9 @@ organizationSchema.methods.isProjectManager = function(userId) {
   return employee ? employee.isProjectManager : false;
 };
 
-// Método: Agregar empleado
+// Method: Add employee
 organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
-  // Inicializar employees si no existe
+  // Initialize employees if it doesn't exist
   if (!this.employees) {
     this.employees = [];
   }
@@ -443,7 +433,7 @@ organizationSchema.methods.addEmployee = function(userId, employeeData = {}) {
   return this.save();
 };
 
-// Método: Remover empleado
+// Method: Remove employee
 organizationSchema.methods.removeEmployee = function(userId) {
   if (!this.employees) {
     throw new Error('Employee not found in the organization');
@@ -462,7 +452,7 @@ organizationSchema.methods.removeEmployee = function(userId) {
   return this.save();
 };
 
-// Método: Actualizar estado de empleado
+// Method: Update employee status
 organizationSchema.methods.updateEmployeeStatus = function(userId, newStatus) {
   if (!this.employees) {
     throw new Error('Employee not found in the organization');
@@ -481,7 +471,7 @@ organizationSchema.methods.updateEmployeeStatus = function(userId, newStatus) {
   return this.save();
 };
 
-// Método: Asignar/desasignar rol de jefe de proyecto
+// Method: Assign/unassign project manager role
 organizationSchema.methods.setProjectManagerRole = function(userId, isProjectManager) {
   if (!this.employees) {
     throw new Error('Employee not found in the organization');
@@ -504,7 +494,7 @@ organizationSchema.methods.setProjectManagerRole = function(userId, isProjectMan
   return this.save();
 };
 
-// Método: Agregar administrador adicional
+// Method: Add additional administrator
 organizationSchema.methods.addAdmin = function(userId) {
   const userIdStr = userId.toString();
   
@@ -522,11 +512,6 @@ organizationSchema.methods.addAdmin = function(userId) {
 };
 
 organizationSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
-
-organizationSchema.pre('save', function(next) {
   if (this.admin && this.additionalAdmins.length > 0) {
     const adminStr = this.admin.toString();
     this.additionalAdmins = this.additionalAdmins.filter(
@@ -536,7 +521,7 @@ organizationSchema.pre('save', function(next) {
   next();
 });
 
-// Método estático: Buscar organizaciones por administrador
+// Static method: Find organizations by administrator
 organizationSchema.statics.findByAdmin = function(adminId) {
   return this.find({
     $or: [
@@ -547,7 +532,7 @@ organizationSchema.statics.findByAdmin = function(adminId) {
     .populate('additionalAdmins', 'name email avatar');
 };
 
-// Método estático: Buscar organizaciones donde el usuario es empleado
+// Static method: Find organizations where the user is an employee
 organizationSchema.statics.findByEmployee = function(userId) {
   return this.find({
     'employees.user': userId,

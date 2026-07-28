@@ -10,6 +10,7 @@ require('dotenv').config({
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
@@ -33,10 +34,23 @@ const allowedOrigins = (process.env.CORS_ORIGINS || '')
 
 app.use(
   cors({
+    credentials: true,
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (!isProduction) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      if (isProduction) {
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('CORS: origin not allowed'));
+      }
+
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.length > 0 && allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
       return callback(new Error('CORS: origin not allowed'));
     }
   })
@@ -64,6 +78,9 @@ app.use(
 app.use(mongoSanitize());
 app.use(hpp());
 
+app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: process.env.URLENCODED_BODY_LIMIT || '1mb' }));
+
 const sanitizeXss = (value) => {
   if (typeof value === 'string') return xss(value);
   if (Array.isArray(value)) return value.map(sanitizeXss);
@@ -76,22 +93,26 @@ const sanitizeXss = (value) => {
 };
 
 app.use((req, res, next) => {
+  if (req.method === 'GET') return next();
   req.body = sanitizeXss(req.body);
   req.query = sanitizeXss(req.query);
   req.params = sanitizeXss(req.params);
   next();
 });
 
-app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: process.env.URLENCODED_BODY_LIMIT || '1mb' }));
+app.use(cookieParser());
 
-// Serverless DB connection (Vercel)
+// Serverless DB connection (Vercel): app.js is the entry point there, so it must
+// open the connection itself. connectDB() is idempotent, so the extra call made by
+// src/server.js in a long-running process reuses this same connection.
 const connectDB = require('./config/db');
 const mongoose = require('mongoose');
 
-app.use(async (req, res, next) => {
+connectDB();
+
+app.use((req, res, next) => {
   if (mongoose.connection.readyState !== 1) {
-    await connectDB();
+    return res.status(503).json({ success: false, error: 'Database not connected' });
   }
   next();
 });

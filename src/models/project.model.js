@@ -484,17 +484,6 @@ const projectSchema = new mongoose.Schema({
     type: Date
   },
   
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    immutable: true
-  },
-  
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  },
-  
   lastActivityAt: {
     type: Date,
     default: Date.now
@@ -1655,11 +1644,6 @@ projectSchema.methods.cancel = function() {
   this.lastActivityAt = Date.now();
   return this.save();
 };
-
-projectSchema.pre('save', function(next) {
-  this.updatedAt = Date.now();
-  next();
-});
 
 projectSchema.pre('save', function(next) {
   if (this.actualStartDate && this.actualEndDate) {

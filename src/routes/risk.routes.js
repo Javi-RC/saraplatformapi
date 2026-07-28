@@ -7,7 +7,8 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const riskController = require('../controllers/risk.controller');
-const { requireOrganizationMember, requireRole } = require('../middleware/authorization');
+const { requireOrganizationMember, requireRole, requireOrgAdminOrProjectManager } = require('../middleware/authorization');
+const { ROLES } = require('../config/roles');
 
 const authenticate = passport.authenticate('jwt', { session: false });
 
@@ -19,6 +20,7 @@ const authenticate = passport.authenticate('jwt', { session: false });
 router.post(
   '/projects/:id/risks/predict',
   authenticate,
+  requireOrgAdminOrProjectManager,
   riskController.predictRisks
 );
 
@@ -42,6 +44,7 @@ router.get(
 router.post(
   '/projects/:id/risks/manual',
   authenticate,
+  requireOrgAdminOrProjectManager,
   riskController.addManualRisk
 );
 
@@ -64,6 +67,7 @@ router.get(
 router.put(
   '/projects/:id/risks/:riskId',
   authenticate,
+  requireOrgAdminOrProjectManager,
   riskController.updateManualRisk
 );
 
@@ -75,6 +79,7 @@ router.put(
 router.delete(
   '/projects/:id/risks/:riskId',
   authenticate,
+  requireOrgAdminOrProjectManager,
   riskController.deleteManualRisk
 );
 
@@ -202,14 +207,15 @@ router.get(
 );
 
 /**
- * GET /api/case-base/:id
- * Get specific case by ID
- * Requires: Authentication
+ * GET /api/case-base/seed
+ * Get all seed cases
+ * Requires: Admin role
  */
 router.get(
-  '/case-base/:id',
+  '/case-base/seed',
   authenticate,
-  riskController.getCaseById
+  requireRole(ROLES.ORG_ADMIN),
+  riskController.getSeedCases
 );
 
 /**
@@ -220,20 +226,19 @@ router.get(
 router.post(
   '/case-base/seed',
   authenticate,
-  requireRole('org_admin'),
+  requireRole(ROLES.ORG_ADMIN),
   riskController.loadSeedCases
 );
 
 /**
- * GET /api/case-base/seed
- * Get all seed cases
- * Requires: Admin role
+ * GET /api/case-base/:id
+ * Get specific case by ID
+ * Requires: Authentication
  */
 router.get(
-  '/case-base/seed',
+  '/case-base/:id',
   authenticate,
-  requireRole('org_admin'),
-  riskController.getSeedCases
+  riskController.getCaseById
 );
 
 /**
@@ -272,47 +277,6 @@ router.post(
   '/projects/:id/risks/accept',
   authenticate,
   riskController.acceptRisks
-);
-
-/**
- * DEBUG ENDPOINTS
- * Secret endpoints for development and testing
- */
-
-/**
- * GET /api/risks/debug/all
- * Get all risks with full structure
- * For debugging and development only
- * Requires: Authentication
- */
-router.get(
-  '/risks/debug/all',
-  authenticate,
-  riskController.debugGetAllRisks
-);
-
-/**
- * GET /api/risks/debug/by-type/:type
- * Get all risks of a specific type
- * For debugging and development only
- * Requires: Authentication
- */
-router.get(
-  '/risks/debug/by-type/:type',
-  authenticate,
-  riskController.debugGetRisksByType
-);
-
-/**
- * GET /api/risks/debug/types-summary
- * Get summary statistics by risk type
- * For debugging and development only
- * Requires: Authentication
- */
-router.get(
-  '/risks/debug/types-summary',
-  authenticate,
-  riskController.debugGetRiskTypesSummary
 );
 
 module.exports = router;

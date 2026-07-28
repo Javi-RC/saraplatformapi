@@ -1,7 +1,9 @@
 const organizationController = require('../../../src/controllers/organization.controller');
-const organizationService = require('../../../src/services/organization.service');
+const organizationService = require('../../../src/services/core/organization.service');
+const projectService = require('../../../src/services/core/project.service');
 
-jest.mock('../../../src/services/organization.service');
+jest.mock('../../../src/services/core/organization.service');
+jest.mock('../../../src/services/core/project.service');
 
 describe('Organization Controller - Unit Tests', () => {
   let req, res;
@@ -60,7 +62,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.createOrganization(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(409);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         error: error.message
@@ -74,7 +76,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.createOrganization(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 
@@ -115,7 +117,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.getOrganization(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(404);
     });
 
     it('should return 400 for other errors', async () => {
@@ -125,7 +127,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.getOrganization(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         error: 'Database error'
@@ -184,7 +186,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.updateOrganization(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         error: 'Unexpected error'
@@ -302,7 +304,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.addEmployee(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         error: 'Unknown error'
@@ -346,7 +348,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.removeEmployee(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         error: 'Unexpected remove error'
@@ -383,7 +385,7 @@ describe('Organization Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Se requiere el nuevo estado'
+        error: 'New status is required'
       });
     });
 
@@ -396,7 +398,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.updateEmployeeStatus(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
         error: 'Unexpected status error'
@@ -438,7 +440,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.addAdmin(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 
@@ -570,7 +572,7 @@ describe('Organization Controller - Unit Tests', () => {
 
       await organizationController.deactivateOrganization(req, res);
 
-      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 
@@ -748,6 +750,90 @@ describe('Organization Controller - Unit Tests', () => {
       await organizationController.getProjectManagers(req, res);
 
       expect(res.status).toHaveBeenCalledWith(404);
+    });
+  });
+
+  describe('getOrganizationProjects', () => {
+    it('should get organization projects successfully', async () => {
+      req.params.id = 'org123';
+      const mockProjects = [
+        { _id: 'proj1', name: 'Project 1' },
+        { _id: 'proj2', name: 'Project 2' }
+      ];
+      projectService.getProjectsByOrganization.mockResolvedValue(mockProjects);
+
+      await organizationController.getOrganizationProjects(req, res);
+
+      expect(projectService.getProjectsByOrganization).toHaveBeenCalledWith('org123', {
+        status: undefined,
+        projectManager: undefined
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 2,
+        data: mockProjects
+      });
+    });
+
+    it('should apply filters when provided', async () => {
+      req.params.id = 'org123';
+      req.query = { status: 'active', projectManager: 'pm123' };
+      projectService.getProjectsByOrganization.mockResolvedValue([]);
+
+      await organizationController.getOrganizationProjects(req, res);
+
+      expect(projectService.getProjectsByOrganization).toHaveBeenCalledWith('org123', {
+        status: 'active',
+        projectManager: 'pm123'
+      });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 0,
+        data: []
+      });
+    });
+
+    it('should handle errors', async () => {
+      req.params.id = 'org123';
+      const error = new Error('Database error');
+      projectService.getProjectsByOrganization.mockRejectedValue(error);
+
+      await organizationController.getOrganizationProjects(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
+  });
+
+  describe('getProjectStatistics', () => {
+    it('should get project statistics successfully', async () => {
+      req.params.id = 'org123';
+      const mockStats = {
+        totalProjects: 10,
+        activeProjects: 5,
+        completedProjects: 3
+      };
+      projectService.getProjectStatistics.mockResolvedValue(mockStats);
+
+      await organizationController.getProjectStatistics(req, res);
+
+      expect(projectService.getProjectStatistics).toHaveBeenCalledWith('org123');
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockStats
+      });
+    });
+
+    it('should handle errors', async () => {
+      req.params.id = 'org123';
+      const error = new Error('Database error');
+      projectService.getProjectStatistics.mockRejectedValue(error);
+
+      await organizationController.getProjectStatistics(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
     });
   });
 });

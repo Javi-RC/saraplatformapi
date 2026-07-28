@@ -2,28 +2,65 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
+const { COOKIE_NAME } = require('../utils/cookie');
 const User = require('../models/user.model');
 
 const backendUrl = process.env.BACKEND_URL;
 
 // JWT STRATEGY
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is not defined in environment variables');
+}
+
+// Short-lived cache to avoid DB hit on every request (30s TTL)
+const _userCache = new Map();
+const CACHE_TTL_MS = 30_000;
+
+function _getCachedUser(userId) {
+  const entry = _userCache.get(userId);
+  if (entry && Date.now() - entry.ts < CACHE_TTL_MS) return entry.user;
+  _userCache.delete(userId);
+  return null;
+}
+
+function _setCachedUser(userId, user) {
+  _userCache.set(userId, { user, ts: Date.now() });
+}
+
+// Evict stale entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of _userCache) {
+    if (now - entry.ts >= CACHE_TTL_MS) _userCache.delete(key);
+  }
+}, 60_000).unref();
+
+const cookieExtractor = (req) => {
+  return req?.cookies?.[COOKIE_NAME] || null;
+};
+
 const jwtOptions = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_SECRET || 'your-secret-key'
+  jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor, ExtractJwt.fromAuthHeaderAsBearerToken()]),
+  secretOrKey: process.env.JWT_SECRET
 };
 
 passport.use(
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
+      const cached = _getCachedUser(payload.userId);
+      if (cached) return done(null, cached);
+
       const user = await User.findById(payload.userId);
       if (user) {
-        return done(null, {
+        const userData = {
           id: user._id,
           email: user.email,
           name: user.name,
           role: user.role,
           organization: user.organization
-        });
+        };
+        _setCachedUser(payload.userId, userData);
+        return done(null, userData);
       }
       return done(null, false);
     } catch (error) {

@@ -1,17 +1,17 @@
-const BFI44Service = require('../services/bfi44.service');
+const BFI44Service = require('../services/core/bfi44.service');
 const responseHandler = require('../utils/responseHandler');
-const Organization = require('../models/organization.model');
-const User = require('../models/user.model');
+const { userRepository, organizationRepository } = require('../repositories');
+const { ROLES } = require('../config/roles');
 
 /**
  * BFI-44 Controller
- * Controlador para manejar las peticiones HTTP del Big Five Inventory
- * Siguiendo principios SOLID y arquitectura existente
+ * Handles HTTP requests for the Big Five Inventory
+ * Following SOLID principles and existing architecture
  */
 class BFI44Controller {
   /**
    * GET /api/bfi-44/questions
-   * Obtener el cuestionario completo del BFI-44
+   * Get the full BFI-44 questionnaire
    * @query language - Language code ('en' or 'es', default: 'en')
    */
   static getQuestions(req, res) {
@@ -21,14 +21,14 @@ class BFI44Controller {
       
       return responseHandler.success(res, questionnaire);
     } catch (error) {
-      console.error('Error en getQuestions:', error);
+      console.error('Error in getQuestions:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * POST /api/bfi-44/submit
-   * Enviar respuestas del cuestionario
+   * Submit questionnaire responses
    */
   static async submitResponses(req, res) {
     try {
@@ -36,7 +36,7 @@ class BFI44Controller {
       const userId = req.user.id;
 
       if (!responses) {
-        return responseHandler.error(res, 'Las respuestas son requeridas', 400);
+        return responseHandler.error(res, 'Responses are required', 400);
       }
 
       const result = await BFI44Service.submitResponses(userId, responses);
@@ -47,32 +47,32 @@ class BFI44Controller {
       }, 201);
 
     } catch (error) {
-      console.error('Error en submitResponses:', error);
+      console.error('Error in submitResponses:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * GET /api/bfi-44/profile/:userId
-   * Obtener el perfil BFI-44 de un usuario
+   * Get a user's BFI-44 profile
    */
   static async getProfile(req, res) {
     try {
       const { userId } = req.params;
 
-      if (req.user.id !== userId && req.user.role !== 'org_admin') {
-        const targetUser = await User.findById(userId).select('organization');
+      if (req.user.id !== userId && req.user.role !== ROLES.ORG_ADMIN) {
+        const targetUser = await userRepository.findById(userId, { select: 'organization' });
         const organizationId = targetUser?.organization;
 
         if (!organizationId) {
-          return responseHandler.error(res, 'No autorizado para ver este perfil', 403);
+          return responseHandler.error(res, 'Not authorized to view this profile', 403);
         }
 
-        const organization = await Organization.findById(organizationId);
+        const organization = await organizationRepository.findById(organizationId);
         const isAllowed = organization && (organization.isAdmin(req.user.id) || organization.isProjectManager(req.user.id));
 
         if (!isAllowed) {
-          return responseHandler.error(res, 'No autorizado para ver este perfil', 403);
+          return responseHandler.error(res, 'Not authorized to view this profile', 403);
         }
       }
 
@@ -85,14 +85,14 @@ class BFI44Controller {
       return responseHandler.success(res, profile);
 
     } catch (error) {
-      console.error('Error en getProfile:', error);
+      console.error('Error in getProfile:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * GET /api/bfi-44/my-profile
-   * Obtener el perfil BFI-44 del usuario autenticado
+   * Get the authenticated user's BFI-44 profile
    */
   static async getMyProfile(req, res) {
     try {
@@ -101,27 +101,27 @@ class BFI44Controller {
       const profile = await BFI44Service.getUserProfile(userId);
 
       if (!profile) {
-        return responseHandler.error(res, 'No has completado el cuestionario BFI-44', 404);
+        return responseHandler.error(res, 'You have not completed the BFI-44 questionnaire', 404);
       }
 
       return responseHandler.success(res, profile);
 
     } catch (error) {
-      console.error('Error en getMyProfile:', error);
+      console.error('Error in getMyProfile:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * POST /api/bfi-44/recalculate/:responseId
-   * Recalcular resultados de un perfil (solo para admins)
+   * Recalculate a profile's results (admin only)
    */
   static async recalculateProfile(req, res) {
     try {
       const { responseId } = req.params;
 
-      if (req.user.role !== 'org_admin') {
-        return responseHandler.error(res, 'No autorizado', 403);
+      if (req.user.role !== ROLES.ORG_ADMIN) {
+        return responseHandler.error(res, 'Not authorized', 403);
       }
 
       const result = await BFI44Service.recalculateProfile(responseId);
@@ -132,14 +132,14 @@ class BFI44Controller {
       });
 
     } catch (error) {
-      console.error('Error en recalculateProfile:', error);
+      console.error('Error in recalculateProfile:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * GET /api/bfi-44/has-profile
-   * Verificar si el usuario autenticado tiene un perfil BFI-44
+   * Check if the authenticated user has a BFI-44 profile
    */
   static async hasProfile(req, res) {
     try {
@@ -150,62 +150,62 @@ class BFI44Controller {
       return responseHandler.success(res, { hasProfile });
 
     } catch (error) {
-      console.error('Error en hasProfile:', error);
+      console.error('Error in hasProfile:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * POST /api/bfi-44/notify-pending
-   * Notificar a empleados sin test (org_admin o project manager)
+   * Notify employees without test (org_admin or project manager)
    */
   static async notifyPendingEmployees(req, res) {
     try {
-      const isOrgAdmin = req.user.role === 'org_admin';
+      const isOrgAdmin = req.user.role === ROLES.ORG_ADMIN;
       const isProjectManager = req.isProjectManager === true;
 
       if (!isOrgAdmin && !isProjectManager) {
-        return responseHandler.error(res, 'No autorizado', 403);
+        return responseHandler.error(res, 'Not authorized', 403);
       }
 
       if (!req.user.organization) {
-        return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
+        return responseHandler.error(res, 'You do not belong to any organization', 400);
       }
 
       const result = await BFI44Service.notifyEmployeesWithoutTest(req.user.organization);
 
       return responseHandler.success(res, {
-        message: `${result.notified} empleado(s) notificado(s)`,
+        message: `${result.notified} employee(s) notified`,
         ...result
       });
 
     } catch (error) {
-      console.error('Error en notifyPendingEmployees:', error);
+      console.error('Error in notifyPendingEmployees:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * POST /api/bfi-44/notify-user/:userId
-   * Notificar a un empleado específico que complete el test
+   * Notify a specific employee to complete the test
    */
   static async notifySpecificUser(req, res) {
     try {
       const { userId } = req.params;
 
       if (!req.user.organization) {
-        return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
+        return responseHandler.error(res, 'You do not belong to any organization', 400);
       }
 
       // Verify the target user belongs to the same organization
-      const targetUser = await User.findById(userId).select('organization role');
+      const targetUser = await userRepository.findById(userId, { select: 'organization role' });
 
       if (!targetUser) {
-        return responseHandler.error(res, 'Usuario no encontrado', 404);
+        return responseHandler.error(res, 'User not found', 404);
       }
 
       if (!targetUser.organization || targetUser.organization.toString() !== req.user.organization.toString()) {
-        return responseHandler.error(res, 'El usuario no pertenece a tu organización', 403);
+        return responseHandler.error(res, 'The user does not belong to your organization', 403);
       }
 
       const result = await BFI44Service.checkAndNotifyUser(userId);
@@ -213,26 +213,26 @@ class BFI44Controller {
       return responseHandler.success(res, result);
 
     } catch (error) {
-      console.error('Error en notifySpecificUser:', error);
+      console.error('Error in notifySpecificUser:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * GET /api/bfi-44/employees-without-test
-   * Obtener lista de empleados sin test (org_admin o project manager)
+   * Get list of employees without test (org_admin or project manager)
    */
   static async getEmployeesWithoutTest(req, res) {
     try {
-      const isOrgAdmin = req.user.role === 'org_admin';
+      const isOrgAdmin = req.user.role === ROLES.ORG_ADMIN;
       const isProjectManager = req.isProjectManager === true;
 
       if (!isOrgAdmin && !isProjectManager) {
-        return responseHandler.error(res, 'No autorizado', 403);
+        return responseHandler.error(res, 'Not authorized', 403);
       }
 
       if (!req.user.organization) {
-        return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
+        return responseHandler.error(res, 'You do not belong to any organization', 400);
       }
 
       const employees = await BFI44Service.getEmployeesWithoutTest(req.user.organization);
@@ -247,22 +247,22 @@ class BFI44Controller {
       });
 
     } catch (error) {
-      console.error('Error en getEmployeesWithoutTest:', error);
+      console.error('Error in getEmployeesWithoutTest:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * GET /api/bfi-44/consent-status
-   * Verificar si el usuario tiene consentimiento para el BFI-44
+   * Check if the user has consent for the BFI-44
    */
   static async getConsentStatus(req, res) {
     try {
       const userId = req.user.id;
-      const user = await User.findById(userId).select('personalityDataConsent');
+      const user = await userRepository.findById(userId, { select: 'personalityDataConsent' });
 
       if (!user) {
-        return responseHandler.error(res, 'Usuario no encontrado', 404);
+        return responseHandler.error(res, 'User not found', 404);
       }
 
       return responseHandler.success(res, {
@@ -271,23 +271,23 @@ class BFI44Controller {
       });
 
     } catch (error) {
-      console.error('Error en getConsentStatus:', error);
+      console.error('Error in getConsentStatus:', error);
       return responseHandler.handleError(error, res);
     }
   }
 
   /**
    * GET /api/bfi-44/organization-stats
-   * Obtener estadísticas de test por organización (solo para org_admin)
+   * Get test statistics by organization (org_admin only)
    */
   static async getOrganizationStats(req, res) {
     try {
-      if (req.user.role !== 'org_admin') {
-        return responseHandler.error(res, 'No autorizado', 403);
+      if (req.user.role !== ROLES.ORG_ADMIN) {
+        return responseHandler.error(res, 'Not authorized', 403);
       }
 
       if (!req.user.organization) {
-        return responseHandler.error(res, 'No perteneces a ninguna organización', 400);
+        return responseHandler.error(res, 'You do not belong to any organization', 400);
       }
 
       const stats = await BFI44Service.getOrganizationStats(req.user.organization);
@@ -295,7 +295,7 @@ class BFI44Controller {
       return responseHandler.success(res, stats);
 
     } catch (error) {
-      console.error('Error en getOrganizationStats:', error);
+      console.error('Error in getOrganizationStats:', error);
       return responseHandler.handleError(error, res);
     }
   }

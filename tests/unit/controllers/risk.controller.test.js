@@ -1,16 +1,29 @@
 const riskController = require('../../../src/controllers/risk.controller');
-const riskPredictionService = require('../../../src/services/riskPrediction.service');
-const postProjectService = require('../../../src/services/postProject.service');
-const seedCasesService = require('../../../src/services/seedCases.service');
-const Risk = require('../../../src/models/risk.model');
-const CaseBase = require('../../../src/models/caseBase.model');
+const riskPredictionService = require('../../../src/services/risk/riskPrediction.service');
+const postProjectService = require('../../../src/services/risk/postProject.service');
+const seedCasesService = require('../../../src/services/risk/seedCases.service');
+const { riskRepository, caseBaseRepository } = require('../../../src/repositories');
 const i18n = require('../../../src/i18n/i18n.service');
 
-jest.mock('../../../src/services/riskPrediction.service');
-jest.mock('../../../src/services/postProject.service');
-jest.mock('../../../src/services/seedCases.service');
-jest.mock('../../../src/models/risk.model');
-jest.mock('../../../src/models/caseBase.model');
+jest.mock('../../../src/services/risk/riskPrediction.service');
+jest.mock('../../../src/services/risk/postProject.service');
+jest.mock('../../../src/services/risk/seedCases.service');
+jest.mock('../../../src/repositories', () => ({
+  riskRepository: {
+    findById: jest.fn(),
+    updateById: jest.fn(),
+    getOrganizationStats: jest.fn(),
+    getAccuracyReport: jest.fn(),
+  },
+  projectRepository: {
+    findById: jest.fn(),
+  },
+  caseBaseRepository: {
+    findById: jest.fn(),
+    getCaseBaseStats: jest.fn(),
+    getOrganizationCases: jest.fn(),
+  },
+}));
 jest.mock('../../../src/i18n/i18n.service');
 
 describe('Risk Controller - Unit Tests', () => {
@@ -158,20 +171,19 @@ describe('Risk Controller - Unit Tests', () => {
         _id: 'risk123',
         type: 'schedule',
         severity: 'high',
-        populate: jest.fn().mockReturnThis(),
         toObject: jest.fn().mockReturnValue({ _id: 'risk123', type: 'schedule', severity: 'high' })
       };
-      Risk.findById.mockReturnValue({
-        populate: jest.fn().mockReturnValue({
-          populate: jest.fn().mockReturnValue({
-            populate: jest.fn().mockResolvedValue(mockRisk)
-          })
-        })
-      });
+      riskRepository.findById.mockResolvedValue(mockRisk);
 
       await riskController.getRiskById(req, res);
 
-      expect(Risk.findById).toHaveBeenCalledWith('risk123');
+      expect(riskRepository.findById).toHaveBeenCalledWith('risk123', {
+        populate: [
+          { path: 'project', select: 'projectName' },
+          { path: 'organization', select: 'name' },
+          { path: 'basedOnCases.caseId' }
+        ]
+      });
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -182,13 +194,7 @@ describe('Risk Controller - Unit Tests', () => {
 
     it('should return 404 when risk not found', async () => {
       req.params.id = 'risk123';
-      Risk.findById.mockReturnValue({
-        populate: jest.fn().mockReturnValue({
-          populate: jest.fn().mockReturnValue({
-            populate: jest.fn().mockResolvedValue(null)
-          })
-        })
-      });
+      riskRepository.findById.mockResolvedValue(null);
 
       await riskController.getRiskById(req, res);
 
@@ -198,9 +204,7 @@ describe('Risk Controller - Unit Tests', () => {
     it('should handle errors', async () => {
       req.params.id = 'risk123';
       const error = new Error('Database error');
-      Risk.findById.mockImplementation(() => {
-        throw error;
-      });
+      riskRepository.findById.mockRejectedValue(error);
 
       await riskController.getRiskById(req, res);
 
@@ -216,32 +220,42 @@ describe('Risk Controller - Unit Tests', () => {
         accuracyRating: 5,
         comments: 'Very helpful'
       };
-      const mockRisk = {
+      const mockRisk = { _id: 'risk123' };
+      const updatedRisk = {
         _id: 'risk123',
-        feedback: {},
-        save: jest.fn().mockResolvedValue(true),
-        toObject: jest.fn().mockReturnValue({ _id: 'risk123', feedback: {} })
+        toObject: jest.fn().mockReturnValue({
+          _id: 'risk123',
+          feedback: {
+            usefulnessRating: 4,
+            accuracyRating: 5,
+            comments: 'Very helpful',
+            providedBy: 'user123',
+            providedAt: expect.any(Date)
+          }
+        })
       };
-      Risk.findById.mockResolvedValue(mockRisk);
+      riskRepository.findById.mockResolvedValue(mockRisk);
+      riskRepository.updateById.mockResolvedValue(updatedRisk);
 
       await riskController.updateRiskFeedback(req, res);
 
-      expect(Risk.findById).toHaveBeenCalledWith('risk123');
-      expect(mockRisk.feedback).toEqual({
-        usefulnessRating: 4,
-        accuracyRating: 5,
-        comments: 'Very helpful',
-        providedBy: 'user123',
-        providedAt: expect.any(Date)
+      expect(riskRepository.findById).toHaveBeenCalledWith('risk123');
+      expect(riskRepository.updateById).toHaveBeenCalledWith('risk123', {
+        feedback: {
+          usefulnessRating: 4,
+          accuracyRating: 5,
+          comments: 'Very helpful',
+          providedBy: 'user123',
+          providedAt: expect.any(Date)
+        }
       });
-      expect(mockRisk.save).toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
     it('should return 404 when risk not found', async () => {
       req.params.id = 'risk123';
       req.body = { usefulnessRating: 4 };
-      Risk.findById.mockResolvedValue(null);
+      riskRepository.findById.mockResolvedValue(null);
 
       await riskController.updateRiskFeedback(req, res);
 
@@ -252,7 +266,7 @@ describe('Risk Controller - Unit Tests', () => {
       req.params.id = 'risk123';
       req.body = { usefulnessRating: 4 };
       const error = new Error('Database error');
-      Risk.findById.mockRejectedValue(error);
+      riskRepository.findById.mockRejectedValue(error);
 
       await riskController.updateRiskFeedback(req, res);
 
@@ -304,7 +318,7 @@ describe('Risk Controller - Unit Tests', () => {
     it('should return 403 when not authorized', async () => {
       req.params.id = 'project123';
       req.body = { completed: true };
-      const error = new Error('Not authorized');
+      const error = new Error('unauthorized');
       postProjectService.captureProjectOutcome.mockRejectedValue(error);
 
       await riskController.captureOutcome(req, res);
@@ -443,11 +457,11 @@ describe('Risk Controller - Unit Tests', () => {
         activeRisks: 10,
         resolvedRisks: 40
       };
-      Risk.getOrganizationStats.mockResolvedValue(mockStats);
+      riskRepository.getOrganizationStats.mockResolvedValue(mockStats);
 
       await riskController.getOrganizationStats(req, res);
 
-      expect(Risk.getOrganizationStats).toHaveBeenCalledWith('org123');
+      expect(riskRepository.getOrganizationStats).toHaveBeenCalledWith('org123');
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -458,7 +472,7 @@ describe('Risk Controller - Unit Tests', () => {
     it('should handle errors', async () => {
       req.params.id = 'org123';
       const error = new Error('Database error');
-      Risk.getOrganizationStats.mockRejectedValue(error);
+      riskRepository.getOrganizationStats.mockRejectedValue(error);
 
       await riskController.getOrganizationStats(req, res);
 
@@ -477,11 +491,11 @@ describe('Risk Controller - Unit Tests', () => {
           budget: 0.8
         }
       };
-      Risk.getAccuracyReport.mockResolvedValue(mockReport);
+      riskRepository.getAccuracyReport.mockResolvedValue(mockReport);
 
       await riskController.getAccuracyReport(req, res);
 
-      expect(Risk.getAccuracyReport).toHaveBeenCalledWith('org123');
+      expect(riskRepository.getAccuracyReport).toHaveBeenCalledWith('org123');
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -492,7 +506,7 @@ describe('Risk Controller - Unit Tests', () => {
     it('should handle errors', async () => {
       req.params.id = 'org123';
       const error = new Error('Service error');
-      Risk.getAccuracyReport.mockRejectedValue(error);
+      riskRepository.getAccuracyReport.mockRejectedValue(error);
 
       await riskController.getAccuracyReport(req, res);
 
@@ -507,18 +521,18 @@ describe('Risk Controller - Unit Tests', () => {
         totalCases: 50,
         casesByType: { success: 30, failure: 20 }
       };
-      CaseBase.getCaseBaseStats.mockResolvedValue(mockStats);
+      caseBaseRepository.getCaseBaseStats.mockResolvedValue(mockStats);
 
       await riskController.getCaseBaseStats(req, res);
 
-      expect(CaseBase.getCaseBaseStats).toHaveBeenCalledWith('org123');
+      expect(caseBaseRepository.getCaseBaseStats).toHaveBeenCalledWith('org123');
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
     it('should handle errors', async () => {
       req.params.id = 'org123';
       const error = new Error('Database error');
-      CaseBase.getCaseBaseStats.mockRejectedValue(error);
+      caseBaseRepository.getCaseBaseStats.mockRejectedValue(error);
 
       await riskController.getCaseBaseStats(req, res);
 
@@ -548,11 +562,11 @@ describe('Risk Controller - Unit Tests', () => {
           }
         }
       ];
-      CaseBase.getOrganizationCases.mockResolvedValue(mockCases);
+      caseBaseRepository.getOrganizationCases.mockResolvedValue(mockCases);
 
       await riskController.getOrganizationCases(req, res);
 
-      expect(CaseBase.getOrganizationCases).toHaveBeenCalledWith('org123', {});
+      expect(caseBaseRepository.getOrganizationCases).toHaveBeenCalledWith('org123', {});
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -566,11 +580,11 @@ describe('Risk Controller - Unit Tests', () => {
     it('should filter by type', async () => {
       req.params.id = 'org123';
       req.query.type = 'success';
-      CaseBase.getOrganizationCases.mockResolvedValue([]);
+      caseBaseRepository.getOrganizationCases.mockResolvedValue([]);
 
       await riskController.getOrganizationCases(req, res);
 
-      expect(CaseBase.getOrganizationCases).toHaveBeenCalledWith('org123', { type: 'success' });
+      expect(caseBaseRepository.getOrganizationCases).toHaveBeenCalledWith('org123', { type: 'success' });
     });
   });
 
@@ -582,25 +596,22 @@ describe('Risk Controller - Unit Tests', () => {
         caseId: 'c1',
         problem: { projectName: 'Test Project' }
       };
-      CaseBase.findById.mockReturnValue({
-        populate: jest.fn().mockReturnValue({
-          populate: jest.fn().mockResolvedValue(mockCase)
-        })
-      });
+      caseBaseRepository.findById.mockResolvedValue(mockCase);
 
       await riskController.getCaseById(req, res);
 
-      expect(CaseBase.findById).toHaveBeenCalledWith('case123');
+      expect(caseBaseRepository.findById).toHaveBeenCalledWith('case123', {
+        populate: [
+          { path: 'organization', select: 'name' },
+          { path: 'caseId', select: 'projectName' }
+        ]
+      });
       expect(res.status).toHaveBeenCalledWith(200);
     });
 
     it('should return 404 when case not found', async () => {
       req.params.id = 'case123';
-      CaseBase.findById.mockReturnValue({
-        populate: jest.fn().mockReturnValue({
-          populate: jest.fn().mockResolvedValue(null)
-        })
-      });
+      caseBaseRepository.findById.mockResolvedValue(null);
 
       await riskController.getCaseById(req, res);
 
@@ -610,6 +621,7 @@ describe('Risk Controller - Unit Tests', () => {
 
   describe('loadSeedCases', () => {
     it('should load seed cases successfully', async () => {
+      req.user.role = 'super_admin';
       const mockResult = {
         message: 'Seed cases loaded',
         count: 10
@@ -628,6 +640,7 @@ describe('Risk Controller - Unit Tests', () => {
     });
 
     it('should handle errors', async () => {
+      req.user.role = 'super_admin';
       const error = new Error('Service error');
       seedCasesService.loadSeedCases.mockRejectedValue(error);
 

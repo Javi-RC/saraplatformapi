@@ -1,11 +1,12 @@
 const { NotificationTypes, NotificationChannels, NotificationPriority } = require('../models/notification.model');
+const { ROLES } = require('../config/roles');
 
-/**
- * Middleware de validación para notificaciones
- */
+  /**
+   * Middleware for notification validation
+   */
 class NotificationValidator {
   /**
-   * Valida los datos de creación de una notificación
+   * Validates the data for creating a notification
    */
   static validateCreateNotification(req, res, next) {
     const { recipientId, type, title, message, channels, priority } = req.body;
@@ -65,7 +66,7 @@ class NotificationValidator {
   }
 
   /**
-   * Valida los datos de notificación masiva
+   * Validates bulk notification data
    */
   static validateBulkNotification(req, res, next) {
     const { recipientIds, type, title, message } = req.body;
@@ -107,12 +108,12 @@ class NotificationValidator {
   }
 
   /**
-   * Valida los datos para enviar a un rol
+   * Validates data for sending to a role
    */
   static validateSendToRole(req, res, next) {
     const { role, type, title, message } = req.body;
     const errors = [];
-    const validRoles = ['employee', 'org_admin', 'unassigned'];
+    const validRoles = [ROLES.EMPLOYEE, ROLES.ORG_ADMIN, ROLES.UNASSIGNED];
 
     if (!role) {
       errors.push('role is required');
@@ -144,18 +145,18 @@ class NotificationValidator {
   }
 
   /**
-   * Valida los parámetros de consulta para obtener notificaciones
+   * Validates query parameters for getting notifications
    */
   static validateGetNotifications(req, res, next) {
     const { page, limit, status, type } = req.query;
     const errors = [];
 
-    if (page && (isNaN(page) || parseInt(page) < 1)) {
+    if (page && (isNaN(page) || parseInt(page, 10) < 1)) {
       errors.push('page must be a number greater than 0');
     }
 
     if (limit) {
-      const limitNum = parseInt(limit);
+      const limitNum = parseInt(limit, 10);
       if (isNaN(limit) || limitNum < 1 || limitNum > 100) {
         errors.push('limit must be a number between 1 and 100');
       }

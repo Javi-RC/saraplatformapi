@@ -44,9 +44,7 @@ class BFI44Repository extends BaseRepository {
    * @param {string} organizationId - Organization ID
    * @returns {Promise<number>}
    */
-  async countByOrganization(organizationId) {
-    return this.count({ organization: organizationId });
-  }
+  // NOTE: countByOrganization removed — BFI44Response model has no organization field; requires a populate/join approach via user.
 
   /**
    * Find responses by organization
@@ -54,9 +52,7 @@ class BFI44Repository extends BaseRepository {
    * @param {Object} options - Query options
    * @returns {Promise<Array>}
    */
-  async findByOrganization(organizationId, options = {}) {
-    return this.find({ organization: organizationId }, options);
-  }
+  // NOTE: findByOrganization removed — BFI44Response model has no organization field; requires a populate/join approach via user.
 }
 
 module.exports = new BFI44Repository();

@@ -3,13 +3,17 @@
  * Handles HTTP requests for risk prediction and management
  */
 
-const riskPredictionService = require('../services/riskPrediction.service');
-const postProjectService = require('../services/postProject.service');
-const seedCasesService = require('../services/seedCases.service');
-const manualRiskService = require('../services/manualRisk.service');
-const Risk = require('../models/risk.model');
-const CaseBase = require('../models/caseBase.model');
+const riskPredictionService = require('../services/risk/riskPrediction.service');
+const postProjectService = require('../services/risk/postProject.service');
+const seedCasesService = require('../services/risk/seedCases.service');
+const manualRiskService = require('../services/risk/manualRisk.service');
+const cbrService = require('../services/risk/cbr.service');
+const { riskRepository, projectRepository, caseBaseRepository } = require('../repositories');
+// Risk catalog data is now in i18n as single source of truth
 const i18n = require('../i18n/i18n.service');
+
+const { ROLES } = require('../config/roles');
+const { handleErrorCatch } = require('../utils/errorHelper');
 
 class RiskController {
   /**
@@ -22,14 +26,7 @@ class RiskController {
       const { id: projectId } = req.params;
       const lang = i18n.getLanguageFromRequest(req);
       
-      console.log(`[RiskController] Predicting risks with language: ${lang}`);
-      console.log(`[RiskController] Query params:`, req.query);
-      console.log(`[RiskController] User preferred language:`, req.user?.preferredLanguage);
-      
       const prediction = await riskPredictionService.predictProjectRisks(projectId, lang);
-      
-      console.log(`[RiskController] First risk title:`, prediction.risks[0]?.title);
-      console.log(`[RiskController] Response language:`, lang);
       
       return res.status(200).json({
         success: true,
@@ -39,12 +36,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error predicting risks:', error);
-      
-      const statusCode = error.message.includes('not found') ? 404 : 500;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -81,12 +73,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting project risks:', error);
-      
-      const statusCode = error.message.includes('not found') ? 404 : 500;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -100,10 +87,13 @@ class RiskController {
       const { id } = req.params;
       const lang = i18n.getLanguageFromRequest(req);
       
-      let risk = await Risk.findById(id)
-        .populate('project', 'projectName')
-        .populate('organization', 'name')
-        .populate('basedOnCases.caseId');
+      let risk = await riskRepository.findById(id, {
+        populate: [
+          { path: 'project', select: 'projectName' },
+          { path: 'organization', select: 'name' },
+          { path: 'basedOnCases.caseId' }
+        ]
+      });
       
       if (!risk) {
         return res.status(404).json({
@@ -122,10 +112,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting risk:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -184,16 +171,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error adding manual risk:', error);
-      
-      let statusCode = 500;
-      if (error.message.includes('not found')) statusCode = 404;
-      if (error.message.includes('not authorized')) statusCode = 403;
-      if (error.message.includes('required')) statusCode = 400;
-      
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
@@ -209,9 +187,6 @@ class RiskController {
       const updates = req.body;
       const lang = i18n.getLanguageFromRequest(req);
 
-      console.log(`[UpdateManualRisk] Project: ${projectId}, Risk: ${riskId}, Lang: ${lang}`);
-      console.log(`[UpdateManualRisk] Updates:`, JSON.stringify(updates));
-
       const risk = await manualRiskService.updateManualRisk(
         projectId,
         riskId,
@@ -219,12 +194,8 @@ class RiskController {
         userId
       );
 
-      console.log(`[UpdateManualRisk] Risk after update:`, risk.type, risk.title);
-
       // Translate risk before returning
       const translatedRisk = i18n.translateRiskObject(risk.toObject ? risk.toObject() : risk, lang);
-
-      console.log(`[UpdateManualRisk] Translated title:`, translatedRisk.title);
 
       return res.status(200).json({
         success: true,
@@ -234,15 +205,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error updating risk:', error);
-      
-      let statusCode = 500;
-      if (error.message.includes('not found')) statusCode = 404;
-      if (error.message.includes('not authorized')) statusCode = 403;
-      
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
@@ -272,12 +235,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting manual risks:', error);
-      
-      const statusCode = error.message.includes('not found') ? 404 : 500;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
@@ -303,16 +261,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error deleting manual risk:', error);
-      
-      let statusCode = 500;
-      if (error.message.includes('not found')) statusCode = 404;
-      if (error.message.includes('not authorized')) statusCode = 403;
-      if (error.message.includes('Cannot delete')) statusCode = 400;
-      
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
@@ -327,7 +276,7 @@ class RiskController {
       const userId = req.user.id;
       const lang = i18n.getLanguageFromRequest(req);
       
-      const risk = await Risk.findById(id);
+      const risk = await riskRepository.findById(id);
       
       if (!risk) {
         return res.status(404).json({
@@ -336,18 +285,18 @@ class RiskController {
         });
       }
       
-      risk.feedback = {
-        usefulnessRating,
-        accuracyRating,
-        comments,
-        providedBy: userId,
-        providedAt: new Date()
-      };
-      
-      await risk.save();
+      const updatedRisk = await riskRepository.updateById(id, {
+        feedback: {
+          usefulnessRating,
+          accuracyRating,
+          comments,
+          providedBy: userId,
+          providedAt: new Date()
+        }
+      });
       
       // Translate risk before returning
-      const translatedRisk = i18n.translateRiskObject(risk.toObject(), lang);
+      const translatedRisk = i18n.translateRiskObject(updatedRisk.toObject(), lang);
       
       return res.status(200).json({
         success: true,
@@ -357,10 +306,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error updating risk feedback:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -387,16 +333,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error capturing outcome:', error);
-      
-      let statusCode = 500;
-      if (error.message.includes('not found')) statusCode = 404;
-      if (error.message.includes('Not authorized')) statusCode = 403;
-      if (error.message.includes('required')) statusCode = 400;
-      
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -419,12 +356,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting outcome form:', error);
-      
-      const statusCode = error.message.includes('not found') ? 404 : 500;
-      return res.status(statusCode).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -446,10 +378,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting organization insights:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -461,7 +390,7 @@ class RiskController {
     try {
       const { id: organizationId } = req.params;
       
-      const stats = await Risk.getOrganizationStats(organizationId);
+      const stats = await riskRepository.getOrganizationStats(organizationId);
       
       return res.status(200).json({
         success: true,
@@ -469,10 +398,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting organization stats:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -484,7 +410,7 @@ class RiskController {
     try {
       const { id: organizationId } = req.params;
       
-      const report = await Risk.getAccuracyReport(organizationId);
+      const report = await riskRepository.getAccuracyReport(organizationId);
       
       return res.status(200).json({
         success: true,
@@ -492,10 +418,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting accuracy report:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -507,7 +430,7 @@ class RiskController {
     try {
       const { id: organizationId } = req.params;
       
-      const stats = await CaseBase.getCaseBaseStats(organizationId);
+      const stats = await caseBaseRepository.getCaseBaseStats(organizationId);
       
       return res.status(200).json({
         success: true,
@@ -515,10 +438,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting case base stats:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -534,7 +454,7 @@ class RiskController {
       const options = {};
       if (type) options.type = type;
       
-      const cases = await CaseBase.getOrganizationCases(organizationId, options);
+      const cases = await caseBaseRepository.getOrganizationCases(organizationId, options);
       
       return res.status(200).json({
         success: true,
@@ -557,10 +477,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting organization cases:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -572,9 +489,12 @@ class RiskController {
     try {
       const { id } = req.params;
       
-      const caseDoc = await CaseBase.findById(id)
-        .populate('organization', 'name')
-        .populate('caseId', 'projectName');
+      const caseDoc = await caseBaseRepository.findById(id, {
+        populate: [
+          { path: 'organization', select: 'name' },
+          { path: 'caseId', select: 'projectName' }
+        ]
+      });
       
       if (!caseDoc) {
         return res.status(404).json({
@@ -589,10 +509,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting case:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -601,8 +518,10 @@ class RiskController {
    * POST /api/case-base/seed
    */
   async loadSeedCases(req, res) {
+    if (req.user.role !== ROLES.SUPER_ADMIN && req.user.role !== ROLES.ORG_ADMIN) {
+      return res.status(403).json({ success: false, error: 'Forbidden' });
+    }
     try {
-      // This should be restricted to admins
       const result = await seedCasesService.loadSeedCases();
       
       return res.status(200).json({
@@ -612,10 +531,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error loading seed cases:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -636,10 +552,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting seed cases:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
   
@@ -652,10 +565,9 @@ class RiskController {
       const { id: projectId } = req.params;
       const { limit = 5 } = req.query;
       
-      const Project = require('../models/project.model');
-      const cbrService = require('../services/cbr.service');
-      
-      const project = await Project.findById(projectId).populate('organization');
+      const project = await projectRepository.findById(projectId, {
+        populate: { path: 'organization' }
+      });
       
       if (!project) {
         return res.status(404).json({
@@ -677,7 +589,7 @@ class RiskController {
       const similarCases = await cbrService.retrieveSimilarCases(
         project,
         organizationId,
-        parseInt(limit)
+        parseInt(limit, 10)
       );
       
       return res.status(200).json({
@@ -707,10 +619,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error finding similar cases:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
@@ -726,8 +635,7 @@ class RiskController {
       
       const threshold = Math.max(0, Math.min(1, parseFloat(minSimilarity)));
       
-      const Project = require('../models/project.model');
-      const project = await Project.findById(projectId);
+      const project = await projectRepository.findById(projectId);
       if (!project) {
         return res.status(404).json({
           success: false,
@@ -768,10 +676,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting CBR risks:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
@@ -793,8 +698,7 @@ class RiskController {
         });
       }
       
-      const Project = require('../models/project.model');
-      const project = await Project.findById(projectId);
+      const project = await projectRepository.findById(projectId);
       
       if (!project) {
         return res.status(404).json({
@@ -827,7 +731,7 @@ class RiskController {
         }
       });
       
-      await project.save();
+      await projectRepository.updateById(projectId, { monitoredRisks: project.monitoredRisks });
       
       return res.status(200).json({
         success: true,
@@ -840,10 +744,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error accepting risks:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 
@@ -855,8 +756,7 @@ class RiskController {
     try {
       const { id: projectId } = req.params;
       
-      const Project = require('../models/project.model');
-      const project = await Project.findById(projectId);
+      const project = await projectRepository.findById(projectId);
       if (!project) {
         return res.status(404).json({
           success: false,
@@ -887,253 +787,7 @@ class RiskController {
       });
     } catch (error) {
       console.error('Error getting DT indicators:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
-    }
-  }
-
-  /**
-   * DEBUG ENDPOINT: Get complete catalog of all possible risk types with full metadata
-   * GET /api/risks/debug/all?lang=en or ?lang=es
-   * Returns all risk types the system can generate with detailed information
-   * Supports language selection via query param
-   */
-  async debugGetAllRisks(req, res) {
-    try {
-      const Risk = require('../models/risk.model');
-      const { RISK_CATALOG, getHofstedeRisks, getTraditionalRisks, getAllRiskTypes } = require('../config/riskCatalog');
-      const riskTypes = getAllRiskTypes();
-      const lang = i18n.getLanguageFromRequest(req);
-      
-      // Build response from centralized catalog with translations
-      const catalog = riskTypes.map(type => {
-        const catalogEntry = RISK_CATALOG[type];
-        const translated = i18n.translateRisk(type, lang);
-        const indicators = i18n.translateIndicators(type, lang);
-        const recommendations = i18n.translateRecommendations(type, lang);
-        
-        return {
-          type,
-          title: translated?.title || catalogEntry?.title || type.replace(/_/g, ' '),
-          description: translated?.description || catalogEntry?.description || 'No description available',
-          category: catalogEntry?.category || 'management',
-          typicalSeverities: catalogEntry?.typicalSeverities || ['medium'],
-          possibleSources: catalogEntry?.possibleSources || ['expert_rules'],
-          isHofstedeRelated: catalogEntry?.isHofstedeRelated || false,
-          triggerConditions: catalogEntry?.triggerConditions || 'Unknown',
-          typicalIndicators: indicators || [],
-          typicalRecommendations: recommendations || []
-        };
-      });
-
-      const hofstedeRisks = getHofstedeRisks();
-      const traditionalRisks = getTraditionalRisks();
-
-      return res.status(200).json({
-        success: true,
-        language: lang,
-        summary: {
-          totalPossibleRiskTypes: catalog.length,
-          hofstedeRisksCount: hofstedeRisks.length,
-          traditionalRisksCount: traditionalRisks.length,
-          categories: [...new Set(catalog.map(r => r.category))],
-          allSources: [...new Set(catalog.flatMap(r => r.possibleSources))]
-        },
-        hofstedeRisks: hofstedeRisks.map(r => {
-          const translated = i18n.translateRisk(r.type, lang);
-          return {
-            type: r.type,
-            title: translated?.title || r.title,
-            algorithm: r.algorithm,
-            formula: r.formula
-          };
-        }),
-        data: catalog,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error in debug endpoint:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
-    }
-  }
-
-   /**
-   * DEBUG ENDPOINT: Validate if a risk type exists in the system
-   * GET /api/risks/debug/by-type/:type?lang=en or ?lang=es
-   * Returns information about a specific risk type possibility
-   * Supports language selection via query param
-   */
-  async debugGetRisksByType(req, res) {
-    try {
-      const { type } = req.params;
-      const Risk = require('../models/risk.model');
-      const { getAllRiskTypes, RISK_CATALOG } = require('../config/riskCatalog');
-      const riskTypeEnum = getAllRiskTypes();
-      const lang = i18n.getLanguageFromRequest(req);
-      
-      if (!riskTypeEnum.includes(type)) {
-        return res.status(404).json({
-          success: false,
-          message: `Risk type '${type}' does not exist in the system`,
-          validTypes: riskTypeEnum,
-          timestamp: new Date().toISOString()
-        });
-      }
-
-      const isHofstede = [
-        'communication_tools_missing',
-        'cultural_distance_risk',
-        'linguistic_distance_risk',
-        'linguistic_distance_no_common_language',
-        'team_autonomy_risk',
-        'schedule_flexibility_risk',
-        'travel_availability_risk'
-      ].includes(type);
-
-      const translated = i18n.translateRisk(type, lang);
-      const catalogEntry = RISK_CATALOG[type];
-
-      return res.status(200).json({
-        success: true,
-        language: lang,
-        data: {
-          type,
-          title: translated?.title || type.replace(/_/g, ' '),
-          description: translated?.description || catalogEntry?.description || 'No description available',
-          exists: true,
-          isHofstedeRelated: isHofstede,
-          indicators: translated?.indicators || {},
-          recommendations: translated?.recommendations || {},
-          possibleSeverities: ['low', 'medium', 'medium-high', 'high', 'critical', 'emerging'],
-          possibleCategories: ['coordination', 'technical', 'team', 'management', 'organizational'],
-          possibleSources: Risk.schema.path('source').enumValues,
-          algorithm: catalogEntry?.algorithm,
-          formula: catalogEntry?.formula,
-          triggerConditions: catalogEntry?.triggerConditions
-        },
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error in debug endpoint:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
-    }
-  }
-
-  /**
-   * DEBUG ENDPOINT: Get complete risk system metadata
-   * GET /api/risks/debug/types-summary
-   * Returns system configuration: types, categories, severities, sources, algorithms
-   */
-  async debugGetRiskTypesSummary(req, res) {
-    try {
-      const Risk = require('../models/risk.model');
-      const { getAllRiskTypes } = require('../config/riskCatalog');
-      
-      const riskTypes = getAllRiskTypes();
-      const categories = Risk.schema.path('category').enumValues;
-      const severities = Risk.schema.path('severity').enumValues;
-      const sources = Risk.schema.path('source').enumValues;
-
-      const hofstedeRisks = [
-        'communication_tools_missing',
-        'cultural_distance_risk',
-        'linguistic_distance_risk',
-        'linguistic_distance_no_common_language',
-        'team_autonomy_risk',
-        'schedule_flexibility_risk',
-        'travel_availability_risk'
-      ];
-
-      const summary = {
-        system: {
-          totalRiskTypes: riskTypes.length,
-          totalCategories: categories.length,
-          totalSeverityLevels: severities.length,
-          totalSources: sources.length
-        },
-        riskTypes: {
-          all: riskTypes,
-          hofstedeRelated: hofstedeRisks,
-          traditional: riskTypes.filter(type => !hofstedeRisks.includes(type))
-        },
-        categories: {
-          all: categories,
-          descriptions: {
-            coordination: 'Coordination and communication risks',
-            technical: 'Technical skills and infrastructure risks',
-            team: 'Team dynamics and wellbeing risks',
-            management: 'Project management and planning risks',
-            organizational: 'Organizational culture and policy risks'
-          }
-        },
-        severities: {
-          all: severities,
-          numericMapping: {
-            low: 1,
-            medium: 2,
-            'medium-high': 3,
-            high: 4,
-            critical: 5,
-            emerging: 2
-          }
-        },
-        sources: {
-          all: sources,
-          descriptions: {
-            expert_rules: 'Traditional decision tree expert rules',
-            expert_rules_enhanced: 'Enhanced rules with time overlap + binomial coefficient',
-            expert_rules_hofstede: 'Hofstede cultural dimensions (6D Euclidean distance)',
-            expert_rules_linguistic: 'Linguistic distance analysis',
-            expert_rules_project_requirements: 'Project requirements mismatch (1-5 inverse scale)',
-            expert_rules_early_warning: 'Early warning indicators',
-            cbr: 'Case-based reasoning from historical projects',
-            combined: 'Combined DT + CBR weighted prediction',
-            seed_cases: 'From seed case database',
-            emerging_pattern: 'Detected emerging patterns',
-            manual: 'Manually entered by PM'
-          }
-        },
-        algorithms: {
-          hofstedeCulturalDistance: {
-            formula: 'sqrt(sum((dim1-dim2)^2)) for 6 dimensions',
-            dimensions: ['PDI', 'IDV', 'MAS', 'UAI', 'LTO', 'IND'],
-            supportedCountries: 32,
-            classification: '5 equal intervals (MUY BAJO to MUY ALTO)'
-          },
-          communicationTools: {
-            formula: 'Max = C(n,2) × Z where n=countries, Z=tool count',
-            timeRules: 'S≤2h (async+1,sync-1) | 2h<S<6h (all+1) | S≥6h (sync+1,async-1)'
-          },
-          linguisticDistance: {
-            formula: 'Score +1 per country speaking commonLanguage',
-            intervals: '5 equal intervals from 0 to N (countries)'
-          },
-          projectRequirements: {
-            formula: '6 - requiredLevel (inverse 1-5 scale)',
-            types: ['autonomy', 'scheduleFlexibility', 'travelAvailability']
-          }
-        }
-      };
-
-      return res.status(200).json({
-        success: true,
-        data: summary,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Error in debug endpoint:', error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return handleErrorCatch(error, res);
     }
   }
 }

@@ -27,7 +27,12 @@ class OrganizationRepository extends BaseRepository {
    * @returns {Promise<Array>}
    */
   async findByAdmin(userId, options = {}) {
-    return this.find({ admin: userId }, options);
+    return this.find({
+      $or: [
+        { admin: userId },
+        { additionalAdmins: userId }
+      ]
+    }, options);
   }
 
   /**
@@ -37,7 +42,7 @@ class OrganizationRepository extends BaseRepository {
    * @returns {Promise<Array>}
    */
   async findByProjectManager(userId, options = {}) {
-    return this.find({ projectManagers: userId }, options);
+    return this.find({ employees: { $elemMatch: { user: userId, isProjectManager: true } } }, options);
   }
 
   /**
@@ -50,7 +55,7 @@ class OrganizationRepository extends BaseRepository {
   async addAdmin(organizationId, userId, options = {}) {
     return this.updateById(
       organizationId,
-      { $addToSet: { admins: userId } },
+      { $addToSet: { additionalAdmins: userId } },
       options
     );
   }
@@ -65,7 +70,7 @@ class OrganizationRepository extends BaseRepository {
   async removeAdmin(organizationId, userId, options = {}) {
     return this.updateById(
       organizationId,
-      { $pull: { admins: userId } },
+      { $pull: { additionalAdmins: userId } },
       options
     );
   }
@@ -78,10 +83,10 @@ class OrganizationRepository extends BaseRepository {
    * @returns {Promise<Object|null>}
    */
   async addProjectManager(organizationId, userId, options = {}) {
-    return this.updateById(
+    return this.model.findByIdAndUpdate(
       organizationId,
-      { $addToSet: { projectManagers: userId } },
-      options
+      { $set: { 'employees.$[elem].isProjectManager': true } },
+      { arrayFilters: [{ 'elem.user': userId }], new: true, ...options }
     );
   }
 
@@ -93,10 +98,10 @@ class OrganizationRepository extends BaseRepository {
    * @returns {Promise<Object|null>}
    */
   async removeProjectManager(organizationId, userId, options = {}) {
-    return this.updateById(
+    return this.model.findByIdAndUpdate(
       organizationId,
-      { $pull: { projectManagers: userId } },
-      options
+      { $set: { 'employees.$[elem].isProjectManager': false } },
+      { arrayFilters: [{ 'elem.user': userId }], new: true, ...options }
     );
   }
 
@@ -118,7 +123,7 @@ class OrganizationRepository extends BaseRepository {
   async findWithAdmins(criteria = {}, options = {}) {
     return this.find(criteria, {
       ...options,
-      populate: { path: 'admins', select: 'firstName lastName email' }
+      populate: { path: 'admin', select: 'name email' }
     });
   }
 }

@@ -8,6 +8,11 @@ module.exports = {
     // Communication Risks
     communication_breakdown: {
       title: 'Communication Breakdown',
+      category: 'coordination',
+      typicalSeverities: ['medium', 'high', 'critical'],
+      possibleSources: ['expert_rules', 'expert_rules_enhanced', 'cbr', 'combined'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Team size, remote work percentage, timezone differences',
       description: 'If the team is distributed across time zones with little overlap, communication failures may arise that delay deliveries and cause misunderstandings',
       indicators: {
         delays: 'Response delays',
@@ -23,6 +28,13 @@ module.exports = {
 
     communication_tools_missing: {
       title: 'Inadequate Communication Tools',
+      category: 'coordination',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules_enhanced'],
+      isHofstedeRelated: true,
+      algorithm: 'Time Overlap + Binomial Coefficient',
+      formula: 'Max = C(n,2) × Z where n=countries, Z=tool count',
+      triggerConditions: 'involvedCountries (≥2 countries) + communicationTools',
       description: 'If the project involves multiple countries and no communication tools have been defined, serious coordination problems will arise due to lack of adequate channels',
       indicators: {
         limitedOverlap: 'Limited time overlap',
@@ -37,6 +49,13 @@ module.exports = {
     // Cultural & Linguistic Risks
     cultural_distance_risk: {
       title: 'High Socio-Cultural Distance',
+      category: 'team',
+      typicalSeverities: ['medium', 'high', 'critical'],
+      possibleSources: ['expert_rules_hofstede'],
+      isHofstedeRelated: true,
+      algorithm: 'Hofstede 6D Euclidean Distance',
+      formula: 'sqrt(sum((dim1-dim2)^2)) across PDI, IDV, MAS, UAI, LTO, IND',
+      triggerConditions: 'involvedCountries (≥2 countries)',
       description: 'If there are people from different cultures in the project, misunderstandings derived from socio-cultural distance may arise and cause delivery delays',
       indicators: {
         culturalDistance: 'Cultural distance between team countries',
@@ -52,6 +71,13 @@ module.exports = {
 
     linguistic_distance_risk: {
       title: 'Socio-Cultural Linguistic Distance',
+      category: 'coordination',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules_linguistic'],
+      isHofstedeRelated: true,
+      algorithm: 'Language Overlap Analysis',
+      formula: 'Score +1 per country speaking commonLanguage, 5 intervals',
+      triggerConditions: 'involvedCountries + commonLanguage',
       description: 'If the team is multicultural and not all countries speak the common project language, socio-cultural distance problems may arise that hinder understanding',
       indicators: {
         differentLanguages: 'Different official languages in team countries',
@@ -67,6 +93,12 @@ module.exports = {
 
     linguistic_distance_no_common_language: {
       title: 'No Common Language Defined',
+      category: 'coordination',
+      typicalSeverities: ['high', 'critical'],
+      possibleSources: ['expert_rules_linguistic'],
+      isHofstedeRelated: true,
+      algorithm: 'Language Overlap Analysis',
+      triggerConditions: 'involvedCountries without commonLanguage',
       description: 'If the multicultural team has no common project language defined, the lack of a shared language will cause constant misunderstandings and delays',
       indicators: {
         multiculturalNoCommon: 'Multicultural team without common language',
@@ -83,6 +115,13 @@ module.exports = {
     // Project Requirements Risks
     team_autonomy_risk: {
       title: 'Team Autonomy Risk',
+      category: 'team',
+      typicalSeverities: ['low', 'medium', 'high'],
+      possibleSources: ['expert_rules_project_requirements'],
+      isHofstedeRelated: true,
+      algorithm: '1-5 Inverse Scale',
+      formula: 'Risk = 6 - requiredAutonomyLevel',
+      triggerConditions: 'requiredAutonomyLevel present (1-5)',
       description: 'If the project requires a high level of team autonomy, problems may arise if the team is not prepared to work with that degree of independence',
       indicators: {
         autonomyMismatch: 'Required vs available autonomy level',
@@ -97,6 +136,13 @@ module.exports = {
 
     schedule_flexibility_risk: {
       title: 'Schedule Flexibility Risk',
+      category: 'management',
+      typicalSeverities: ['low', 'medium', 'high'],
+      possibleSources: ['expert_rules_project_requirements'],
+      isHofstedeRelated: true,
+      algorithm: '1-5 Inverse Scale',
+      formula: 'Risk = 6 - requiredScheduleFlexibility',
+      triggerConditions: 'requiredScheduleFlexibility present (1-5)',
       description: 'If the project requires high schedule flexibility, coordination and availability problems may arise',
       indicators: {
         flexibilityMismatch: 'Required vs available schedule flexibility',
@@ -111,6 +157,13 @@ module.exports = {
 
     travel_availability_risk: {
       title: 'Travel Availability Risk',
+      category: 'management',
+      typicalSeverities: ['low', 'medium', 'high'],
+      possibleSources: ['expert_rules_project_requirements'],
+      isHofstedeRelated: true,
+      algorithm: '1-5 Inverse Scale',
+      formula: 'Risk = 6 - requiredTravelAvailability',
+      triggerConditions: 'requiredTravelAvailability present (1-5)',
       description: 'If the project requires high travel availability, logistical and cost problems may arise',
       indicators: {
         travelMismatch: 'Required vs available travel availability',
@@ -127,6 +180,11 @@ module.exports = {
     // Technical Risks
     skill_gap: {
       title: 'Skill Gap',
+      category: 'technical',
+      typicalSeverities: ['medium', 'high', 'critical'],
+      possibleSources: ['expert_rules', 'cbr', 'combined'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Technology stack complexity vs team experience',
       description: 'If the team lacks several project technologies or technology coverage is below 50%, a skill gap will arise affecting quality and development speed',
       indicators: {
         lowTechMatch: 'Technical match <50%',
@@ -142,6 +200,11 @@ module.exports = {
 
     tool_fragmentation: {
       title: 'Tool Fragmentation',
+      category: 'technical',
+      typicalSeverities: ['low', 'medium'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Too many tools without integration',
       description: 'If the project uses several tools without integration, tool fragmentation will arise causing confusion and productivity loss',
       indicators: {
         tooManyTools: '>5 main tools'
@@ -154,6 +217,11 @@ module.exports = {
     // Team Risks
     team_overload: {
       title: 'Team Overload',
+      category: 'team',
+      typicalSeverities: ['medium', 'high', 'critical'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Workload vs team capacity',
       description: 'If team members work on more than two concurrent projects, exceed 45 weekly hours, or show high stress tendency, work overload may arise',
       indicators: {
         highHours: '>45h/week average',
@@ -168,6 +236,11 @@ module.exports = {
 
     team_conflicts: {
       title: 'Team Conflicts',
+      category: 'team',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Personality clashes, poor communication',
       description: 'If personality clashes or poor communication exist among team members, conflicts may arise affecting productivity and work environment',
       indicators: {
         tensions: 'Interpersonal tensions',
@@ -183,6 +256,11 @@ module.exports = {
 
     burnout_susceptibility: {
       title: 'Burnout Susceptibility',
+      category: 'team',
+      typicalSeverities: ['medium', 'high', 'critical'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'High workload, long hours, stress',
       description: 'If the team shows high neuroticism, high workload, and requires synchronous communication with low time overlap, burnout may arise',
       indicators: {
         highNeuroticism: 'High neuroticism',
@@ -199,6 +277,11 @@ module.exports = {
 
     social_isolation: {
       title: 'Social Isolation',
+      category: 'team',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'High remote work percentage',
       description: 'If remote work exceeds 70%, there are no annual in-person meetings, no prior joint experience, and no team building activities, social isolation may occur',
       indicators: {
         highRemote: '>70% remote work',
@@ -215,6 +298,11 @@ module.exports = {
 
     conflict_escalation_risk: {
       title: 'Conflict Escalation Risk',
+      category: 'team',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Unresolved conflicts, poor communication',
       description: 'If the team has low agreeableness, high cultural diversity, and multiple teams involved, conflict risk may arise',
       indicators: {
         lowAgreeableness: 'Low average agreeableness (<3)',
@@ -230,6 +318,11 @@ module.exports = {
 
     onboarding_issues: {
       title: 'Onboarding Issues',
+      category: 'team',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'New team members, complex project',
       description: 'If the team is composed of new members, there is no mentoring program or onboarding documentation, onboarding problems may arise',
       indicators: {
         manyNewMembers: '>30% new members',
@@ -246,6 +339,11 @@ module.exports = {
 
     digital_fatigue: {
       title: 'Digital Fatigue',
+      category: 'organizational',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'High digital interaction, remote work',
       description: 'If work is fully remote, there is a high number of meetings and no disconnection policy, digital fatigue may arise',
       indicators: {
         highRemote: 'High percentage of remote work',
@@ -261,6 +359,11 @@ module.exports = {
 
     work_life_boundary_blur: {
       title: 'Work-Life Boundary Blur',
+      category: 'organizational',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Remote work, always-on culture',
       description: 'If work mode is remote, there is no disconnection policy or defined schedule and deadlines are tight, burnout may arise',
       indicators: {
         alwaysOnCulture: 'Always-on culture',
@@ -275,6 +378,11 @@ module.exports = {
 
     meeting_fatigue: {
       title: 'Meeting Fatigue',
+      category: 'organizational',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Too many meetings, inefficient meetings',
       description: 'If there is an excessive number of meetings, multiple distributed teams, burnout may arise',
       indicators: {
         manyMeetings: 'More than 5 daily meetings',
@@ -289,6 +397,11 @@ module.exports = {
 
       timezone_scheduling_gap: {
         title: 'Timezone Scheduling Gap',
+        category: 'management',
+        typicalSeverities: ['medium', 'high'],
+        possibleSources: ['expert_rules', 'cbr'],
+        isHofstedeRelated: false,
+        triggerConditions: 'Distributed team, timezone differences',
         description: 'If the project has low time overlap, three or more different time zones, and frequent meetings, gaps will arise making team synchronization difficult',
         indicators: {
           lowOverlap: 'Low time overlap (<3h)',
@@ -306,6 +419,11 @@ module.exports = {
 
       role_clarity_gap: {
         title: 'Role Clarity Gap',
+        category: 'management',
+        typicalSeverities: ['medium', 'high'],
+        possibleSources: ['expert_rules', 'cbr'],
+        isHofstedeRelated: false,
+        triggerConditions: 'Unclear roles, overlapping responsibilities',
         description: 'If the team exceeds eight members and roles are not clearly defined, lack of clarity may arise',
         indicators: {
           largeTeam: 'Large team (>8)',
@@ -320,6 +438,11 @@ module.exports = {
 
       knowledge_management_gap: {
         title: 'Knowledge Management Gap',
+        category: 'organizational',
+        typicalSeverities: ['medium', 'high'],
+        possibleSources: ['expert_rules', 'cbr'],
+        isHofstedeRelated: false,
+        triggerConditions: 'Knowledge silos, no documentation',
         description: 'If the team is large, there are no knowledge management tools and documentation is minimal, a knowledge management gap may arise',
         indicators: {
           oversizedTeam: 'Team too large >5 people'
@@ -333,6 +456,11 @@ module.exports = {
 
       remote_work_support_gap: {
         title: 'Remote Work Support Gap',
+        category: 'organizational',
+        typicalSeverities: ['medium', 'high'],
+        possibleSources: ['expert_rules', 'cbr'],
+        isHofstedeRelated: false,
+        triggerConditions: 'High remote work, lack of infrastructure',
         description: 'If work mode is not in-person and no policies exist, there will be a lack of remote work support',
         indicators: {
           highRemote: '>50% remote work',
@@ -349,6 +477,11 @@ module.exports = {
 
     technostress_overload: {
       title: 'Technostress Overload',
+      category: 'organizational',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Complex tools, constant notifications',
       description: 'If the project uses too many digital tools and there is no adequate training, overload may arise',
       indicators: {
         tooManyTools: 'Too many different tools',
@@ -364,6 +497,11 @@ module.exports = {
 
       change_resistance_risk: {
         title: 'Resistance to Change',
+        category: 'organizational',
+        typicalSeverities: ['medium', 'high'],
+        possibleSources: ['expert_rules', 'cbr'],
+        isHofstedeRelated: false,
+        triggerConditions: 'Organizational changes, new processes',
         description: 'If the team has low openness to experience and the project is highly complex, resistance to change may arise',
         indicators: {
           lowOpenness: 'Low openness to experience',
@@ -381,6 +519,11 @@ module.exports = {
     // Management Risks
     scope_creep: {
       title: 'Scope Creep',
+      category: 'management',
+      typicalSeverities: ['medium', 'high', 'critical'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Unclear requirements, weak change control',
       description: 'If the project description is vague, documentation incomplete and key roles are not defined, risk of uncontrolled scope expansion may arise',
       indicators: {
         frequentChanges: 'Frequent changes in requirements',
@@ -396,6 +539,11 @@ module.exports = {
 
     process_mismatch: {
       title: 'Process Mismatch',
+      category: 'management',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'Methodology vs project needs mismatch',
       description: 'If the project lacks onboarding processes, CI/CD, has tool fragmentation and low experience in distributed projects, a process mismatch will occur',
       indicators: {
         heavyProcess: 'Too heavy processes',
@@ -410,6 +558,11 @@ module.exports = {
 
     dependency_blockage: {
       title: 'Dependency Blockage',
+      category: 'management',
+      typicalSeverities: ['medium', 'high'],
+      possibleSources: ['expert_rules', 'cbr'],
+      isHofstedeRelated: false,
+      triggerConditions: 'External dependencies, complex integrations',
       description: 'If there are multiple critical dependencies and several teams, blockages may occur delaying the project',
       indicators: {
         externalDependencies: 'Critical external dependencies',
@@ -691,7 +844,14 @@ module.exports = {
       linguistic_distance_risk: 'Language barriers affected communication',
       burnout_susceptibility: 'Team experienced professional burnout',
       conflict_escalation_risk: 'Minor conflicts escalated without proper resolution',
-      onboarding_issues: 'Difficulties integrating new team members'
+      onboarding_issues: 'Difficulties integrating new team members',
+      communication_tools_missing: 'Lack of adequate communication tools for coordination',
+      tool_fragmentation: 'Excessive tools without integration causing confusion',
+      team_conflicts: 'Interpersonal conflicts affecting productivity and work environment',
+      digital_fatigue: 'Mental exhaustion from excessive digital tool usage and meetings',
+      work_life_boundary_blur: 'Inability to disconnect from work due to lack of boundaries',
+      meeting_fatigue: 'Exhaustion from excessive and prolonged meetings',
+      technostress_overload: 'Overload from too many digital tools without adequate training'
     }
   },
 

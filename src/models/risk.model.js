@@ -124,19 +124,7 @@ const riskSchema = new mongoose.Schema({
     type: Boolean,
     default: null
   },
-  
-  actualSeverity: {
-    type: String,
-    enum: ['low', 'medium', 'high', 'critical', null],
-    default: null
-  },
-  
-  detectedAt: {
-    type: Date,
-    default: null
-  },
-  
- 
+
   rootCause: {
     type: String,
     trim: true,
@@ -177,17 +165,6 @@ const riskSchema = new mongoose.Schema({
     type: String,
     trim: true,
     maxlength: [1000, 'Note cannot exceed 1000 characters']
-  },
-  
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    immutable: true
-  },
-  
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
 }, {
   timestamps: true
@@ -195,54 +172,8 @@ const riskSchema = new mongoose.Schema({
 
 riskSchema.index({ project: 1, type: 1 });
 riskSchema.index({ organization: 1, occurred: 1 });
-riskSchema.index({ similarity: -1, severity: 1 });
+riskSchema.index({ severity: 1, category: 1 });
 riskSchema.index({ 'basedOnCases.caseId': 1 });
-
-riskSchema.methods.markAsOccurred = function(actualData) {
-  this.occurred = true;
-  this.actualSeverity = actualData.severity;
-  this.detectedAt = actualData.detectedAt || new Date();
-  this.actualImpact = actualData.impact;
-  this.rootCause = actualData.rootCause;
-  this.status = 'occurred';
-  
-  // Calculate prediction accuracy
-  this.predictionAccuracy = {
-    severityMatch: this.severity === actualData.severity,
-    occurrenceMatch: true, // it occurred as predicted
-    impactAccuracy: this.calculateImpactAccuracy(actualData.impact),
-    overallScore: 0 // will be calculated
-  };
-  
-  // Calculate overall accuracy score
-  const scores = [
-    this.predictionAccuracy.severityMatch ? 1 : 0.5,
-    1, // occurred match
-    this.predictionAccuracy.impactAccuracy
-  ];
-  this.predictionAccuracy.overallScore = 
-    scores.reduce((sum, score) => sum + score, 0) / scores.length;
-  
-  return this.save();
-};
-
-/**
- * Mark risk as avoided (did not occur)
- *
-
-/**
- * Mark risk as mitigated
- */
-riskSchema.methods.markAsMitigated = function(mitigationDate, effectiveness) {
-  this.status = 'mitigated';
-  this.mitigatedAt = mitigationDate || new Date();
-  
-  if (effectiveness) {
-    this.note = `Mitigated with ${effectiveness} effectiveness`;
-  }
-  
-  return this.save();
-};
 
 /**
  * Get risk priority score (for sorting)
@@ -382,10 +313,5 @@ riskSchema.statics.getAccuracyReport = async function(organizationId) {
   
   return report;
 };
-// Pre-save hook
-riskSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
-});
 
 module.exports = mongoose.model('Risk', riskSchema);

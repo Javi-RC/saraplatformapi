@@ -29,13 +29,17 @@ describe('Validators - Unit Tests', () => {
 
   describe('validatePassword', () => {
     it('debería aceptar contraseña válida', () => {
-      expect(validators.validatePassword('password123')).toBe(true);
-      expect(validators.validatePassword('123456')).toBe(true);
-      expect(validators.validatePassword('contraseñaSegura123')).toBe(true);
+      expect(validators.validatePassword('Password1')).toBe(true);
+      expect(validators.validatePassword('MiContraseña1')).toBe(true);
+      expect(validators.validatePassword('Abcdefg1')).toBe(true);
     });
 
     it('debería rechazar contraseña inválida', () => {
       expect(validators.validatePassword('12345')).toBe(false);
+      expect(validators.validatePassword('password')).toBe(false);
+      expect(validators.validatePassword('PASSWORD')).toBe(false);
+      expect(validators.validatePassword('12345678')).toBe(false);
+      expect(validators.validatePassword('password123')).toBe(false);
       expect(validators.validatePassword('')).toBe(false);
       expect(validators.validatePassword(null)).toBe(false);
       expect(validators.validatePassword(undefined)).toBe(false);
@@ -45,17 +49,17 @@ describe('Validators - Unit Tests', () => {
   describe('validateRegistrationData', () => {
     it('debería aceptar datos de registro válidos', () => {
       expect(() => {
-        validators.validateRegistrationData('test@example.com', 'Test User', 'password123');
+        validators.validateRegistrationData('test@example.com', 'Test User', 'Password1');
       }).not.toThrow();
     });
 
     it('debería rechazar datos faltantes', () => {
       expect(() => {
-        validators.validateRegistrationData('', 'Test User', 'password123');
+        validators.validateRegistrationData('', 'Test User', 'Password1');
       }).toThrow(expect.objectContaining({ code: 'MISSING_REQUIRED_FIELDS' }));
 
       expect(() => {
-        validators.validateRegistrationData('test@example.com', '', 'password123');
+        validators.validateRegistrationData('test@example.com', '', 'Password1');
       }).toThrow(expect.objectContaining({ code: 'MISSING_REQUIRED_FIELDS' }));
 
       expect(() => {
@@ -65,14 +69,14 @@ describe('Validators - Unit Tests', () => {
 
     it('debería rechazar email inválido', () => {
       expect(() => {
-        validators.validateRegistrationData('invalid-email', 'Test User', 'password123');
+        validators.validateRegistrationData('invalid-email', 'Test User', 'Password1');
       }).toThrow(expect.objectContaining({ code: 'INVALID_EMAIL_FORMAT' }));
     });
 
-    it('debería rechazar contraseña corta', () => {
+    it('debería rechazar contraseña débil', () => {
       expect(() => {
         validators.validateRegistrationData('test@example.com', 'Test User', '123');
-      }).toThrow(expect.objectContaining({ code: 'PASSWORD_TOO_SHORT' }));
+      }).toThrow(expect.objectContaining({ code: 'PASSWORD_TOO_WEAK' }));
     });
   });
 });

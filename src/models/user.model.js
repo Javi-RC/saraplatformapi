@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const { ROLES } = require('../config/roles');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -36,8 +37,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['employee', 'org_admin', 'unassigned'],
-    default: 'unassigned'
+    enum: [ROLES.EMPLOYEE, ROLES.ORG_ADMIN, ROLES.UNASSIGNED, ROLES.ADMIN, ROLES.SUPER_ADMIN],
+    default: ROLES.UNASSIGNED
   },
   organization: {
     type: mongoose.Schema.Types.ObjectId,
@@ -60,7 +61,13 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  
+  emailStatus: {
+    lastSentAt: Date,
+    sendAttempts: { type: Number, default: 0 },
+    lastError: String,
+    queuedJobId: { type: mongoose.Schema.Types.ObjectId, ref: 'EmailQueue' }
+  },
+
   // Login attempts tracking for brute force protection
   loginAttempts: {
     type: Number,
@@ -223,8 +230,10 @@ userSchema.index(
   }
 );
 
+userSchema.index({ isConfirmed: 1, role: 1 });
+
 userSchema.methods.isProfileComplete = function() {
-  return this.role !== 'unassigned';
+  return this.role !== ROLES.UNASSIGNED;
 };
 
 userSchema.methods.hasCVProcessingConsent = function() {
@@ -247,6 +256,7 @@ userSchema.methods.toJSON = function() {
   delete user.passwordHash;
   delete user.confirmationToken;
   delete user.confirmationTokenExpiry;
+  delete user.emailStatus;
   return user;
 };
 

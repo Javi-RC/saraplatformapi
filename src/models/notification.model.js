@@ -1,20 +1,20 @@
 const mongoose = require('mongoose');
 
 /**
- * Tipos de notificaciones disponibles en el sistema
+ * Notification types available in the system
  */
 const NotificationTypes = {
-  // Notificaciones de autenticación
+  // Authentication notifications
   EMAIL_CONFIRMATION: 'email_confirmation',
   PASSWORD_RESET: 'password_reset',
   
-  // Notificaciones de cuenta
+  // Account notifications
   ACCOUNT_UPDATED: 'account_updated',
   ACCOUNT_DELETION_CONFIRMED: 'account_deletion_confirmed',
   ACCOUNT_DELETION_REQUIREMENTS: 'account_deletion_requirements',
   ROLE_CHANGED: 'role_changed',
   
-  // Notificaciones de currículo
+  // Curriculum notifications
   CV_UPLOADED: 'cv_uploaded',
   CV_PROCESSED: 'cv_processed',
   CV_ANALYSIS_READY: 'cv_analysis_ready',
@@ -23,14 +23,14 @@ const NotificationTypes = {
   CV_REVIEWED: 'cv_reviewed',
   CV_STATUS_CHANGED: 'cv_status_changed',
   
-  // Notificaciones de organización
+  // Organization notifications
   ORG_EMPLOYEE_ADDED: 'org_employee_added',
   ORG_EMPLOYEE_REMOVED: 'org_employee_removed',
   ORG_EMPLOYEE_STATUS_CHANGED: 'org_employee_status_changed',
   ORG_ADMIN_ADDED: 'org_admin_added',
   ORG_SETTINGS_UPDATED: 'org_settings_updated',
   
-  // Notificaciones de proyectos
+  // Project notifications
   PROJECT_CREATED: 'project_created',
   PROJECT_UPDATED: 'project_updated',
   PROJECT_DELETED: 'project_deleted',
@@ -40,20 +40,20 @@ const NotificationTypes = {
   ASSIGNED_TO_PROJECT: 'assigned_to_project',
   REMOVED_FROM_PROJECT: 'removed_from_project',
   
-  // Notificaciones de BFI-44
+  // BFI-44 notifications
   BFI44_COMPLETED: 'bfi44_completed',
   BFI44_REMINDER: 'bfi44_reminder',
   
-  // Notificaciones administrativas
+  // Administrative notifications
   ADMIN_ANNOUNCEMENT: 'admin_announcement',
   SYSTEM_UPDATE: 'system_update',
   
-  // Notificaciones genéricas
+  // Generic notifications
   CUSTOM: 'custom'
 };
 
 /**
- * Prioridades de las notificaciones
+ * Notification priorities
  */
 const NotificationPriority = {
   LOW: 'low',
@@ -63,7 +63,7 @@ const NotificationPriority = {
 };
 
 /**
- * Estados de las notificaciones
+ * Notification statuses
  */
 const NotificationStatus = {
   PENDING: 'pending',
@@ -74,7 +74,7 @@ const NotificationStatus = {
 };
 
 /**
- * Canales de entrega de notificaciones
+ * Notification delivery channels
  */
 const NotificationChannels = {
   IN_APP: 'in_app',
@@ -83,7 +83,7 @@ const NotificationChannels = {
 };
 
 const notificationSchema = new mongoose.Schema({
-  // Receptor de la notificación
+  // Notification recipient
   recipient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -91,7 +91,7 @@ const notificationSchema = new mongoose.Schema({
     index: true
   },
   
-  // Tipo de notificación
+  // Notification type
   type: {
     type: String,
     enum: Object.values(NotificationTypes),
@@ -99,7 +99,7 @@ const notificationSchema = new mongoose.Schema({
     index: true
   },
   
-  // Título de la notificación
+  // Notification title
   title: {
     type: String,
     required: true,
@@ -107,7 +107,7 @@ const notificationSchema = new mongoose.Schema({
     maxlength: 200
   },
   
-  // Mensaje de la notificación
+  // Notification message
   message: {
     type: String,
     required: true,
@@ -115,13 +115,13 @@ const notificationSchema = new mongoose.Schema({
     maxlength: 1000
   },
   
-  // Datos adicionales en formato JSON
+  // Additional data in JSON format
   metadata: {
     type: mongoose.Schema.Types.Mixed,
     default: {}
   },
   
-  // Prioridad de la notificación
+  // Notification priority
   priority: {
     type: String,
     enum: Object.values(NotificationPriority),
@@ -129,7 +129,7 @@ const notificationSchema = new mongoose.Schema({
     index: true
   },
   
-  // Estado de la notificación
+  // Notification status
   status: {
     type: String,
     enum: Object.values(NotificationStatus),
@@ -137,14 +137,14 @@ const notificationSchema = new mongoose.Schema({
     index: true
   },
   
-  // Canales por los que se enviará/envió la notificación
+  // Channels through which the notification will be/has been sent
   channels: [{
     type: String,
     enum: Object.values(NotificationChannels),
     required: true
   }],
   
-  // Información de entrega por canal
+  // Delivery information per channel
   deliveryInfo: {
     type: Map,
     of: {
@@ -159,36 +159,36 @@ const notificationSchema = new mongoose.Schema({
     default: {}
   },
   
-  // URL de acción opcional
+  // Optional action URL
   actionUrl: {
     type: String,
     trim: true
   },
   
-  // Texto del botón de acción opcional
+  // Optional action button text
   actionText: {
     type: String,
     trim: true,
     maxlength: 50
   },
   
-  // Fecha de lectura (solo para notificaciones in-app)
+  // Read date (only for in-app notifications)
   readAt: {
     type: Date
   },
   
-  // Fecha de expiración opcional
+  // Optional expiration date
   expiresAt: {
     type: Date
   },
   
-  // Emisor de la notificación (puede ser el sistema o un usuario admin)
+  // Notification sender (can be the system or an admin user)
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
   
-  // Indica si la notificación está archivada (solo para in-app)
+  // Whether the notification is archived (only for in-app)
   isArchived: {
     type: Boolean,
     default: false,
@@ -200,23 +200,23 @@ const notificationSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Índices compuestos para consultas frecuentes
+// Compound indexes for frequent queries
 notificationSchema.index({ recipient: 1, status: 1, createdAt: -1 });
 notificationSchema.index({ recipient: 1, type: 1, createdAt: -1 });
 notificationSchema.index({ recipient: 1, readAt: 1, isArchived: 1 });
 notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0, sparse: true });
 
-// Virtual para verificar si la notificación está leída
+// Virtual to check if the notification is read
 notificationSchema.virtual('isRead').get(function() {
   return !!this.readAt;
 });
 
-// Virtual para verificar si la notificación ha expirado
+// Virtual to check if the notification has expired
 notificationSchema.virtual('isExpired').get(function() {
   return this.expiresAt && this.expiresAt < new Date();
 });
 
-// Método para marcar como leída
+// Method to mark as read
 notificationSchema.methods.markAsRead = async function() {
   if (!this.readAt) {
     this.readAt = new Date();
@@ -226,14 +226,14 @@ notificationSchema.methods.markAsRead = async function() {
   return this;
 };
 
-// Método para archivar
+// Method to archive
 notificationSchema.methods.archive = async function() {
   this.isArchived = true;
   await this.save();
   return this;
 };
 
-// Método para actualizar estado de entrega por canal
+// Method to update delivery status per channel
 notificationSchema.methods.updateDeliveryStatus = async function(channel, status, error = null) {
   if (!this.deliveryInfo) {
     this.deliveryInfo = new Map();
@@ -249,7 +249,7 @@ notificationSchema.methods.updateDeliveryStatus = async function(channel, status
     error
   });
   
-  // Actualizar el estado general si todos los canales están en el mismo estado
+  // Update overall status if all channels are in the same state
   const allStatuses = Array.from(this.deliveryInfo.values()).map(info => info.status);
   if (allStatuses.every(s => s === status)) {
     this.status = status;
@@ -265,7 +265,7 @@ notificationSchema.methods.updateDeliveryStatus = async function(channel, status
   return this;
 };
 
-// Método estático para limpiar notificaciones antiguas
+// Static method to clean up old notifications
 notificationSchema.statics.cleanupOldNotifications = async function(daysOld = 90) {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - daysOld);
@@ -276,7 +276,7 @@ notificationSchema.statics.cleanupOldNotifications = async function(daysOld = 90
   });
 };
 
-// Método estático para obtener estadísticas de notificaciones de un usuario
+// Static method to get notification statistics for a user
 notificationSchema.statics.getUserStats = async function(userId) {
   const stats = await this.aggregate([
     { $match: { recipient: mongoose.Types.ObjectId(userId) } },
@@ -311,10 +311,10 @@ notificationSchema.statics.getUserStats = async function(userId) {
 
 notificationSchema.pre('save', function(next) {
   if (this.actionUrl && !this.actionText) {
-    this.actionText = 'Ver más';
+    this.actionText = 'See more';
   }
   
-  // Si la notificación está leída, asegurar que tenga fecha de lectura
+  // If the notification is read, ensure it has a read date
   if (this.status === NotificationStatus.READ && !this.readAt) {
     this.readAt = new Date();
   }

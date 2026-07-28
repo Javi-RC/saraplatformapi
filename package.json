@@ -16,13 +16,18 @@
     "test:coverage:services": "cross-env NODE_ENV=test jest tests/unit/services --runInBand --silent --coverage --collectCoverageFrom=src/services/**/*.js",
     "test:watch": "cross-env NODE_ENV=test jest --watch",
     "seed": "cross-env NODE_ENV=development node scripts/comprehensive-seed.js",
-    "seed:prod": "cross-env NODE_ENV=production node scripts/comprehensive-seed.js",
     "seed:help": "node scripts/seed-help.js",
     "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
+    "lint:fix": "eslint src/ --fix",
+    "security": "semgrep --config .semgrep.yml src/",
+    "security:auto": "semgrep --config auto src/",
+    "profile": "clinic doctor -- node src/server.js",
+    "profile:flame": "clinic flame -- node src/server.js",
+    "profile:bubbleprof": "clinic bubbleprof -- node src/server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
@@ -39,10 +44,15 @@
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "pdf-parse": "^1.1.1",
+    "piscina": "^5.3.0",
     "xss": "^1.0.15"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "clinic": "^13.0.0",
     "cross-env": "^7.0.3",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
     "jest": "^30.2.0",
     "mongodb-memory-server": "^10.3.0",
     "nodemon": "^3.0.1",

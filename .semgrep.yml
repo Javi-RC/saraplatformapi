@@ -1,0 +1,63 @@
+rules:
+  - id: jwt-in-localstorage
+    patterns:
+      - pattern: |
+          localStorage.setItem(...)
+      - metavariable-regex:
+          metavariable: $ARG
+          regex: ".*token.*"
+    message: >
+      JWT stored in localStorage is vulnerable to XSS.
+      Use HttpOnly cookies instead.
+    languages: [javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      technology: [javascript]
+
+  - id: hardcoded-jwt-secret
+    patterns:
+      - pattern: |
+          $X = "..."
+      - metavariable-regex:
+          metavariable: $X
+          regex: ".*(SECRET|secret|key).*"
+    message: >
+      Possible hardcoded secret detected. Use environment variables instead.
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: sql-injection-express
+    pattern: |
+      $MODEL.findOne({ $EXPR: "..." })
+    message: >
+      Possible NoSQL injection. Validate and sanitize user input.
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: missing-rate-limit
+    patterns:
+      - pattern: |
+          $APP.post($PATH, $HANDLER)
+      - pattern-not-inside: |
+          $APP.use($PATH, rateLimit(...))
+    message: >
+      Route may be missing rate limiting protection.
+    languages: [javascript, typescript]
+    severity: WARNING
+    metadata:
+      category: security
+
+  - id: disable-x-powered-by
+    pattern: |
+      $APP.disable('x-powered-by')
+    message: >
+      Good: x-powered-by header is disabled.
+    languages: [javascript, typescript]
+    severity: INFO
+    metadata:
+      category: security

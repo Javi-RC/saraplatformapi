@@ -3,12 +3,13 @@ const router = express.Router();
 const cvController = require('../controllers/cv.controller');
 const passport = require('passport');
 const multer = require('multer');
+const { isAdmin } = require('../middleware/authorization');
 
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // Límite de 5MB
+    fileSize: 5 * 1024 * 1024 // 5MB limit
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'application/pdf' || file.mimetype === 'text/plain') {
@@ -21,98 +22,67 @@ const upload = multer({
 
 const authenticate = passport.authenticate('jwt', { session: false });
 
-const isAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'org_admin') {
-    return next();
-  }
-  return res.status(403).json({
-    success: false,
-    error: 'Access denied. Administrator permissions are required.'
-  });
-};
-
 /**
  * @route   POST /api/cv/upload
- * @desc    Sube y procesa un currículo
- * @access  Private (requiere autenticación)
+ * @desc    Uploads and processes a curriculum
+ * @access  Private (requires authentication)
  */
 router.post('/upload', authenticate, upload.single('cv'), cvController.uploadCV);
 
 /**
  * @route   GET /api/cv/my-cv
- * @desc    Obtiene el currículo del usuario autenticado
+ * @desc    Gets the authenticated user's curriculum
  * @access  Private
  */
 router.get('/my-cv', authenticate, cvController.getMyCV);
 
 /**
  * @route   POST /api/cv/submit-to-organization
- * @desc    Envía el currículo a una organización
+ * @desc    Submits the curriculum to an organization
  * @access  Private
  */
 router.post('/submit-to-organization', authenticate, cvController.submitToOrganization);
 
 /**
  * @route   GET /api/cv/stats
- * @desc    Obtiene estadísticas del currículo del usuario
+ * @desc    Gets the user's curriculum statistics
  * @access  Private
  */
 router.get('/stats', authenticate, cvController.getCVStats);
 
 /**
- * @route   GET /api/cv/:cvId
- * @desc    Obtiene un currículo específico por ID
- * @access  Private (propietario o admin)
- */
-router.get('/:cvId', authenticate, cvController.getCVById);
-
-/**
- * @route   PUT /api/cv/:cvId
- * @desc    Actualiza el currículo del usuario
- * @access  Private
- */
-router.put('/:cvId', authenticate, cvController.updateCV);
-
-/**
- * @route   DELETE /api/cv/:cvId
- * @desc    Elimina el currículo del usuario
- * @access  Private
- */
-router.delete('/:cvId', authenticate, cvController.deleteCV);
-
-/**
  * @route   GET /api/cv/admin/all
- * @desc    Obtiene todos los currículos (con filtros opcionales)
- * @access  Private (solo admin)
+ * @desc    Gets all curricula (with optional filters)
+ * @access  Private (admin only)
  */
 router.get('/admin/all', authenticate, isAdmin, cvController.getAllCVs);
 
 /**
  * @route   POST /api/cv/admin/search
- * @desc    Busca currículos por criterios
- * @access  Private (solo admin)
+ * @desc    Searches curricula by criteria
+ * @access  Private (admin only)
  */
 router.post('/admin/search', authenticate, isAdmin, cvController.searchCVs);
 
 /**
  * @route   GET /api/cv/completeness
- * @desc    Obtiene el estado de completitud del currículo del usuario
+ * @desc    Gets the completeness status of the user's curriculum
  * @access  Private
  */
 router.get('/completeness', authenticate, cvController.getCompleteness);
 
 /**
  * @route   GET /api/cv/missing-fields-questions
- * @desc    Obtiene preguntas dinámicas para completar los campos faltantes del currículo
+ * @desc    Gets dynamic questions to complete missing curriculum fields
  * @access  Private
- * @query   language - Idioma de las preguntas ('en' o 'es', por defecto 'en')
- * @query   groupByCategory - Si es 'true', agrupa las preguntas por categoría
+ * @query   language - Question language ('en' or 'es', default 'en')
+ * @query   groupByCategory - If 'true', groups questions by category
  */
 router.get('/missing-fields-questions', authenticate, cvController.getMissingFieldsQuestions);
 
 /**
  * @route   PATCH /api/cv/complete-fields
- * @desc    Completa los campos faltantes del currículo
+ * @desc    Completes missing curriculum fields
  * @access  Private
  */
 router.patch('/complete-fields', authenticate, cvController.completeFields);
@@ -130,6 +100,27 @@ router.post('/questionnaire/next', authenticate, cvController.submitPhaseRespons
  * @access  Private
  */
 router.post('/questionnaire/submit', authenticate, cvController.submitQuestionnaire);
+
+/**
+ * @route   GET /api/cv/:cvId
+ * @desc    Gets a specific curriculum by ID
+ * @access  Private (owner or admin)
+ */
+router.get('/:cvId', authenticate, cvController.getCVById);
+
+/**
+ * @route   PUT /api/cv/:cvId
+ * @desc    Updates the user's curriculum
+ * @access  Private
+ */
+router.put('/:cvId', authenticate, cvController.updateCV);
+
+/**
+ * @route   DELETE /api/cv/:cvId
+ * @desc    Deletes the user's curriculum
+ * @access  Private
+ */
+router.delete('/:cvId', authenticate, cvController.deleteCV);
 
 // Error handler middleware
 router.use((error, req, res, next) => {

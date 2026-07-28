@@ -1,4 +1,5 @@
-const userService = require('../services/user.service');
+const userService = require('../services/core/user.service');
+const userRepository = require('../repositories/user.repository');
 const responseHandler = require('../utils/responseHandler');
 const AppError = require('../utils/AppError');
 const i18n = require('../i18n/i18n.service');
@@ -16,7 +17,7 @@ class UserController {
    */
   async updateLanguagePreference(req, res) {
     try {
-      const userId = req.user?.userId || req.user?.id || req.user?._id;
+      const userId = req.user.id;
       const { language } = req.body;
 
       if (!language || !i18n.isValidLanguage(language)) {
@@ -26,12 +27,11 @@ class UserController {
         });
       }
 
-      const User = require('../models/user.model');
-      const user = await User.findByIdAndUpdate(
+      const user = await userRepository.updateById(
         userId,
         { preferredLanguage: language },
-        { new: true }
-      ).select('-passwordHash');
+        { select: '-passwordHash' }
+      );
 
       return responseHandler.success(res, {
         message: 'Language preference updated successfully',
@@ -50,12 +50,12 @@ class UserController {
    */
   async getLanguagePreference(req, res) {
     try {
-      const userId = req.user?.userId || req.user?.id || req.user?._id;
+      const userId = req.user.id;
       
-      const User = require('../models/user.model');
-      const user = await User.findById(userId)
-        .select('preferredLanguage')
-        .populate('organization', 'defaultLanguage');
+      const user = await userRepository.findById(userId, {
+        select: 'preferredLanguage',
+        populate: { path: 'organization', select: 'defaultLanguage' }
+      });
 
       const effectiveLanguage = user?.preferredLanguage || 
                                  user?.organization?.defaultLanguage || 
@@ -84,7 +84,7 @@ class UserController {
    */
   async getDeletionPrerequisites(req, res) {
     try {
-      const userId = req.user?.userId || req.user?.id || req.user?._id;
+      const userId = req.user.id;
 
       const prerequisites = await userService.getDeletionPrerequisites(userId);
 
@@ -105,7 +105,7 @@ class UserController {
    */
   async deleteAccount(req, res) {
     try {
-      const userId = req.user?.userId || req.user?.id || req.user?._id;
+      const userId = req.user.id;
       const { password, confirmation } = req.body;
 
       // Validate confirmation text
@@ -118,8 +118,9 @@ class UserController {
       }
 
       // Password is required for non-OAuth users
-      const User = require('../models/user.model');
-      const user = await User.findById(userId).select('passwordHash oauthProvider');
+      const user = await userRepository.findById(userId, {
+        select: 'passwordHash oauthProvider'
+      });
       
       if (user.passwordHash && !user.oauthProvider && !password) {
         throw new AppError(

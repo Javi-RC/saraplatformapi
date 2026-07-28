@@ -5,7 +5,7 @@ const app = require('../../src/app'); // ✅ Ruta corregida
 const User = require('../../src/models/user.model');
 
 // Mock del servicio de email para evitar llamadas reales a Brevo
-jest.mock('../../src/services/email.service', () => ({
+jest.mock('../../src/services/auth/email.service', () => ({
   sendConfirmationEmail: jest.fn().mockResolvedValue({ messageId: 'test-123' })
 }));
 
@@ -113,8 +113,11 @@ describe('Auth - Integration Tests', () => {
         })
         .expect(200);
       expect(response.body.success).toBe(true);
-      expect(response.body.token).toBeDefined();
       expect(response.body.user.email).toBe('test@example.com');
+      expect(response.body.token).toBeUndefined();
+      const cookies = response.headers['set-cookie'];
+      expect(cookies).toBeDefined();
+      expect(cookies.some(c => c.startsWith('auth_token='))).toBe(true);
       bcrypt.compare.mockRestore();
     });
 
@@ -193,6 +196,19 @@ describe('Auth - Integration Tests', () => {
         .expect(200);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toContain('Confirmation email sent');
+    });
+  });
+
+  describe('POST /auth/logout', () => {
+    it('debería limpiar la cookie de autenticación', async () => {
+      const response = await request(app)
+        .post('/auth/logout')
+        .expect(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toContain('Logged out');
+      const cookies = response.headers['set-cookie'];
+      expect(cookies).toBeDefined();
+      expect(cookies.some(c => c.startsWith('auth_token=;'))).toBe(true);
     });
   });
 });

@@ -8,7 +8,7 @@ const {
   processResponsesAndGetNext,
   finalizeQuestionnaire,
   validateResponse
-} = require('../../src/services/cvInteractiveQuestionnaire.service');
+} = require('../../src/services/cv/cvInteractiveQuestionnaire.service');
 
 describe('Curriculum Interactive Questionnaire Flow', () => {
   // Sample curricula for testing

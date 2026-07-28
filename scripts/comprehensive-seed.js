@@ -405,7 +405,7 @@ const updateCollaborationHistory = async (users) => {
 const addSeedCases = async () => {
   console.log('\n📚 Adding seed CBR cases...');
   
-  const seedCasesService = require('../src/services/seedCases.service');
+  const seedCasesService = require('../src/services/risk/seedCases.service');
   
   try {
     const result = await seedCasesService.loadSeedCases();

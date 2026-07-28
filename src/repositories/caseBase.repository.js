@@ -17,7 +17,7 @@ class CaseBaseRepository extends BaseRepository {
    * @returns {Promise<Array>}
    */
   async findByProject(projectId, options = {}) {
-    return this.find({ projectId }, options);
+    return this.find({ caseId: projectId }, options);
   }
 
   /**
@@ -27,7 +27,7 @@ class CaseBaseRepository extends BaseRepository {
    * @returns {Promise<Array>}
    */
   async findByOrganization(organizationId, options = {}) {
-    return this.find({ organizationId }, options);
+    return this.find({ organization: organizationId }, options);
   }
 
   /**
@@ -38,7 +38,7 @@ class CaseBaseRepository extends BaseRepository {
   async findAllForMatching(options = {}) {
     return this.find({}, {
       ...options,
-      select: 'teamProfile risks outcome organizationId projectId'
+      select: 'caseId organization type source problem solution result metadata'
     });
   }
 
@@ -49,7 +49,7 @@ class CaseBaseRepository extends BaseRepository {
    * @returns {Promise<Object>}
    */
   async deleteByProject(projectId, options = {}) {
-    return this.deleteMany({ projectId }, options);
+    return this.deleteMany({ caseId: projectId }, options);
   }
 
   /**
@@ -58,7 +58,7 @@ class CaseBaseRepository extends BaseRepository {
    * @returns {Promise<number>}
    */
   async countByOrganization(organizationId) {
-    return this.count({ organizationId });
+    return this.count({ organization: organizationId });
   }
 
   /**
@@ -67,7 +67,7 @@ class CaseBaseRepository extends BaseRepository {
    * @returns {Promise<number>}
    */
   async countByProject(projectId) {
-    return this.count({ projectId });
+    return this.count({ caseId: projectId });
   }
 
   /**
@@ -87,6 +87,36 @@ class CaseBaseRepository extends BaseRepository {
       },
       options
     );
+  }
+
+  /**
+   * Get case base statistics for an organization
+   * @param {string} organizationId - Organization ID
+   * @returns {Promise<Object>}
+   */
+  async getCaseBaseStats(organizationId) {
+    return this.model.getCaseBaseStats(organizationId);
+  }
+
+  /**
+   * Get all cases for an organization
+   * @param {string} organizationId - Organization ID
+   * @param {Object} options - Query options
+   * @returns {Promise<Array>}
+   */
+  async getOrganizationCases(organizationId, options = {}) {
+    return this.model.getOrganizationCases(organizationId, options);
+  }
+
+  /**
+   * Find similar cases based on features
+   * @param {Object} projectFeatures - Project features for similarity matching
+   * @param {string} organizationId - Organization ID
+   * @param {number} limit - Max results
+   * @returns {Promise<Array>}
+   */
+  async findSimilar(projectFeatures, organizationId, limit = 5) {
+    return this.model.findSimilar(projectFeatures, organizationId, limit);
   }
 }
 

@@ -4,29 +4,30 @@ const cvSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true
   },
   
-  // Organización a la que se envía el currículo (opcional)
+  // Organization to which the curriculum is submitted (optional)
   organization: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Organization',
     index: true
   },
   
-  // Estado del currículo en relación a la organización
+  // Curriculum status in relation to the organization
   organizationStatus: {
     type: String,
     enum: ['pending', 'reviewed', 'accepted', 'rejected'],
     default: 'pending'
   },
   
-  // Fecha de envío a la organización
+  // Date submitted to the organization
   submittedToOrganizationAt: {
     type: Date
   },
   
-  // Notas del administrador de la organización
+  // Organization administrator notes
   organizationNotes: {
     type: String,
     trim: true,
@@ -336,8 +337,7 @@ const cvSchema = new mongoose.Schema({
   }
 });
 
-// Índices para búsquedas
-cvSchema.index({ 'userId': 1 });
+// Indexes for searches (userId is already indexed via `index: true` in the schema)
 cvSchema.index({ 'organization': 1, 'organizationStatus': 1 });
 cvSchema.index({ 'skills.technical.normalizedName': 1 });
 cvSchema.index({ 'experience.technologies': 1 });
@@ -349,7 +349,7 @@ cvSchema.pre('save', function(next) {
   next();
 });
 
-// Método para obtener resumen
+// Method to get summary
 cvSchema.methods.getSummary = function() {
   return {
     id: this._id,

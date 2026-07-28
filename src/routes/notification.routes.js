@@ -3,19 +3,7 @@ const router = Router();
 const notificationController = require('../controllers/notification.controller');
 const { authMiddleware } = require('../utils/jwt');
 const NotificationValidator = require('../utils/notificationValidator');
-
-/**
- * Middleware para verificar que el usuario sea administrador
- */
-const isAdmin = (req, res, next) => {
-  if (req.user.role !== 'org_admin') {
-    return res.status(403).json({
-      success: false,
-      error: 'Access denied. Administrator permissions are required.'
-    });
-  }
-  next();
-};
+const { isAdmin } = require('../middleware/authorization');
 
 /**
  * GET /api/notifications

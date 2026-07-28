@@ -27,7 +27,7 @@ class NotificationRepository extends BaseRepository {
    * @returns {Promise<Array>}
    */
   async findUnreadByUser(userId, options = {}) {
-    return this.find({ recipient: userId, read: false }, options);
+    return this.find({ recipient: userId, status: { $ne: 'read' } }, options);
   }
 
   /**
@@ -39,7 +39,7 @@ class NotificationRepository extends BaseRepository {
   async markAsRead(notificationId, options = {}) {
     return this.updateById(
       notificationId,
-      { read: true, readAt: new Date() },
+      { status: 'read', readAt: new Date() },
       options
     );
   }
@@ -52,8 +52,8 @@ class NotificationRepository extends BaseRepository {
    */
   async markAllAsReadForUser(userId, options = {}) {
     return this.updateMany(
-      { recipient: userId, read: false },
-      { read: true, readAt: new Date() },
+      { recipient: userId, status: { $ne: 'read' } },
+      { status: 'read', readAt: new Date() },
       options
     );
   }
@@ -64,7 +64,7 @@ class NotificationRepository extends BaseRepository {
    * @returns {Promise<number>}
    */
   async countUnreadByUser(userId) {
-    return this.count({ recipient: userId, read: false });
+    return this.count({ recipient: userId, status: { $ne: 'read' } });
   }
 
   /**

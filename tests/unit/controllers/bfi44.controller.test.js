@@ -1,13 +1,14 @@
 const BFI44Controller = require('../../../src/controllers/bfi44.controller');
-const BFI44Service = require('../../../src/services/bfi44.service');
+const BFI44Service = require('../../../src/services/core/bfi44.service');
 const responseHandler = require('../../../src/utils/responseHandler');
-const Organization = require('../../../src/models/organization.model');
-const User = require('../../../src/models/user.model');
+const { userRepository, organizationRepository } = require('../../../src/repositories');
 
-jest.mock('../../../src/services/bfi44.service');
+jest.mock('../../../src/services/core/bfi44.service');
 jest.mock('../../../src/utils/responseHandler');
-jest.mock('../../../src/models/organization.model');
-jest.mock('../../../src/models/user.model');
+jest.mock('../../../src/repositories', () => ({
+  userRepository: { findById: jest.fn(), updateById: jest.fn() },
+  organizationRepository: { findById: jest.fn() }
+}));
 
 describe('BFI44 Controller - Unit Tests', () => {
   let req, res;
@@ -84,7 +85,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'Las respuestas son requeridas',
+        'Responses are required',
         400
       );
     });
@@ -126,15 +127,13 @@ describe('BFI44 Controller - Unit Tests', () => {
 
     it('should deny access for unauthorized user', async () => {
       req.params.userId = 'otherUser123';
-      User.findById.mockReturnValue({
-        select: jest.fn().mockResolvedValue({ organization: null })
-      });
+      userRepository.findById.mockResolvedValue({ organization: null });
 
       await BFI44Controller.getProfile(req, res);
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'No autorizado para ver este perfil',
+        'Not authorized to view this profile',
         403
       );
     });
@@ -149,10 +148,8 @@ describe('BFI44 Controller - Unit Tests', () => {
         isProjectManager: jest.fn().mockReturnValue(false)
       };
 
-      User.findById.mockReturnValue({
-        select: jest.fn().mockResolvedValue({ organization: 'org123' })
-      });
-      Organization.findById.mockResolvedValue(mockOrganization);
+      userRepository.findById.mockResolvedValue({ organization: 'org123' });
+      organizationRepository.findById.mockResolvedValue(mockOrganization);
       
       const mockProfile = { openness: 3.5 };
       BFI44Service.getUserProfile.mockResolvedValue(mockProfile);
@@ -204,7 +201,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'No has completado el cuestionario BFI-44',
+        'You have not completed the BFI-44 questionnaire',
         404
       );
     });
@@ -241,7 +238,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       await BFI44Controller.recalculateProfile(req, res);
 
-      expect(responseHandler.error).toHaveBeenCalledWith(res, 'No autorizado', 403);
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Not authorized', 403);
       expect(BFI44Service.recalculateProfile).not.toHaveBeenCalled();
     });
 
@@ -298,7 +295,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       expect(BFI44Service.notifyEmployeesWithoutTest).toHaveBeenCalledWith('org123');
       expect(responseHandler.success).toHaveBeenCalledWith(res, {
-        message: '5 empleado(s) notificado(s)',
+        message: '5 employee(s) notified',
         ...mockResult
       });
     });
@@ -314,7 +311,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       expect(BFI44Service.notifyEmployeesWithoutTest).toHaveBeenCalledWith('org123');
       expect(responseHandler.success).toHaveBeenCalledWith(res, {
-        message: '3 empleado(s) notificado(s)',
+        message: '3 employee(s) notified',
         ...mockResult
       });
     });
@@ -325,7 +322,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       await BFI44Controller.notifyPendingEmployees(req, res);
 
-      expect(responseHandler.error).toHaveBeenCalledWith(res, 'No autorizado', 403);
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Not authorized', 403);
     });
 
     it('should return error when user has no organization', async () => {
@@ -336,7 +333,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'No perteneces a ninguna organización',
+        'You do not belong to any organization',
         400
       );
     });
@@ -401,7 +398,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       await BFI44Controller.getEmployeesWithoutTest(req, res);
 
-      expect(responseHandler.error).toHaveBeenCalledWith(res, 'No autorizado', 403);
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Not authorized', 403);
     });
 
     it('should return error when user has no organization', async () => {
@@ -412,7 +409,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'No perteneces a ninguna organización',
+        'You do not belong to any organization',
         400
       );
     });
@@ -430,9 +427,7 @@ describe('BFI44 Controller - Unit Tests', () => {
         personalityDataConsent: mockConsent,
         hasPersonalityDataConsent: jest.fn().mockReturnValue(true)
       };
-      User.findById.mockReturnValue({
-        select: jest.fn().mockResolvedValue(mockUser)
-      });
+      userRepository.findById.mockResolvedValue(mockUser);
 
       await BFI44Controller.getConsentStatus(req, res);
 
@@ -448,9 +443,7 @@ describe('BFI44 Controller - Unit Tests', () => {
         personalityDataConsent: mockConsent,
         hasPersonalityDataConsent: jest.fn().mockReturnValue(false)
       };
-      User.findById.mockReturnValue({
-        select: jest.fn().mockResolvedValue(mockUser)
-      });
+      userRepository.findById.mockResolvedValue(mockUser);
 
       await BFI44Controller.getConsentStatus(req, res);
 
@@ -461,20 +454,16 @@ describe('BFI44 Controller - Unit Tests', () => {
     });
 
     it('should return 404 when user not found', async () => {
-      User.findById.mockReturnValue({
-        select: jest.fn().mockResolvedValue(null)
-      });
+      userRepository.findById.mockResolvedValue(null);
 
       await BFI44Controller.getConsentStatus(req, res);
 
-      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Usuario no encontrado', 404);
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'User not found', 404);
     });
 
     it('should handle errors', async () => {
       const error = new Error('Database error');
-      User.findById.mockReturnValue({
-        select: jest.fn().mockRejectedValue(error)
-      });
+      userRepository.findById.mockRejectedValue(error);
 
       await BFI44Controller.getConsentStatus(req, res);
 
@@ -505,7 +494,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       await BFI44Controller.getOrganizationStats(req, res);
 
-      expect(responseHandler.error).toHaveBeenCalledWith(res, 'No autorizado', 403);
+      expect(responseHandler.error).toHaveBeenCalledWith(res, 'Not authorized', 403);
     });
 
     it('should return error when user has no organization', async () => {
@@ -516,7 +505,7 @@ describe('BFI44 Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'No perteneces a ninguna organización',
+        'You do not belong to any organization',
         400
       );
     });

@@ -1,40 +1,47 @@
 jest.mock('pdf-parse', () => jest.fn());
-jest.mock('../../../src/services/aiExtractor.service');
-jest.mock('../../../src/services/cv.service');
+jest.mock('../../../src/services/cv/aiExtractor.service');
+jest.mock('../../../src/services/cv/cv.service');
 jest.mock('../../../src/utils/responseHandler');
-jest.mock('../../../src/models/user.model');
-jest.mock('../../../src/models/cv.model');
-jest.mock('../../../src/services/cvNotificationHelper', () => ({
+jest.mock('../../../src/repositories', () => ({
+  cvRepository: {
+    findOne: jest.fn(),
+    findById: jest.fn(),
+    find: jest.fn(),
+    create: jest.fn(),
+    updateById: jest.fn(),
+    deleteById: jest.fn(),
+    countDocuments: jest.fn()
+  },
+  userRepository: {
+    findById: jest.fn(),
+    findByEmail: jest.fn(),
+    updateById: jest.fn()
+  },
+  organizationRepository: { findById: jest.fn() },
+  projectRepository: { findById: jest.fn(), find: jest.fn() }
+}));
+jest.mock('../../../src/services/notification/helpers/cv.helper', () => ({
   notifyCVUploaded: jest.fn().mockReturnValue({
     catch: jest.fn()
   })
 }));
-jest.mock('../../../src/services/cvCompletenessValidator.service');
-jest.mock('../../../src/services/cvQuestionsGenerator.service', () => ({
+jest.mock('../../../src/services/cv/cvCompletenessValidator.service');
+jest.mock('../../../src/services/cv/cvQuestionsGenerator.service', () => ({
   generateQuestionsForMissingFields: jest.fn(),
   generateConditionalQuestions: jest.fn(),
   getQuestionsByCategory: jest.fn()
 }));
-jest.mock('../../../src/services/cvInteractiveQuestionnaire.service');
+jest.mock('../../../src/services/cv/cvInteractiveQuestionnaire.service');
 
 const cvController = require('../../../src/controllers/cv.controller');
-const aiExtractorService = require('../../../src/services/aiExtractor.service');
-const cvService = require('../../../src/services/cv.service');
+const aiExtractorService = require('../../../src/services/cv/aiExtractor.service');
+const cvService = require('../../../src/services/cv/cv.service');
 const responseHandler = require('../../../src/utils/responseHandler');
-const User = require('../../../src/models/user.model');
-const CV = require('../../../src/models/cv.model');
+const { cvRepository, userRepository } = require('../../../src/repositories');
 const pdfParse = require('pdf-parse');
 
 describe('Curriculum Controller - Unit Tests', () => {
   let req, res;
-
-  const createPopulateQuery = (resolvedValue) => {
-    const query = {
-      populate: jest.fn().mockReturnThis(),
-      then: (resolve, reject) => Promise.resolve(resolvedValue).then(resolve, reject)
-    };
-    return query;
-  };
 
   beforeEach(() => {
     req = {
@@ -88,7 +95,7 @@ describe('Curriculum Controller - Unit Tests', () => {
       };
 
       pdfParse.mockResolvedValue({ text: 'CV content here' });
-      User.findById.mockResolvedValue({
+      userRepository.findById.mockResolvedValue({
         name: 'Test User',
         hasCVProcessingConsent: jest.fn().mockReturnValue(false)
       });
@@ -124,10 +131,10 @@ describe('Curriculum Controller - Unit Tests', () => {
       };
 
       pdfParse.mockResolvedValue({ text: 'CV content here with skills' });
-      User.findById.mockResolvedValue(mockUser);
+      userRepository.findById.mockResolvedValue(mockUser);
       aiExtractorService.processCV.mockResolvedValue(mockCV);
 
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({
         isComplete: true,
         completenessScore: 100,
@@ -163,10 +170,10 @@ describe('Curriculum Controller - Unit Tests', () => {
         getSummary: jest.fn().mockReturnValue({ id: 'cv123' })
       };
 
-      User.findById.mockResolvedValue(mockUser);
+      userRepository.findById.mockResolvedValue(mockUser);
       aiExtractorService.processCV.mockResolvedValue(mockCV);
 
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({
         isComplete: true,
         completenessScore: 100,
@@ -267,7 +274,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'No tienes permisos para ver este currículo',
+        'You do not have permission to view this curriculum',
         403
       );
     });
@@ -437,7 +444,7 @@ describe('Curriculum Controller - Unit Tests', () => {
         req.body
       );
       expect(responseHandler.success).toHaveBeenCalledWith(res, {
-        message: 'Currículo actualizado exitosamente',
+        message: 'Curriculum updated successfully',
         cv: mockCV
       });
     });
@@ -553,7 +560,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'Se requiere el ID de la organización',
+        'Organization ID is required',
         400
       );
     });
@@ -567,7 +574,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'Organización no encontrada',
+        'Organization not found',
         404
       );
     });
@@ -581,7 +588,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
       expect(responseHandler.error).toHaveBeenCalledWith(
         res,
-        'Ya has enviado tu currículo a esta organización',
+        'You have already submitted your curriculum to this organization',
         409
       );
     });
@@ -589,7 +596,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
   describe('getCompleteness', () => {
     it('should return 404 when curriculum not found', async () => {
-      CV.findOne.mockReturnValue(createPopulateQuery(null));
+      cvRepository.findOne.mockResolvedValue(null);
 
       await cvController.getCompleteness(req, res);
 
@@ -602,9 +609,9 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should return completeness information', async () => {
       const cv = { _id: 'cv1', lastUpdated: new Date('2024-01-01') };
-      CV.findOne.mockReturnValue(createPopulateQuery(cv));
+      cvRepository.findOne.mockResolvedValue(cv);
 
-      const { validateCVCompleteness, getCategoryCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      const { validateCVCompleteness, getCategoryCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({
         isComplete: false,
         completenessScore: 60,
@@ -633,7 +640,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
   describe('getMissingFieldsQuestions', () => {
     it('should return 404 when curriculum not found', async () => {
-      CV.findOne.mockResolvedValue(null);
+      cvRepository.findOne.mockResolvedValue(null);
 
       await cvController.getMissingFieldsQuestions(req, res);
 
@@ -645,8 +652,8 @@ describe('Curriculum Controller - Unit Tests', () => {
     });
 
     it('should return isComplete when completeness is complete', async () => {
-      CV.findOne.mockResolvedValue({});
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      cvRepository.findOne.mockResolvedValue({});
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({ isComplete: true });
 
       await cvController.getMissingFieldsQuestions(req, res);
@@ -664,9 +671,9 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should generate questions grouped by category', async () => {
       req.query = { groupByCategory: 'true', language: 'en' };
-      CV.findOne.mockResolvedValue({ toObject: jest.fn().mockReturnValue({}) });
+      cvRepository.findOne.mockResolvedValue({ toObject: jest.fn().mockReturnValue({}) });
 
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({
         isComplete: false,
         completenessScore: 50,
@@ -674,7 +681,7 @@ describe('Curriculum Controller - Unit Tests', () => {
         missingByPriority: { critical: ['availability.immediate'] }
       });
 
-      const { getQuestionsByCategory } = require('../../../src/services/cvQuestionsGenerator.service');
+      const { getQuestionsByCategory } = require('../../../src/services/cv/cvQuestionsGenerator.service');
       getQuestionsByCategory.mockReturnValue({ basics: [{ id: 'q1' }] });
 
       await cvController.getMissingFieldsQuestions(req, res);
@@ -694,9 +701,9 @@ describe('Curriculum Controller - Unit Tests', () => {
     it('should generate conditional questions (flat list)', async () => {
       req.query = { language: 'en' };
       const cvObj = { a: 1 };
-      CV.findOne.mockResolvedValue({ toObject: jest.fn().mockReturnValue(cvObj) });
+      cvRepository.findOne.mockResolvedValue({ toObject: jest.fn().mockReturnValue(cvObj) });
 
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({
         isComplete: false,
         completenessScore: 50,
@@ -704,7 +711,7 @@ describe('Curriculum Controller - Unit Tests', () => {
         missingByPriority: {}
       });
 
-      const { generateConditionalQuestions } = require('../../../src/services/cvQuestionsGenerator.service');
+      const { generateConditionalQuestions } = require('../../../src/services/cv/cvQuestionsGenerator.service');
       generateConditionalQuestions.mockReturnValue([{ id: 'q1' }, { id: 'q2' }]);
 
       await cvController.getMissingFieldsQuestions(req, res);
@@ -729,7 +736,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should return 404 when curriculum not found', async () => {
       req.body = { 'availability.immediate': true };
-      CV.findOne.mockResolvedValue(null);
+      cvRepository.findOne.mockResolvedValue(null);
 
       await cvController.completeFields(req, res);
 
@@ -742,19 +749,20 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should apply nested updates and return improvement', async () => {
       req.body = { 'availability.immediate': true };
-      const save = jest.fn().mockResolvedValue(undefined);
-      const cv = { _id: 'cv1', lastUpdated: new Date('2024-01-01'), save };
-      CV.findOne.mockResolvedValue(cv);
+      const cv = { _id: 'cv1', lastUpdated: new Date('2024-01-01') };
+      cvRepository.findOne.mockResolvedValue(cv);
+      cvRepository.updateById.mockResolvedValue({});
+      cvRepository.findById.mockResolvedValue({ _id: 'cv1', lastUpdated: new Date('2024-01-01') });
 
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness
         .mockReturnValueOnce({ completenessScore: 40, isComplete: false, missingFields: ['x'] })
         .mockReturnValueOnce({ completenessScore: 60, isComplete: false, missingFields: ['y'] });
 
       await cvController.completeFields(req, res);
 
-      expect(cv.availability.immediate).toBe(true);
-      expect(save).toHaveBeenCalled();
+      expect(cvRepository.updateById).toHaveBeenCalledWith('cv1', { 'availability.immediate': true });
+      expect(cvRepository.findById).toHaveBeenCalledWith('cv1');
       expect(responseHandler.success).toHaveBeenCalledWith(
         res,
         expect.objectContaining({
@@ -768,7 +776,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
   describe('startQuestionnaire', () => {
     it('should return 404 when curriculum not found', async () => {
-      CV.findOne.mockResolvedValue(null);
+      cvRepository.findOne.mockResolvedValue(null);
 
       await cvController.startQuestionnaire(req, res);
 
@@ -780,8 +788,8 @@ describe('Curriculum Controller - Unit Tests', () => {
     });
 
     it('should return isComplete when curriculum is already complete', async () => {
-      CV.findOne.mockResolvedValue({});
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      cvRepository.findOne.mockResolvedValue({});
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({ isComplete: true });
 
       await cvController.startQuestionnaire(req, res);
@@ -797,11 +805,11 @@ describe('Curriculum Controller - Unit Tests', () => {
     });
 
     it('should create session and return initial questions', async () => {
-      CV.findOne.mockResolvedValue({});
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      cvRepository.findOne.mockResolvedValue({});
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness.mockReturnValue({ isComplete: false });
 
-      const questionnaireService = require('../../../src/services/cvInteractiveQuestionnaire.service');
+      const questionnaireService = require('../../../src/services/cv/cvInteractiveQuestionnaire.service');
       questionnaireService.createQuestionnaireSession.mockReturnValue({ sessionId: 's1', language: 'en', startedAt: 't' });
       questionnaireService.getInitialQuestions.mockReturnValue({ phase: { id: 'p1' }, questions: [{ id: 'q1' }] });
 
@@ -838,7 +846,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should return 404 when curriculum not found', async () => {
       req.body = { responses: {}, currentPhase: 'p1' };
-      CV.findOne.mockResolvedValue(null);
+      cvRepository.findOne.mockResolvedValue(null);
 
       await cvController.getNextQuestions(req, res);
 
@@ -851,9 +859,9 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should return next questions successfully', async () => {
       req.body = { responses: { a: 1 }, currentPhase: 'p1' };
-      CV.findOne.mockResolvedValue({});
+      cvRepository.findOne.mockResolvedValue({});
 
-      const questionnaireService = require('../../../src/services/cvInteractiveQuestionnaire.service');
+      const questionnaireService = require('../../../src/services/cv/cvInteractiveQuestionnaire.service');
       questionnaireService.processResponsesAndGetNext.mockReturnValue({
         phase: { id: 'p2' },
         questions: [{ id: 'q2' }]
@@ -876,7 +884,7 @@ describe('Curriculum Controller - Unit Tests', () => {
   describe('getQuestionnairePhases', () => {
     it('should return phases list', async () => {
       req.query.language = 'en';
-      const questionnaireService = require('../../../src/services/cvInteractiveQuestionnaire.service');
+      const questionnaireService = require('../../../src/services/cv/cvInteractiveQuestionnaire.service');
       questionnaireService.getAllPhases.mockReturnValue({
         p1: { title: { en: 'P1' }, description: { en: 'D1' }, fields: ['a'] },
         p2: { title: { en: 'P2' }, description: { en: 'D2' }, fields: ['b'] }
@@ -913,7 +921,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should return 404 when curriculum not found', async () => {
       req.body = { sessionId: 's1', currentPhase: 'p1', responses: { a: 1 } };
-      CV.findOne.mockResolvedValue(null);
+      cvRepository.findOne.mockResolvedValue(null);
 
       await cvController.submitPhaseResponses(req, res);
 
@@ -922,11 +930,12 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should return completion when questionnaire becomes complete', async () => {
       req.body = { sessionId: 's1', currentPhase: 'p1', responses: { 'availability.immediate': true } };
-      const save = jest.fn().mockResolvedValue(undefined);
-      const cv = { save };
-      CV.findOne.mockResolvedValue(cv);
+      const cv = { _id: 'cv1' };
+      cvRepository.findOne.mockResolvedValue(cv);
+      cvRepository.updateById.mockResolvedValue({});
+      cvRepository.findById.mockResolvedValue({ _id: 'cv1' });
 
-      const questionnaireService = require('../../../src/services/cvInteractiveQuestionnaire.service');
+      const questionnaireService = require('../../../src/services/cv/cvInteractiveQuestionnaire.service');
       questionnaireService.processResponsesAndGetNext.mockReturnValue({
         isComplete: true,
         completenessScore: 100,
@@ -935,7 +944,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
       await cvController.submitPhaseResponses(req, res);
 
-      expect(save).toHaveBeenCalled();
+      expect(cvRepository.updateById).toHaveBeenCalled();
       expect(responseHandler.success).toHaveBeenCalledWith(
         res,
         {
@@ -962,7 +971,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should return 404 when curriculum not found', async () => {
       req.body = { sessionId: 's1', finalResponses: { a: 1 } };
-      CV.findOne.mockResolvedValue(null);
+      cvRepository.findOne.mockResolvedValue(null);
 
       await cvController.submitQuestionnaire(req, res);
 
@@ -971,18 +980,19 @@ describe('Curriculum Controller - Unit Tests', () => {
 
     it('should save final responses and return improvement', async () => {
       req.body = { sessionId: 's1', finalResponses: { 'availability.immediate': true } };
-      const save = jest.fn().mockResolvedValue(undefined);
-      const cv = { save };
-      CV.findOne.mockResolvedValue(cv);
+      const cv = { _id: 'cv1' };
+      cvRepository.findOne.mockResolvedValue(cv);
+      cvRepository.updateById.mockResolvedValue({});
+      cvRepository.findById.mockResolvedValue({ _id: 'cv1' });
 
-      const { validateCVCompleteness } = require('../../../src/services/cvCompletenessValidator.service');
+      const { validateCVCompleteness } = require('../../../src/services/cv/cvCompletenessValidator.service');
       validateCVCompleteness
         .mockReturnValueOnce({ completenessScore: 40, isComplete: false, missingFields: ['x'] })
         .mockReturnValueOnce({ completenessScore: 70, isComplete: false, missingFields: ['y'] });
 
       await cvController.submitQuestionnaire(req, res);
 
-      expect(save).toHaveBeenCalled();
+      expect(cvRepository.updateById).toHaveBeenCalled();
       expect(responseHandler.success).toHaveBeenCalledWith(
         res,
         expect.objectContaining({

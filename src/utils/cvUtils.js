@@ -1,11 +1,23 @@
 /**
- * Utilidades para extracción de información de currículos
- * Contiene funciones para extraer y normalizar datos usando regex
+ * Utilities for extracting information from resumes
+ * Contains functions to extract and normalize data using regex
  */
 
 class CVUtils {
   /**
-   * Extrae emails del texto usando regex
+   * Creates a safe word-boundary regex for matching a term in text.
+   * Escapes the term to prevent ReDoS and validates it's a simple alphanumeric string.
+   */
+  static createWordBoundaryRegex(term) {
+    if (typeof term !== 'string' || term.length === 0 || term.length > 100) {
+      return null;
+    }
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\b${escaped}\\b`, 'gi');
+  }
+
+  /**
+   * Extracts emails from text using regex
    */
   extractEmails(text) {
     const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
@@ -14,11 +26,11 @@ class CVUtils {
   }
 
   /**
-   * Extrae números de teléfono del texto
-   * Soporta formatos internacionales con código de país
+   * Extracts phone numbers from text
+   * Supports international formats with country code
    */
   extractPhones(text) {
-    // Patrones para teléfonos con código de país y varios formatos
+    // Phone patterns with country code and various formats
     const phonePatterns = [
       /\+?\d{1,4}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,9}/g,
       /\(\d{3}\)[\s.-]?\d{3}[\s.-]?\d{4}/g,
@@ -35,7 +47,7 @@ class CVUtils {
   }
 
   /**
-   * Extrae URLs del texto
+   * Extracts URLs from text
    */
   extractUrls(text) {
     const urlRegex = /https?:\/\/[^\s<>"{}|\\^`[\]]+/g;
@@ -44,7 +56,7 @@ class CVUtils {
   }
 
   /**
-   * Extrae URLs específicas de LinkedIn
+   * Extracts LinkedIn-specific URLs
    */
   extractLinkedIn(text) {
     const linkedinRegex = /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/[\w-]+/gi;
@@ -53,7 +65,7 @@ class CVUtils {
   }
 
   /**
-   * Extrae URLs específicas de GitHub
+   * Extracts GitHub-specific URLs
    */
   extractGitHub(text) {
     const githubRegex = /(?:https?:\/\/)?(?:www\.)?github\.com\/[\w-]+/gi;
@@ -62,14 +74,14 @@ class CVUtils {
   }
 
   /**
-   * Extrae fechas en varios formatos
-   * Soporta: YYYY, MM/YYYY, Mes YYYY, YYYY-MM, presente, actualidad
+   * Extracts dates in various formats
+   * Supports: YYYY, MM/YYYY, Month YYYY, YYYY-MM, present, current
    */
   extractDates(text) {
     const datePatterns = [
       /\b(20\d{2}|19\d{2})\b/g, // YYYY
       /\b(0?[1-9]|1[0-2])\/(20\d{2}|19\d{2})\b/g, // MM/YYYY
-      /\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2}|19\d{2})\b/gi, // Mes YYYY
+      /\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2}|19\d{2})\b/gi, // Month YYYY (Spanish)
       /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(20\d{2}|19\d{2})\b/gi, // Mon YYYY
       /\b(20\d{2}|19\d{2})-(0?[1-9]|1[0-2])\b/g // YYYY-MM
     ];
@@ -80,7 +92,7 @@ class CVUtils {
       matches.forEach(date => dates.add(date.trim()));
     });
 
-    // Detectar palabras clave para "presente"
+    // Detect keywords for "present"
     const currentKeywords = ['presente', 'actualidad', 'actual', 'present', 'current'];
     const textLower = text.toLowerCase();
     currentKeywords.forEach(keyword => {
@@ -93,23 +105,23 @@ class CVUtils {
   }
 
   /**
-   * Normaliza texto: elimina tabulaciones, espacios dobles, y caracteres especiales
+   * Normalizes text: removes tabs, double spaces, and special characters
    */
   normalizeText(text) {
     if (!text) return '';
     
     return text
-      .replace(/\t/g, ' ')            // Reemplazar tabs por espacios
-      .replace(/\r\n/g, '\n')         // Normalizar saltos de línea
-      .replace(/\r/g, '\n')           // Normalizar saltos de línea
-      .replace(/[ \t]{2,}/g, ' ')      // Reemplazar múltiples espacios (no saltos de línea)
-      .replace(/\n{3,}/g, '\n\n')     // Mantener al menos un salto en secciones
-      .replace(/[^\S\n]+$/gm, '')     // Eliminar espacios al final de líneas
+      .replace(/\t/g, ' ')            // Replace tabs with spaces
+      .replace(/\r\n/g, '\n')         // Normalize line breaks
+      .replace(/\r/g, '\n')           // Normalize line breaks
+      .replace(/[ \t]{2,}/g, ' ')      // Replace multiple spaces (not line breaks)
+      .replace(/\n{3,}/g, '\n\n')     // Keep at least one break between sections
+      .replace(/[^\S\n]+$/gm, '')     // Remove trailing spaces from lines
       .trim();
   }
 
   /**
-   * Divide el texto por secciones basándose en encabezados comunes
+   * Splits text into sections based on common headings
    */
   splitIntoSections(text, sectionKeywords) {
     const normalizedText = this.normalizeText(text);
@@ -123,12 +135,12 @@ class CVUtils {
       const lineUpper = line.toUpperCase().trim();
       let foundSection = false;
 
-      // Buscar si la línea es un encabezado de sección
+      // Check if the line is a section heading
       if (line.trim().length > 0) {
-        // Detectar si es una línea de título
-        // Debe ser corta (max 8 palabras) Y cumplir al menos uno de estos criterios:
-        // 1. Todo en mayúsculas
-        // 2. Empieza con mayúscula y no tiene puntos/comas al final
+        // Detect if it is a title line
+        // Must be short (max 8 words) AND meet at least one of these criteria:
+        // 1. All uppercase
+        // 2. Starts with a capital letter and has no periods/commas at the end
         const words = line.trim().split(/\s+/);
         const isShort = words.length <= 8;
         const isUppercase = lineUpper === line.trim();
@@ -137,9 +149,9 @@ class CVUtils {
         const hasColon = line.trim().endsWith(':');
         
         const looksLikeTitle = isShort && (
-          isUppercase || // Todo en mayúsculas como "EDUCACIÓN"
-          (startsCapital && noPunctuation && words.length <= 5) || // Título corto capitalizado
-          hasColon // Termina con dos puntos como "Habilidades:"
+          isUppercase || // All uppercase like "EDUCATION"
+          (startsCapital && noPunctuation && words.length <= 5) || // Short capitalized title
+          hasColon // Ends with colon like "Skills:"
         );
 
         if (looksLikeTitle) {
@@ -148,25 +160,25 @@ class CVUtils {
               const keywordLower = keyword.toLowerCase();
               const keywordWords = keywordLower.split(' ');
               
-              // Coincidencia exacta
+              // Exact match
               if (lineLower === keywordLower) return true;
               
-              // Contiene el keyword
+              // Contains the keyword
               if (lineLower.includes(keywordLower)) return true;
               
-              // Contiene todas las palabras del keyword
+              // Contains all words of the keyword
               if (keywordWords.every(word => lineLower.includes(word))) return true;
               
               return false;
             });
             
             if (matchesKeyword) {
-              // Guardar sección anterior
+              // Save previous section
               if (currentContent.length > 0) {
                 if (!sections[currentSection]) sections[currentSection] = [];
                 sections[currentSection].push(currentContent.join('\n'));
               }
-              // Iniciar nueva sección
+              // Start new section
               currentSection = sectionKey;
               currentContent = [];
               foundSection = true;
@@ -176,13 +188,13 @@ class CVUtils {
         }
       }
 
-      // Si no es un encabezado, agregar al contenido actual
+      // If not a heading, add to current content
       if (!foundSection && line.trim()) {
         currentContent.push(line);
       }
     });
 
-    // Guardar última sección
+    // Save last section
     if (currentContent.length > 0) {
       if (!sections[currentSection]) sections[currentSection] = [];
       sections[currentSection].push(currentContent.join('\n'));
@@ -192,20 +204,20 @@ class CVUtils {
   }
 
   /**
-   * Limpia caracteres especiales innecesarios
+   * Removes unnecessary special characters
    */
   cleanSpecialCharacters(text) {
     if (!text) return '';
     
     return text
       .replace(/[•●○◆◇■□▪▫]/g, '')    // Bullets
-      .replace(/[─┬┼┴├┤┐┘└┌]/g, '')    // Caracteres de tablas
+      .replace(/[─┬┼┴├┤┐┘└┌]/g, '')    // Table characters
       .replace(/\u00A0/g, ' ')          // Non-breaking space
       .trim();
   }
 
   /**
-   * Valida que un campo tenga al menos un valor
+   * Validates that a field has at least one value
    */
   validateField(field) {
     if (Array.isArray(field)) {
@@ -223,13 +235,13 @@ class CVUtils {
   }
 
   /**
-   * Extrae ubicación (ciudad/país) comparando con diccionario
+   * Extracts location (city/country) by comparing with a dictionary
    */
   extractLocation(text, locationDictionary) {
     const textLower = text.toLowerCase();
     const locations = [];
 
-    // Buscar ciudades
+    // Search for cities
     if (locationDictionary.cities) {
       locationDictionary.cities.forEach(city => {
         if (textLower.includes(city.toLowerCase())) {
@@ -238,7 +250,7 @@ class CVUtils {
       });
     }
 
-    // Buscar países
+    // Search for countries
     if (locationDictionary.countries) {
       locationDictionary.countries.forEach(country => {
         if (textLower.includes(country.toLowerCase())) {
@@ -251,12 +263,12 @@ class CVUtils {
   }
 
   /**
-   * Normaliza nombres de tecnologías
+   * Normalizes technology names
    */
   normalizeTechnology(tech, technologyDictionary) {
     const techLower = tech.toLowerCase().trim();
     
-    // Buscar en diccionario de normalizaciones
+    // Search in normalization dictionary
     if (technologyDictionary && technologyDictionary[techLower]) {
       return technologyDictionary[techLower];
     }
@@ -265,8 +277,8 @@ class CVUtils {
   }
 
   /**
-   * Extrae líneas que probablemente sean descripciones de responsabilidades
-   * (líneas largas o que empiezan con bullets)
+   * Extracts lines that are likely responsibility descriptions
+   * (long lines or lines starting with bullets)
    */
   extractResponsibilities(text) {
     const lines = text.split('\n');
@@ -274,7 +286,7 @@ class CVUtils {
 
     lines.forEach(line => {
       const cleaned = line.trim();
-      // Líneas largas (más de 30 caracteres) o que empiezan con bullets comunes
+      // Long lines (more than 30 characters) or lines starting with common bullets
       if (cleaned.length > 30 || /^[-•●○◆▪]/.test(cleaned)) {
         responsibilities.push(this.cleanSpecialCharacters(cleaned));
       }
