@@ -3,9 +3,8 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const { COOKIE_NAME } = require('../utils/cookie');
+const { getFrontendUrl } = require('./urls');
 const User = require('../models/user.model');
-
-const backendUrl = process.env.BACKEND_URL;
 
 // JWT STRATEGY
 if (!process.env.JWT_SECRET) {
@@ -76,7 +75,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: `${backendUrl}/auth/google/callback`,
+        callbackURL: `${getFrontendUrl()}/auth/google/callback`,
       },
       (accessToken, refreshToken, profile, done) => {
         const normalizedProfile = {

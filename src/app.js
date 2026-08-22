@@ -27,10 +27,27 @@ app.disable('x-powered-by');
 app.use(helmet());
 
 const isProduction = process.env.NODE_ENV === 'production';
-const allowedOrigins = (process.env.CORS_ORIGINS || '')
-  .split(',')
-  .map(origin => origin.trim())
-  .filter(Boolean);
+const { getFrontendUrl } = require('./config/urls');
+
+const normalizeOrigin = (value) => {
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+};
+
+const allowedOrigins = [
+  ...new Set(
+    [
+      ...(process.env.CORS_ORIGINS || '')
+        .split(',')
+        .map(origin => origin.trim())
+        .filter(Boolean),
+      normalizeOrigin(getFrontendUrl())
+    ].filter(Boolean)
+  )
+];
 
 app.use(
   cors({
