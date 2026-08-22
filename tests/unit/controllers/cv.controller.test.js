@@ -1,4 +1,6 @@
-jest.mock('pdf-parse', () => jest.fn());
+jest.mock('../../../src/utils/pdfParser', () => ({
+  parsePdf: jest.fn()
+}));
 jest.mock('../../../src/services/cv/aiExtractor.service');
 jest.mock('../../../src/services/cv/cv.service');
 jest.mock('../../../src/utils/responseHandler');
@@ -38,7 +40,7 @@ const aiExtractorService = require('../../../src/services/cv/aiExtractor.service
 const cvService = require('../../../src/services/cv/cv.service');
 const responseHandler = require('../../../src/utils/responseHandler');
 const { cvRepository, userRepository } = require('../../../src/repositories');
-const pdfParse = require('pdf-parse');
+const { parsePdf } = require('../../../src/utils/pdfParser');
 
 describe('Curriculum Controller - Unit Tests', () => {
   let req, res;
@@ -94,7 +96,7 @@ describe('Curriculum Controller - Unit Tests', () => {
         originalname: 'cv.pdf'
       };
 
-      pdfParse.mockResolvedValue({ text: 'CV content here' });
+      parsePdf.mockResolvedValue({ text: 'CV content here' });
       userRepository.findById.mockResolvedValue({
         name: 'Test User',
         hasCVProcessingConsent: jest.fn().mockReturnValue(false)
@@ -130,7 +132,7 @@ describe('Curriculum Controller - Unit Tests', () => {
         })
       };
 
-      pdfParse.mockResolvedValue({ text: 'CV content here with skills' });
+      parsePdf.mockResolvedValue({ text: 'CV content here with skills' });
       userRepository.findById.mockResolvedValue(mockUser);
       aiExtractorService.processCV.mockResolvedValue(mockCV);
 
@@ -144,7 +146,7 @@ describe('Curriculum Controller - Unit Tests', () => {
 
       await cvController.uploadCV(req, res);
 
-      expect(pdfParse).toHaveBeenCalled();
+      expect(parsePdf).toHaveBeenCalled();
       expect(aiExtractorService.processCV).toHaveBeenCalledWith(
         'user123',
         expect.any(String),
@@ -213,7 +215,7 @@ describe('Curriculum Controller - Unit Tests', () => {
       };
 
       const error = new Error('Processing error');
-      pdfParse.mockRejectedValue(error);
+      parsePdf.mockRejectedValue(error);
 
       await cvController.uploadCV(req, res);
 

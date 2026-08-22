@@ -8,7 +8,7 @@ class CVUtils {
    * Creates a safe word-boundary regex for matching a term in text.
    * Escapes the term to prevent ReDoS and validates it's a simple alphanumeric string.
    */
-  static createWordBoundaryRegex(term) {
+  createWordBoundaryRegex(term) {
     if (typeof term !== 'string' || term.length === 0 || term.length > 100) {
       return null;
     }

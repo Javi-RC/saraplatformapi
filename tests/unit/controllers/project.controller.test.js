@@ -352,7 +352,7 @@ describe('Project Controller - Unit Tests', () => {
         { _id: 'project1', projectName: 'Project 1' },
         { _id: 'project2', projectName: 'Project 2' }
       ];
-      projectService.getProjectsByOrganization.mockResolvedValue(mockProjects);
+      projectService.getProjectsByOrganization.mockResolvedValue({ data: mockProjects });
 
       await projectController.getOrganizationProjects(req, res);
 
@@ -374,7 +374,7 @@ describe('Project Controller - Unit Tests', () => {
         status: 'active',
         projectManager: 'pm123'
       };
-      projectService.getProjectsByOrganization.mockResolvedValue([]);
+      projectService.getProjectsByOrganization.mockResolvedValue({ data: [] });
 
       await projectController.getOrganizationProjects(req, res);
 

@@ -190,7 +190,7 @@ describe('Profile API Tests', () => {
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toContain('Name');
+      expect(response.body.error).toContain('NAME_INVALID');
     });
 
     it('should reject invalid working hours format', async () => {

@@ -517,6 +517,82 @@ class OrganizationController {
       return handleErrorCatch(error, res);
     }
   }
+
+  /**
+   * Gets the expert rules configuration for an organization
+   * GET /api/organizations/:id/expert-rules/config
+   */
+  async getExpertRulesConfig(req, res) {
+    try {
+      const { id } = req.params;
+      const Organization = require('../models/organization.model');
+
+      const organization = await Organization.findById(id).select('expertRulesConfig');
+
+      if (!organization) {
+        return res.status(404).json({
+          success: false,
+          error: 'Organization not found'
+        });
+      }
+
+      const config = organization.expertRulesConfig || {
+        riskThresholds: {},
+        personalityRiskThresholds: {}
+      };
+
+      return res.status(200).json({
+        success: true,
+        data: config
+      });
+    } catch (error) {
+      console.error('Error getting expert rules config:', error);
+      return handleErrorCatch(error, res);
+    }
+  }
+
+  /**
+   * Updates the expert rules configuration for an organization
+   * PUT /api/organizations/:id/expert-rules/config
+   */
+  async updateExpertRulesConfig(req, res) {
+    try {
+      const { id } = req.params;
+      const { riskThresholds, personalityRiskThresholds } = req.body;
+      const Organization = require('../models/organization.model');
+
+      const organization = await Organization.findById(id);
+
+      if (!organization) {
+        return res.status(404).json({
+          success: false,
+          error: 'Organization not found'
+        });
+      }
+
+      if (!organization.expertRulesConfig) {
+        organization.expertRulesConfig = {};
+      }
+
+      if (riskThresholds !== undefined) {
+        organization.expertRulesConfig.riskThresholds = riskThresholds;
+      }
+      if (personalityRiskThresholds !== undefined) {
+        organization.expertRulesConfig.personalityRiskThresholds = personalityRiskThresholds;
+      }
+
+      await organization.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Expert rules configuration updated successfully',
+        data: organization.expertRulesConfig
+      });
+    } catch (error) {
+      console.error('Error updating expert rules config:', error);
+      return handleErrorCatch(error, res);
+    }
+  }
 }
 
 module.exports = new OrganizationController();

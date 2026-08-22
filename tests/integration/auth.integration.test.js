@@ -28,7 +28,7 @@ describe('Auth - Integration Tests', () => {
       const userData = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'Password123'
       };
       const response = await request(app)
         .post('/auth/register')
@@ -50,7 +50,7 @@ describe('Auth - Integration Tests', () => {
       const userData = {
         email: 'duplicate@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'Password123'
       };
 
       await request(app).post('/auth/register').send(userData);
@@ -69,15 +69,15 @@ describe('Auth - Integration Tests', () => {
       const testCases = [
         { 
           data: { email: 'invalid-email', name: 'Test', password: '123' },
-          expectedError: 'Invalid email format'
+          expectedError: 'INVALID_EMAIL_FORMAT'
         },
         { 
-          data: { email: '', name: 'Test', password: 'password123' },
-          expectedError: 'All fields are required'
+          data: { email: '', name: 'Test', password: 'Password123' },
+          expectedError: 'MISSING_REQUIRED_FIELDS'
         },
         { 
-          data: { email: 'test@example.com', name: '', password: 'password123' },
-          expectedError: 'All fields are required'
+          data: { email: 'test@example.com', name: '', password: 'Password123' },
+          expectedError: 'MISSING_REQUIRED_FIELDS'
         }
       ];
 
@@ -142,7 +142,7 @@ describe('Auth - Integration Tests', () => {
         .expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toContain('Invalid credentials');
+      expect(response.body.error).toContain('INVALID_CREDENTIALS');
       bcrypt.compare.mockRestore();
     });
   });
@@ -174,7 +174,7 @@ describe('Auth - Integration Tests', () => {
         .get('/auth/confirm?token=invalid-token')
         .expect(302);
 
-      expect(response.header.location).toContain('/error?message=Error%20confirmando%20cuenta');
+      expect(response.header.location).toContain('/login?error=confirmation_failed');
     });
   });
 

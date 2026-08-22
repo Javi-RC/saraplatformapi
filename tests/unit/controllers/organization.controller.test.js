@@ -451,7 +451,7 @@ describe('Organization Controller - Unit Tests', () => {
         { _id: 'user1', name: 'User 1' },
         { _id: 'user2', name: 'User 2' }
       ];
-      organizationService.getEmployees.mockResolvedValue(mockEmployees);
+      organizationService.getEmployees.mockResolvedValue({ data: mockEmployees });
 
       await organizationController.getEmployees(req, res);
 
@@ -467,6 +467,7 @@ describe('Organization Controller - Unit Tests', () => {
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
+        count: 2,
         data: mockEmployees
       });
     });
@@ -760,7 +761,7 @@ describe('Organization Controller - Unit Tests', () => {
         { _id: 'proj1', name: 'Project 1' },
         { _id: 'proj2', name: 'Project 2' }
       ];
-      projectService.getProjectsByOrganization.mockResolvedValue(mockProjects);
+      projectService.getProjectsByOrganization.mockResolvedValue({ data: mockProjects });
 
       await organizationController.getOrganizationProjects(req, res);
 
@@ -779,7 +780,7 @@ describe('Organization Controller - Unit Tests', () => {
     it('should apply filters when provided', async () => {
       req.params.id = 'org123';
       req.query = { status: 'active', projectManager: 'pm123' };
-      projectService.getProjectsByOrganization.mockResolvedValue([]);
+      projectService.getProjectsByOrganization.mockResolvedValue({ data: [] });
 
       await organizationController.getOrganizationProjects(req, res);
 

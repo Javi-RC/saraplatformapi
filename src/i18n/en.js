@@ -987,11 +987,11 @@ module.exports = {
     // Recommendations
     recommendations: {
       roleDiversity: {
-        title: 'Improve Role Diversity',
-        description: 'Team lacks diversity in personality roles',
+        title: 'Improve Trait Diversity',
+        description: 'Team lacks diversity in Big Five personality traits',
         actions: [
           'Consider adding members with complementary personality profiles',
-          'Identify missing team roles and recruit accordingly',
+          'Seek candidates with different Big Five trait combinations',
           'Use personality assessments in hiring process'
         ]
       },
@@ -1036,19 +1036,19 @@ module.exports = {
 
     // Summary / explanation
     summary: {
-      text: 'This team has {level} synergy ({score}/100) for {projectType} projects. The team shows {roleDiversityLevel} role diversity and {projectFitLevel} fit with project requirements.'
+      text: 'This team has {level} synergy ({score}/100) for {projectType} projects. The team shows {roleDiversityLevel} trait diversity and {projectFitLevel} fit with project requirements.'
     },
 
     // Strengths
     strengths: {
-      roleDiversity: 'Team has {uniqueRoles} different personality roles, ensuring good coverage',
+      roleDiversity: 'Team has good Big Five trait diversity, ensuring varied perspectives',
       projectFit: 'Team personality profile matches {projectType} project requirements',
       previousCollaborations: 'Strong collaboration history with {totalCollaborations} past project(s) together'
     },
 
     // Concerns
     concerns: {
-      roleDiversity: 'Team lacks diversity in personality roles',
+      roleDiversity: 'Team has low Big Five trait diversity - members may be too similar',
       projectFit: 'Team personality may not be suited for this project type',
       previousCollaborations: 'Limited or no previous collaboration history'
     },

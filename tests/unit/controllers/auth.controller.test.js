@@ -184,9 +184,10 @@ describe('Auth Controller - Unit Tests', () => {
 
       await authController.confirmAccount(req, res);
 
-      expect(res.redirect).toHaveBeenCalled();
-      const redirectUrl = res.redirect.mock.calls[0][0];
-      expect(redirectUrl).toContain('/login?error=confirmation_failed');
+      expect(responseHandler.redirect).toHaveBeenCalledWith(
+        res,
+        expect.stringContaining('/login?error=confirmation_failed')
+      );
     });
 
     it('debería redirigir a error si falla la confirmación', async () => {

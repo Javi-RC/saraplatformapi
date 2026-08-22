@@ -252,7 +252,7 @@ describe('ProjectService', () => {
 
       const result = await projectService.getProjectsByOrganization(organizationId);
 
-      expect(result).toEqual(mockProjects);
+      expect(result.data).toEqual(mockProjects);
       expect(projectRepository.find).toHaveBeenCalledWith(
         { organization: organizationId },
         expect.any(Object)

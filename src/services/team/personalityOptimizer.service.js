@@ -481,55 +481,30 @@ class PersonalityOptimizerService {
       reasoning: []
     };
 
-    // Analyze current team composition
-    const currentRoles = synergy.metrics.roleDiversity.distribution;
-    const allRoles = teamSynergyService.constructor.TEAM_ROLES;
-    const projectProfile = teamSynergyService.constructor.PROJECT_PROFILES[synergy.projectType];
-
-    // Identify missing roles
-    const missingRoles = projectProfile.idealRoles.filter(role => 
-      !currentRoles[role] || currentRoles[role] === 0
-    );
-
-    missingRoles.forEach(roleKey => {
-      const role = allRoles[roleKey];
-      if (role) {
-        recommendations.idealProfiles.push({
-          role: roleKey,
-          name: role.name,
-          description: role.description,
-          desiredTraits: role.traits,
-          priority: 'high'
-        });
-        recommendations.reasoning.push(
-          `Seek ${role.name} to fill missing role in team`
-        );
-      }
-    });
-
-    // Check for personality imbalances
-    const traits = synergy.metrics.balance.traitBalance;
-    Object.keys(traits).forEach(trait => {
-      const balance = traits[trait];
-      if (balance.average < 2.5) {
-        recommendations.idealProfiles.push({
-          trait,
-          recommendation: `Higher ${trait}`,
-          reason: `Team average is low (${balance.average.toFixed(2)})`,
-          priority: 'medium'
-        });
-      } else if (balance.average > 3.8) {
-        recommendations.avoidProfiles.push({
-          trait,
-          recommendation: `Very high ${trait}`,
-          reason: `Team average is already high (${balance.average.toFixed(2)})`,
-          priority: 'low'
-        });
-      }
-    });
+    // Check for trait imbalances from synergy balance data
+    if (synergy.metrics.balance?.traitBalance) {
+      Object.keys(synergy.metrics.balance.traitBalance).forEach(trait => {
+        const balance = synergy.metrics.balance.traitBalance[trait];
+        if (balance.average < 2.5) {
+          recommendations.idealProfiles.push({
+            trait,
+            recommendation: `Higher ${trait}`,
+            reason: `Team average is low (${balance.average.toFixed(2)})`,
+            priority: 'medium'
+          });
+        } else if (balance.average > 3.8) {
+          recommendations.avoidProfiles.push({
+            trait,
+            recommendation: `Very high ${trait}`,
+            reason: `Team average is already high (${balance.average.toFixed(2)})`,
+            priority: 'low'
+          });
+        }
+      });
+    }
 
     // Address conflict risks
-    if (synergy.metrics.conflictRisk.risksDetected > 0) {
+    if (synergy.metrics.conflictRisk?.risksDetected > 0) {
       synergy.metrics.conflictRisk.risks.forEach(risk => {
         if (risk.type === 'high_stress_tendency') {
           recommendations.idealProfiles.push({

@@ -987,11 +987,11 @@ module.exports = {
     // Recommendations
     recommendations: {
       roleDiversity: {
-        title: 'Mejorar la diversidad de roles',
-        description: 'El equipo carece de diversidad en los roles de personalidad',
+        title: 'Mejorar la diversidad de rasgos',
+        description: 'El equipo carece de diversidad en los rasgos de personalidad Big Five',
         actions: [
           'Considerar añadir miembros con perfiles de personalidad complementarios',
-          'Identificar roles de equipo faltantes y reclutar en consecuencia',
+          'Buscar candidatos con diferentes combinaciones de rasgos Big Five',
           'Utilizar evaluaciones de personalidad en el proceso de contratación'
         ]
       },
@@ -1036,19 +1036,19 @@ module.exports = {
 
     // Summary / explanation
     summary: {
-      text: 'Este equipo tiene una sinergia {level} ({score}/100) para proyectos de tipo {projectType}. El equipo muestra {roleDiversityLevel} diversidad de roles y {projectFitLevel} adecuación a los requisitos del proyecto.'
+      text: 'Este equipo tiene una sinergia {level} ({score}/100) para proyectos de tipo {projectType}. El equipo muestra {roleDiversityLevel} diversidad de rasgos y {projectFitLevel} adecuación a los requisitos del proyecto.'
     },
 
     // Strengths
     strengths: {
-      roleDiversity: 'El equipo tiene {uniqueRoles} roles de personalidad diferentes, asegurando buena cobertura',
+      roleDiversity: 'El equipo tiene buena diversidad de rasgos Big Five, asegurando perspectivas variadas',
       projectFit: 'El perfil de personalidad del equipo coincide con los requisitos del proyecto {projectType}',
       previousCollaborations: 'Fuerte historial de colaboración con {totalCollaborations} proyecto(s) pasado(s) juntos'
     },
 
     // Concerns
     concerns: {
-      roleDiversity: 'El equipo carece de diversidad en los roles de personalidad',
+      roleDiversity: 'El equipo tiene baja diversidad de rasgos Big Five - los miembros pueden ser demasiado similares',
       projectFit: 'La personalidad del equipo puede no ser adecuada para este tipo de proyecto',
       previousCollaborations: 'Historial de colaboración limitado o inexistente'
     },

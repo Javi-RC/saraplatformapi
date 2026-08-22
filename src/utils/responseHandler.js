@@ -44,6 +44,8 @@ const errorMap = {
 
 class ResponseHandler {
   handleError(error, res) {
+    console.error('Controller Error:', error);
+
     if (error && (error.name === 'AppError' || error.code)) {
       const status = Number(error.status || error.statusCode) || 500;
       const code = error.code || 'INTERNAL_ERROR';
@@ -61,10 +63,20 @@ class ResponseHandler {
     }
 
     const errorMessage = error && error.message ? error.message : null;
-    const errorInfo = errorMap[errorMessage] || { status: Number(error && error.statusCode) || 500, message: 'Internal server error' };
-    const fallbackCode = errorMessage && errorMessage !== errorInfo.message
-      ? errorMessage.replace(/\s+/g, '_').toUpperCase()
-      : 'INTERNAL_ERROR';
+
+    // Direct lookup by code-style message, then reverse lookup by human-readable message
+    let matchedCode = errorMessage && errorMap[errorMessage] ? errorMessage : null;
+    if (!matchedCode && errorMessage) {
+      const entry = Object.entries(errorMap).find(([, info]) => info.message === errorMessage);
+      if (entry) {
+        matchedCode = entry[0];
+      }
+    }
+
+    const errorInfo = matchedCode
+      ? errorMap[matchedCode]
+      : { status: Number(error && error.statusCode) || 500, message: 'Internal server error' };
+    const fallbackCode = matchedCode || 'UNKNOWN_ERROR';
 
     const response = { success: false, error: fallbackCode };
 

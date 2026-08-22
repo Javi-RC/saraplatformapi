@@ -14,42 +14,7 @@ const AppError = require('../../utils/AppError');
  * @module services/teamSynergy
  */
 class TeamSynergyService {
-  /**
-   * Big Five trait definitions for team roles
-   * Based on research: Belbin Team Roles + Big Five correlations
-   */
-  static TEAM_ROLES = {
-    innovator: {
-      name: 'Innovator/Creator',
-      description: 'Generates new ideas and creative solutions',
-      traits: { Openness: { min: 3.5 }, Extraversion: { min: 3.0 } },
-      ideal: { Openness: 4.0, Extraversion: 3.5 }
-    },
-    executor: {
-      name: 'Executor/Implementer',
-      description: 'Completes tasks reliably and with discipline',
-      traits: { Conscientiousness: { min: 3.5 } },
-      ideal: { Conscientiousness: 4.5 }
-    },
-    facilitator: {
-      name: 'Facilitator/Coordinator',
-      description: 'Manages team communication and resolves conflicts',
-      traits: { Extraversion: { min: 3.5 }, Agreeableness: { min: 3.5 } },
-      ideal: { Extraversion: 4.0, Agreeableness: 4.0 }
-    },
-    analyst: {
-      name: 'Analyst/Specialist',
-      description: 'Deep analysis and technical problem solving',
-      traits: { Openness: { min: 3.5 }, Conscientiousness: { min: 3.0 } },
-      ideal: { Openness: 4.0, Conscientiousness: 3.5 }
-    },
-    stabilizer: {
-      name: 'Stabilizer/Monitor',
-      description: 'Maintains team stability under pressure',
-      traits: { Neuroticism: { max: 2.5 }, Conscientiousness: { min: 3.0 } },
-      ideal: { Neuroticism: 2.0, Conscientiousness: 3.5 }
-    }
-  };
+  static TRAITS = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
 
   /**
    * Project type personality requirements
@@ -140,10 +105,12 @@ class TeamSynergyService {
 
     // OPTIMIZATION: Calculate independent metrics in parallel (20-40% faster)
     // All these calculations don't depend on each other's results
-    const [roleDiversity, projectFit, previousCollaborations] = await Promise.all([
+    const [roleDiversity, projectFit, previousCollaborations, balance, conflictRisk] = await Promise.all([
       Promise.resolve(this._calculateRoleDiversity(profiles)),
       Promise.resolve(this._calculateProjectFit(profiles, projectProfile)),
-      this._calculatePreviousCollaborations(teamMembers) // Async call
+      this._calculatePreviousCollaborations(teamMembers),
+      Promise.resolve(this._calculateBalance(profiles)),
+      Promise.resolve(this._detectConflictRisks(profiles))
     ]);
 
     // Calculate overall synergy score (0-100)
@@ -168,7 +135,9 @@ class TeamSynergyService {
       metrics: {
         roleDiversity,
         projectFit,
-        previousCollaborations
+        previousCollaborations,
+        balance,
+        conflictRisk
       },
       recommendations: this._generateRecommendations({
         roleDiversity,
@@ -180,34 +149,40 @@ class TeamSynergyService {
   }
 
   /**
-   * Calculate role diversity in the team
-   * Higher diversity = better coverage of team roles
+   * Calculate trait diversity in the team using Big Five trait variance
+   * Higher diversity = higher variance across team members' personality traits
    * @private
    */
   _calculateRoleDiversity(profiles) {
-    const roleAssignments = profiles.map(profile => 
-      this._assignPrimaryRole(profile.traits)
-    );
+    const traits = TeamSynergyService.TRAITS;
+    const traitVariance = {};
 
-    const uniqueRoles = new Set(roleAssignments.map(r => r.role));
-    const roleDistribution = {};
-
-    roleAssignments.forEach(assignment => {
-      roleDistribution[assignment.role] = (roleDistribution[assignment.role] || 0) + 1;
+    traits.forEach(trait => {
+      const values = profiles.map(p => p.traits[trait]).filter(v => v !== undefined);
+      if (values.length < 2) {
+        traitVariance[trait] = { stdDev: 0, normalizedScore: 0 };
+        return;
+      }
+      const mean = values.reduce((a, b) => a + b, 0) / values.length;
+      const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
+      const stdDev = Math.sqrt(variance);
+      const normalizedScore = Math.min(100, Math.round((stdDev / 2.0) * 100));
+      traitVariance[trait] = {
+        stdDev: Math.round(stdDev * 100) / 100,
+        normalizedScore
+      };
     });
 
-    const diversityScore = Math.min(100, (uniqueRoles.size / Math.min(profiles.length, 5)) * 100);
+    const avgScore = Math.round(
+      Object.values(traitVariance).reduce((s, v) => s + v.normalizedScore, 0) / traits.length
+    );
 
     return {
-      score: Math.round(diversityScore),
-      uniqueRoles: uniqueRoles.size,
-      totalRoles: Object.keys(TeamSynergyService.TEAM_ROLES).length,
-      distribution: roleDistribution,
-      assignments: roleAssignments.map(a => ({
-        role: a.role,
-        roleName: TeamSynergyService.TEAM_ROLES[a.role]?.name,
-        fit: a.fit
-      }))
+      score: avgScore,
+      traitVariance,
+      averageStdDev: parseFloat(
+        (Object.values(traitVariance).reduce((s, v) => s + v.stdDev, 0) / traits.length).toFixed(2)
+      )
     };
   }
 
@@ -584,11 +559,11 @@ class TeamSynergyService {
       recommendations.push({
         category: 'role_diversity',
         priority: 'high',
-        title: 'Improve Role Diversity',
-        description: 'Team lacks diversity in personality roles',
+        title: 'Improve Trait Diversity',
+        description: 'Team lacks diversity in Big Five personality traits',
         actions: [
           'Consider adding members with complementary personality profiles',
-          'Identify missing team roles and recruit accordingly',
+          'Seek candidates with different Big Five trait combinations',
           'Use personality assessments in hiring process'
         ]
       });
@@ -650,55 +625,6 @@ class TeamSynergyService {
     }
 
     return recommendations;
-  }
-
-  /**
-   * Assign primary role to a personality profile
-   * @private
-   */
-  _assignPrimaryRole(traits) {
-    const roles = TeamSynergyService.TEAM_ROLES;
-    let bestRole = null;
-    let bestFit = 0;
-
-    Object.keys(roles).forEach(roleKey => {
-      const role = roles[roleKey];
-      let fit = 0;
-      let criteriaCount = 0;
-
-      Object.keys(role.traits).forEach(trait => {
-        const criteria = role.traits[trait];
-        const value = traits[trait];
-
-        if (value !== undefined) {
-          criteriaCount++;
-          
-          if (criteria.min !== undefined && value >= criteria.min) {
-            fit += 1;
-          }
-          if (criteria.max !== undefined && value <= criteria.max) {
-            fit += 1;
-          }
-
-          if (role.ideal && role.ideal[trait] !== undefined) {
-            const distance = Math.abs(value - role.ideal[trait]);
-            fit += Math.max(0, 1 - distance / 2);
-          }
-        }
-      });
-
-      const normalizedFit = criteriaCount > 0 ? fit / (criteriaCount * 2) : 0;
-
-      if (normalizedFit > bestFit) {
-        bestFit = normalizedFit;
-        bestRole = roleKey;
-      }
-    });
-
-    return {
-      role: bestRole || 'generalist',
-      fit: Math.round(bestFit * 100)
-    };
   }
 
   /**
@@ -894,7 +820,7 @@ class TeamSynergyService {
       score: overallScore,
       level,
       text: `This team has ${level} synergy (${overallScore}/100) for ${projectType} projects. ` +
-            `The team shows ${metrics.roleDiversity.score >= 60 ? 'good' : 'limited'} role diversity and ` +
+            `The team shows ${metrics.roleDiversity.score >= 60 ? 'good' : 'limited'} trait diversity and ` +
             `${metrics.projectFit.score >= 60 ? 'good' : 'poor'} fit with project requirements.`
     };
   }
@@ -909,9 +835,9 @@ class TeamSynergyService {
 
     if (metrics.roleDiversity.score >= 70) {
       strengths.push({
-        area: 'Role Diversity',
+        area: 'Trait Diversity',
         score: metrics.roleDiversity.score,
-        description: `Team has ${metrics.roleDiversity.uniqueRoles} different personality roles, ensuring good coverage`
+        description: `Team has good Big Five trait diversity (avg std dev: ${metrics.roleDiversity.averageStdDev}), ensuring varied perspectives`
       });
     }
 
@@ -944,10 +870,10 @@ class TeamSynergyService {
 
     if (metrics.roleDiversity.score < 60) {
       concerns.push({
-        area: 'Role Diversity',
+        area: 'Trait Diversity',
         score: metrics.roleDiversity.score,
         severity: 'medium',
-        description: 'Team lacks diversity in personality roles'
+        description: 'Team has low Big Five trait diversity - members may be too similar'
       });
     }
 

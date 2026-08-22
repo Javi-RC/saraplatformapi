@@ -2,6 +2,8 @@ const { Router } = require('express');
 const router = Router();
 const { authMiddleware } = require('../utils/jwt');
 const User = require('../models/user.model');
+const Project = require('../models/project.model');
+const Notification = require('../models/notification.model');
 const validators = require('../utils/validators');
 const userController = require('../controllers/user.controller');
 
@@ -327,6 +329,137 @@ router.post('/personality-consent', authMiddleware, async (req, res) => {
       success: false,
       error: 'Error updating personality consent'
     });
+  }
+});
+
+/**
+ * GET /api/profile/stats
+ * Returns aggregate statistics for the authenticated user's dashboard
+ */
+router.get('/profile/stats', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.userId || req.user?.id || req.user?._id;
+
+    const projects = await Project.find({
+      $or: [
+        { projectManager: userId },
+        { 'assignedEmployees.user': userId }
+      ]
+    }).select('synergyCache assignedEmployees projectManager').lean();
+
+    const projectCount = projects.length;
+    const teamCount = projects.filter(p =>
+      p.assignedEmployees?.some(e => e.user?.toString() === userId?.toString())
+    ).length;
+
+    let compatibility = null;
+    const synergies = projects
+      .map(p => p.synergyCache?.data?.overallSynergy)
+      .filter(v => v != null);
+    if (synergies.length > 0) {
+      const avg = synergies.reduce((a, b) => a + b, 0) / synergies.length;
+      compatibility = `${Math.round(avg * 100)}%`;
+    }
+
+    const data = [
+      { key: 'projects', value: projectCount, color: 'sara-stat-icon--blue', labelKey: 'profile.dashboard.stats.projects', linkKey: 'profile.dashboard.stats.viewProjects', path: '/projects' },
+      { key: 'teams', value: teamCount, color: 'sara-stat-icon--green', labelKey: 'profile.dashboard.stats.teams', linkKey: 'profile.dashboard.stats.viewTeams', path: '/teams' },
+      { key: 'compatibility', value: compatibility || '—', color: 'sara-stat-icon--purple', labelKey: 'profile.dashboard.stats.compatibility' },
+      { key: 'recommendations', value: projectCount, color: 'sara-stat-icon--orange', labelKey: 'profile.dashboard.stats.recommendations' }
+    ];
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error fetching profile stats:', error);
+    res.status(500).json({ success: false, error: 'Error fetching profile stats' });
+  }
+});
+
+/**
+ * GET /api/profile/activity
+ * Returns recent activity entries for the authenticated user
+ */
+router.get('/profile/activity', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.userId || req.user?.id || req.user?._id;
+
+    const notifications = await Notification.find({ recipient: userId })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    const data = notifications.map(n => {
+      const type = n.type || 'SYSTEM_UPDATE';
+      const now = Date.now();
+      const diffMs = now - new Date(n.createdAt).getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+      let timeKey;
+      if (diffMinutes < 1) {
+        timeKey = 'profile.dashboard.activity.justNow';
+      } else if (diffMinutes < 60) {
+        timeKey = 'profile.dashboard.activity.minutesAgo';
+      } else if (diffHours < 24) {
+        timeKey = 'profile.dashboard.activity.hoursAgo';
+      } else if (diffDays === 1) {
+        timeKey = 'profile.dashboard.activity.yesterday';
+      } else if (diffDays <= 7) {
+        timeKey = 'profile.dashboard.activity.daysAgo';
+      } else {
+        timeKey = 'profile.dashboard.activity.weeksAgo';
+      }
+
+      return {
+        titleKey: `notifications.${type}`,
+        timeKey,
+        rawTitle: n.title,
+        rawMessage: n.message,
+        createdAt: n.createdAt
+      };
+    });
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error fetching profile activity:', error);
+    res.status(500).json({ success: false, error: 'Error fetching profile activity' });
+  }
+});
+
+/**
+ * GET /api/teams/my-teams
+ * Returns teams (projects) the authenticated user is assigned to
+ */
+router.get('/teams/my-teams', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user?.userId || req.user?.id || req.user?._id;
+
+    const projects = await Project.find({
+      'assignedEmployees.user': userId
+    })
+      .select('projectName assignedEmployees projectManager')
+      .populate('projectManager', 'name email')
+      .lean();
+
+    const data = projects.map(p => {
+      const memberCount = p.assignedEmployees?.length || 0;
+      const userAssignment = p.assignedEmployees?.find(
+        e => e.user?.toString() === userId?.toString()
+      );
+      return {
+        id: p._id,
+        projectId: p._id,
+        name: p.projectName,
+        memberCount,
+        role: userAssignment?.assignedRole || 'team_member'
+      };
+    });
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('Error fetching my teams:', error);
+    res.status(500).json({ success: false, error: 'Error fetching teams' });
   }
 });
 

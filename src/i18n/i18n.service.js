@@ -444,21 +444,10 @@ function translateSynergyObject(synergyData, lang = DEFAULT_LANGUAGE) {
 function _translateSynergyMetrics(metrics, projectType, lang) {
   const translated = { ...metrics };
 
-  // Translate role diversity
   if (translated.roleDiversity) {
     translated.roleDiversity = { ...translated.roleDiversity };
     if (translated.roleDiversity.level) {
       translated.roleDiversity.level = translate(lang, `synergy.levels.${translated.roleDiversity.level}`) || translated.roleDiversity.level;
-    }
-    // Translate role assignments
-    if (translated.roleDiversity.assignments) {
-      translated.roleDiversity.assignments = translated.roleDiversity.assignments.map(a => {
-        const roleTrans = translate(lang, `synergy.roles.${a.role}`);
-        return {
-          ...a,
-          roleName: (roleTrans && roleTrans.name) || a.roleName
-        };
-      });
     }
   }
 
@@ -581,7 +570,6 @@ function _translateSynergyExplanation(explanation, synergy, lang) {
       return {
         ...s,
         description: replaceParams(descTrans, {
-          uniqueRoles: synergy.metrics?.roleDiversity?.uniqueRoles || '',
           projectType: synergy.projectType || '',
           totalCollaborations: synergy.metrics?.previousCollaborations?.totalCollaborations || ''
         })
@@ -608,7 +596,7 @@ function _translateSynergyExplanation(explanation, synergy, lang) {
  */
 function _areaToKey(area) {
   const mapping = {
-    'Role Diversity': 'roleDiversity',
+    'Trait Diversity': 'roleDiversity',
     'Project Fit': 'projectFit',
     'Previous Collaborations': 'previousCollaborations'
   };

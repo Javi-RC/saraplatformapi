@@ -102,8 +102,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'User not found',
-        code: 'USER_NOT_FOUND',
+        error: 'USER_NOT_FOUND',
+        message: 'User not found',
         details: { id: '123' }
       });
     });
@@ -121,7 +121,7 @@ describe('ResponseHandler', () => {
       expect(mockRes.json).toHaveBeenCalledWith(
         expect.objectContaining({
           success: false,
-          code: 'VALIDATION_ERROR'
+          error: 'VALIDATION_ERROR'
         })
       );
     });
@@ -134,7 +134,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(409);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'This email is already registered'
+        error: 'USER_ALREADY_EXISTS',
+        message: 'This email is already registered'
       });
     });
 
@@ -146,7 +147,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(401);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Invalid credentials'
+        error: 'INVALID_CREDENTIALS',
+        message: 'Invalid credentials'
       });
     });
 
@@ -158,7 +160,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Internal server error'
+        error: 'UNKNOWN_ERROR',
+        message: 'Internal server error'
       });
     });
 
@@ -179,7 +182,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Project not found'
+        error: 'PROJECT_NOT_FOUND',
+        message: 'Project not found'
       });
     });
 
@@ -207,7 +211,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(400);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Invalid responses format'
+        error: 'BFI44_INVALID_RESPONSES_FORMAT',
+        message: 'Invalid responses format'
       });
     });
 
@@ -219,7 +224,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Error processing the curriculum. Check the Gemini API configuration.'
+        error: 'ERROR_PROCESSING_CV',
+        message: 'Error processing the curriculum'
       });
     });
 
@@ -231,7 +237,8 @@ describe('ResponseHandler', () => {
       expect(mockRes.status).toHaveBeenCalledWith(429);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
-        error: 'Too many registration attempts. Please wait 24 hours or contact support.'
+        error: 'TOO_MANY_ATTEMPTS',
+        message: 'Too many registration attempts. Please wait 24 hours or contact support.'
       });
     });
   });

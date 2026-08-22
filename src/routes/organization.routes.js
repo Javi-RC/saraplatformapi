@@ -163,4 +163,18 @@ router.get('/:id/projects', authenticate, organizationController.getOrganization
  */
 router.get('/:id/projects/statistics', authenticate, organizationController.getProjectStatistics);
 
+/**
+ * Get expert rules configuration
+ * GET /api/organizations/:id/expert-rules/config
+ */
+router.get('/:id/expert-rules/config', authenticate, organizationController.getExpertRulesConfig);
+
+/**
+ * Update expert rules configuration
+ * PUT /api/organizations/:id/expert-rules/config
+ * Body: { riskThresholds: {...}, personalityRiskThresholds: {...} }
+ * Access: Organization admin only
+ */
+router.put('/:id/expert-rules/config', authenticate, requireOrganizationAdmin, organizationController.updateExpertRulesConfig);
+
 module.exports = router;

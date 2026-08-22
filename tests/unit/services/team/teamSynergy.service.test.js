@@ -18,7 +18,7 @@ describe('teamSynergy.service - Unit Tests', () => {
     expect(result.score).toBeLessThanOrEqual(100);
   });
 
-  it('_calculateRoleDiversity returns assignments and distribution', () => {
+  it('_calculateRoleDiversity returns trait variance based diversity', () => {
     const profiles = [
       { traits: { Openness: 4.2, Extraversion: 3.6, Conscientiousness: 3.0, Agreeableness: 3.2, Neuroticism: 2.5 } },
       { traits: { Openness: 3.6, Conscientiousness: 4.4, Extraversion: 2.6, Agreeableness: 3.3, Neuroticism: 2.2 } }
@@ -29,10 +29,11 @@ describe('teamSynergy.service - Unit Tests', () => {
     expect(result).toEqual(
       expect.objectContaining({
         score: expect.any(Number),
-        uniqueRoles: expect.any(Number),
-        assignments: expect.any(Array),
-        distribution: expect.any(Object)
+        averageStdDev: expect.any(Number),
+        traitVariance: expect.any(Object)
       })
     );
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(100);
   });
 });

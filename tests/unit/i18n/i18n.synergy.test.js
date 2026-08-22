@@ -66,15 +66,15 @@ describe('i18n - Synergy Translations', () => {
       metrics: {
         roleDiversity: {
           score: 80,
-          uniqueRoles: 3,
-          totalRoles: 5,
           level: 'excellent',
-          distribution: { innovator: 1, executor: 1, facilitator: 1 },
-          assignments: [
-            { role: 'innovator', roleName: 'Innovator/Creator', fit: 85 },
-            { role: 'executor', roleName: 'Executor/Implementer', fit: 72 },
-            { role: 'facilitator', roleName: 'Facilitator/Coordinator', fit: 65 }
-          ]
+          averageStdDev: 0.34,
+          traitVariance: {
+            Openness: { stdDev: 0.3, normalizedScore: 15 },
+            Conscientiousness: { stdDev: 0.7, normalizedScore: 35 },
+            Extraversion: { stdDev: 0.5, normalizedScore: 25 },
+            Agreeableness: { stdDev: 0.05, normalizedScore: 2 },
+            Neuroticism: { stdDev: 0.15, normalizedScore: 7 }
+          }
         },
         projectFit: {
           score: 70,
@@ -110,12 +110,12 @@ describe('i18n - Synergy Translations', () => {
       expect(result.projectProfile.description).toBe('Desarrollo de productos nuevos con tecnologías novedosas');
     });
 
-    it('should translate role names in assignments to Spanish', () => {
+    it('should pass through roleDiversity trait variance and translate level', () => {
       const result = translateSynergyObject(buildSynergyData(), 'es');
 
-      expect(result.metrics.roleDiversity.assignments[0].roleName).toBe('Innovador/Creador');
-      expect(result.metrics.roleDiversity.assignments[1].roleName).toBe('Ejecutor/Implementador');
-      expect(result.metrics.roleDiversity.assignments[2].roleName).toBe('Facilitador/Coordinador');
+      expect(result.metrics.roleDiversity.traitVariance).toEqual(buildSynergyData().metrics.roleDiversity.traitVariance);
+      expect(result.metrics.roleDiversity.averageStdDev).toBe(0.34);
+      expect(result.metrics.roleDiversity.level).toBe('excelente');
     });
 
     it('should translate score levels to Spanish', () => {
@@ -151,7 +151,7 @@ describe('i18n - Synergy Translations', () => {
 
       expect(result.projectProfile.name).toBe('Innovation/Startup');
       expect(result.metrics.roleDiversity.level).toBe('excellent');
-      expect(result.metrics.roleDiversity.assignments[0].roleName).toBe('Innovator/Creator');
+      expect(result.metrics.roleDiversity.averageStdDev).toBe(0.34);
     });
 
     it('should return null for null input', () => {
@@ -167,7 +167,7 @@ describe('i18n - Synergy Translations', () => {
           text: 'This team has good synergy (75/100) for innovation projects.'
         },
         strengths: [
-          { area: 'Role Diversity', score: 80, description: 'Team has 3 different personality roles' }
+          { area: 'Trait Diversity', score: 80, description: 'Team has good Big Five trait diversity' }
         ],
         concerns: [
           { area: 'Previous Collaborations', score: 45, severity: 'medium', description: 'Limited collaboration history' }
@@ -179,7 +179,7 @@ describe('i18n - Synergy Translations', () => {
 
       expect(result.explanation.summary.level).toBe('bueno');
       expect(result.explanation.summary.text).toContain('sinergia');
-      expect(result.explanation.strengths[0].description).toContain('roles de personalidad');
+      expect(result.explanation.strengths[0].description).toContain('diversidad de rasgos');
       expect(result.explanation.concerns[0].description).toContain('inexistente');
     });
   });

@@ -105,10 +105,14 @@ app.use(cookieParser());
 // Serverless DB connection (Vercel): app.js is the entry point there, so it must
 // open the connection itself. connectDB() is idempotent, so the extra call made by
 // src/server.js in a long-running process reuses this same connection.
+// In tests the connection is managed by tests/setup/mongodb-helper.js (MongoMemoryServer),
+// so the eager connection is skipped to avoid hitting a real database.
 const connectDB = require('./config/db');
 const mongoose = require('mongoose');
 
-connectDB();
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 app.use((req, res, next) => {
   if (mongoose.connection.readyState !== 1) {

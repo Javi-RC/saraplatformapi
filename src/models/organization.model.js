@@ -323,6 +323,20 @@ const organizationSchema = new mongoose.Schema({
     default: {}
   },
   
+  // Expert rules configuration (decision tree thresholds for risk prediction)
+  expertRulesConfig: {
+    riskThresholds: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+      description: 'Risk detection threshold values'
+    },
+    personalityRiskThresholds: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+      description: 'Personality-based risk thresholds'
+    }
+  },
+
   // Audit metadata
   
   // Last activity
