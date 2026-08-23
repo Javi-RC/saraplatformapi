@@ -131,11 +131,27 @@ if (process.env.NODE_ENV !== 'test') {
   connectDB();
 }
 
+const DB_WAIT_TIMEOUT_MS = Number(process.env.DB_WAIT_TIMEOUT_MS || 8000);
+
 app.use((req, res, next) => {
-  if (mongoose.connection.readyState !== 1) {
-    return res.status(503).json({ success: false, error: 'Database not connected' });
-  }
-  next();
+  if (mongoose.connection.readyState === 1) return next();
+
+  let timer;
+  const timeout = new Promise((resolve, reject) => {
+    timer = setTimeout(() => reject(new Error('Database connection wait timeout')), DB_WAIT_TIMEOUT_MS);
+  });
+  timeout.catch(() => {});
+
+  Promise.race([connectDB(), timeout])
+    .then(() => {
+      clearTimeout(timer);
+      if (mongoose.connection.readyState === 1) return next();
+      return res.status(503).json({ success: false, error: 'Database not connected' });
+    })
+    .catch(() => {
+      clearTimeout(timer);
+      return res.status(503).json({ success: false, error: 'Database not connected' });
+    });
 });
 
 // Rutas
