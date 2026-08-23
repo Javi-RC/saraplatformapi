@@ -14,7 +14,7 @@ function getTokenCookieOptions() {
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     path: '/',
     maxAge: parseExpiresIn(process.env.JWT_EXPIRES_IN || '7d')
   };
@@ -28,7 +28,7 @@ exports.clearTokenCookie = (res) => {
   res.cookie(COOKIE_NAME, '', {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     path: '/',
     maxAge: 0
   });
