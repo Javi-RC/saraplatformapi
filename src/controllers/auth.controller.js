@@ -72,7 +72,8 @@ exports.login = async (req, res) => {
 
     return responseHandler.success(res, {
       message: 'Login successful',
-      user: result.user
+      user: result.user,
+      token: result.token
     });
 
   } catch (error) {

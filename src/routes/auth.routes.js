@@ -28,10 +28,11 @@ function isAllowedRedirectUrl(url) {
   }
 }
 
-function safeRedirect(res, path, queryParams = {}) {
+function safeRedirect(res, path, queryParams = {}, hash = '') {
   const base = getFrontendUrl();
   const url = new URL(path, base);
   Object.entries(queryParams).forEach(([k, v]) => url.searchParams.set(k, v));
+  if (hash) url.hash = hash;
   const finalUrl = url.toString();
   if (!isAllowedRedirectUrl(finalUrl)) {
     return res.redirect(`${base}/login`);
@@ -78,10 +79,10 @@ router.get(
 
         const token = generateToken(user);
         setTokenCookie(res, token);
-        const redirectPath = user.role === ROLES.UNASSIGNED 
+        const redirectPath = user.role === ROLES.UNASSIGNED
           ? '/complete-profile'
           : '/auth/callback';
-        return safeRedirect(res, redirectPath);
+        return safeRedirect(res, redirectPath, {}, `token=${token}`);
       }
 
       user = new User({
@@ -99,7 +100,7 @@ router.get(
 
       const token = generateToken(user);
       setTokenCookie(res, token);
-      safeRedirect(res, '/auth/callback');
+      safeRedirect(res, '/auth/callback', {}, `token=${token}`);
 
     } catch (_error) {
       return safeRedirect(res, '/login', { oauth_error: 'Authentication failed' });
