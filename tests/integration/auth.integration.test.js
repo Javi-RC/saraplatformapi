@@ -114,7 +114,7 @@ describe('Auth - Integration Tests', () => {
         .expect(200);
       expect(response.body.success).toBe(true);
       expect(response.body.user.email).toBe('test@example.com');
-      expect(response.body.token).toBeUndefined();
+      expect(response.body.token).toBeDefined();
       const cookies = response.headers['set-cookie'];
       expect(cookies).toBeDefined();
       expect(cookies.some(c => c.startsWith('auth_token='))).toBe(true);

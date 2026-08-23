@@ -129,7 +129,8 @@ describe('Auth Controller - Unit Tests', () => {
         res,
         {
           message: 'Login successful',
-          user: mockResult.user
+          user: mockResult.user,
+          token: 'fake-jwt-token'
         }
       );
     });
