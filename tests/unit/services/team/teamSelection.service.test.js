@@ -396,14 +396,18 @@ describe('TeamSelectionService - Unit Tests', () => {
     };
 
     it('should return Infinity for invalid curriculum input', async () => {
-      const score = await teamSelectionService.calculateEmployeeScore(null, ['node'], 'mid', 'medium', 40, config);
+      const score = await teamSelectionService.calculateEmployeeScore({
+        cv: null, requiredTechs: ['node'], experienceLevel: 'mid', complexity: 'medium', weeklyHours: 40, config
+      });
       expect(score.total).toBe(Infinity);
       expect(score.details.error).toBeDefined();
     });
 
     it('should return Infinity for curriculum without userId', async () => {
       const cv = { skills: {} };
-      const score = await teamSelectionService.calculateEmployeeScore(cv, ['node'], 'mid', 'medium', 40, config);
+      const score = await teamSelectionService.calculateEmployeeScore({
+        cv, requiredTechs: ['node'], experienceLevel: 'mid', complexity: 'medium', weeklyHours: 40, config
+      });
       expect(score.total).toBe(Infinity);
     });
 
@@ -424,17 +428,18 @@ describe('TeamSelectionService - Unit Tests', () => {
 
       projectRepository.find.mockResolvedValue([]);
 
-      const score = await teamSelectionService.calculateEmployeeScore(
+      const score = await teamSelectionService.calculateEmployeeScore({
         cv,
-        ['javascript'],
-        'mid',
-        'medium',
-        40,
+        requiredTechs: ['javascript'],
+        experienceLevel: 'mid',
+        complexity: 'medium',
+        weeklyHours: 40,
         config
-      );
+      });
 
       expect(score.total).toBeDefined();
       expect(score.total).not.toBe(Infinity);
+      expect(Number.isFinite(score.total)).toBe(true);
       expect(score.details).toBeDefined();
       expect(score.matchedSkills).toBeDefined();
       expect(score.missingSkills).toBeDefined();
@@ -452,17 +457,44 @@ describe('TeamSelectionService - Unit Tests', () => {
 
       projectRepository.find.mockResolvedValue([]);
 
-      const score = await teamSelectionService.calculateEmployeeScore(
+      const score = await teamSelectionService.calculateEmployeeScore({
         cv,
-        ['javascript', 'python', 'go'],
-        'mid',
-        'medium',
-        40,
+        requiredTechs: ['javascript', 'python', 'go'],
+        experienceLevel: 'mid',
+        complexity: 'medium',
+        weeklyHours: 40,
         config
-      );
+      });
 
       expect(score.matchedSkills.length).toBeGreaterThan(0);
       expect(score.missingSkills.length).toBeGreaterThan(0);
+    });
+
+    // Regression: the previous positional signature took 7 parameters and every
+    // production call site passed 6, shifting `config` onto `weeklyHours` and the
+    // active-projects array onto `config`. `phase1Config.skillsWeight` was then
+    // undefined and the total came out NaN, which silently disabled every
+    // downstream ranking. A malformed config must never produce a non-finite score.
+    it('should never produce a non-finite score when the config is malformed', async () => {
+      const cv = {
+        userId: { _id: 'user-123' },
+        skills: { technical: [{ name: 'JavaScript', level: 'avanzado' }] },
+        experience: [],
+        availability: { immediate: true }
+      };
+
+      projectRepository.find.mockResolvedValue([]);
+
+      for (const malformed of [[], {}, 'not-a-config', 42]) {
+        const score = await teamSelectionService.calculateEmployeeScore({
+          cv,
+          requiredTechs: ['javascript'],
+          config: malformed
+        });
+
+        expect(Number.isNaN(score.total)).toBe(false);
+        expect(Number.isFinite(score.total)).toBe(true);
+      }
     });
   });
 

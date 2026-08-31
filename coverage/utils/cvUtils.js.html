@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">81.41% </span>
+                <span class="strong">81.19% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>92/113</span>
+                <span class='fraction'>95/117</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.41% </span>
+                <span class="strong">70% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>59/85</span>
+                <span class='fraction'>63/90</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.61% </span>
+                <span class="strong">85.18% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>22/26</span>
+                <span class='fraction'>23/27</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">82.35% </span>
+                <span class="strong">82.07% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>84/102</span>
+                <span class='fraction'>87/106</span>
             </div>
         
             
@@ -350,10 +350,34 @@
 <a name='L285'></a><a href='#L285'>285</a>
 <a name='L286'></a><a href='#L286'>286</a>
 <a name='L287'></a><a href='#L287'>287</a>
-<a name='L288'></a><a href='#L288'>288</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L288'></a><a href='#L288'>288</a>
+<a name='L289'></a><a href='#L289'>289</a>
+<a name='L290'></a><a href='#L290'>290</a>
+<a name='L291'></a><a href='#L291'>291</a>
+<a name='L292'></a><a href='#L292'>292</a>
+<a name='L293'></a><a href='#L293'>293</a>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">46x</span>
+<span class="cline-any cline-yes">46x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -638,13 +662,25 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">14x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
- * Utilidades para extracción de información de CVs
- * Contiene funciones para extraer y normalizar datos usando regex
+ * Utilities for extracting information from resumes
+ * Contains functions to extract and normalize data using regex
  */
 &nbsp;
 class CVUtils {
   /**
-   * Extrae emails del texto usando regex
+   * Creates a safe word-boundary regex for matching a term in text.
+   * Escapes the term to prevent ReDoS and validates it's a simple alphanumeric string.
+   */
+  createWordBoundaryRegex(term) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof term !== 'string' || term.length === 0 || term.length &gt; 100) {
+<span class="cstat-no" title="statement not covered" >      return null;</span>
+    }
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&amp;');
+    return new RegExp(`\\b${escaped}\\b`, 'gi');
+  }
+&nbsp;
+  /**
+   * Extracts emails from text using regex
    */
   extractEmails(text) {
     const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
@@ -653,11 +689,11 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Extrae números de teléfono del texto
-   * Soporta formatos internacionales con código de país
+   * Extracts phone numbers from text
+   * Supports international formats with country code
    */
   extractPhones(text) {
-    // Patrones para teléfonos con código de país y varios formatos
+    // Phone patterns with country code and various formats
     const phonePatterns = [
       /\+?\d{1,4}[\s.-]?\(?\d{1,4}\)?[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,9}/g,
       /\(\d{3}\)[\s.-]?\d{3}[\s.-]?\d{4}/g,
@@ -674,7 +710,7 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Extrae URLs del texto
+   * Extracts URLs from text
    */
   extractUrls(text) {
     const urlRegex = /https?:\/\/[^\s&lt;&gt;"{}|\\^`[\]]+/g;
@@ -683,7 +719,7 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Extrae URLs específicas de LinkedIn
+   * Extracts LinkedIn-specific URLs
    */
   extractLinkedIn(text) {
     const linkedinRegex = /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/[\w-]+/gi;
@@ -692,7 +728,7 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Extrae URLs específicas de GitHub
+   * Extracts GitHub-specific URLs
    */
   extractGitHub(text) {
     const githubRegex = /(?:https?:\/\/)?(?:www\.)?github\.com\/[\w-]+/gi;
@@ -701,14 +737,14 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Extrae fechas en varios formatos
-   * Soporta: YYYY, MM/YYYY, Mes YYYY, YYYY-MM, presente, actualidad
+   * Extracts dates in various formats
+   * Supports: YYYY, MM/YYYY, Month YYYY, YYYY-MM, present, current
    */
   extractDates(text) {
     const datePatterns = [
       /\b(20\d{2}|19\d{2})\b/g, // YYYY
       /\b(0?[1-9]|1[0-2])\/(20\d{2}|19\d{2})\b/g, // MM/YYYY
-      /\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2}|19\d{2})\b/gi, // Mes YYYY
+      /\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\s+(20\d{2}|19\d{2})\b/gi, // Month YYYY (Spanish)
       /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(20\d{2}|19\d{2})\b/gi, // Mon YYYY
       /\b(20\d{2}|19\d{2})-(0?[1-9]|1[0-2])\b/g // YYYY-MM
     ];
@@ -719,7 +755,7 @@ class CVUtils {
       matches.forEach(date =&gt; dates.add(date.trim()));
     });
 &nbsp;
-    // Detectar palabras clave para "presente"
+    // Detect keywords for "present"
     const currentKeywords = ['presente', 'actualidad', 'actual', 'present', 'current'];
     const textLower = text.toLowerCase();
     currentKeywords.forEach(keyword =&gt; {
@@ -732,23 +768,23 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Normaliza texto: elimina tabulaciones, espacios dobles, y caracteres especiales
+   * Normalizes text: removes tabs, double spaces, and special characters
    */
   normalizeText(text) {
     if (!text) return '';
     
     return text
-      .replace(/\t/g, ' ')            // Reemplazar tabs por espacios
-      .replace(/\r\n/g, '\n')         // Normalizar saltos de línea
-      .replace(/\r/g, '\n')           // Normalizar saltos de línea
-      .replace(/[ \t]{2,}/g, ' ')      // Reemplazar múltiples espacios (no saltos de línea)
-      .replace(/\n{3,}/g, '\n\n')     // Mantener al menos un salto en secciones
-      .replace(/[^\S\n]+$/gm, '')     // Eliminar espacios al final de líneas
+      .replace(/\t/g, ' ')            // Replace tabs with spaces
+      .replace(/\r\n/g, '\n')         // Normalize line breaks
+      .replace(/\r/g, '\n')           // Normalize line breaks
+      .replace(/[ \t]{2,}/g, ' ')      // Replace multiple spaces (not line breaks)
+      .replace(/\n{3,}/g, '\n\n')     // Keep at least one break between sections
+      .replace(/[^\S\n]+$/gm, '')     // Remove trailing spaces from lines
       .trim();
   }
 &nbsp;
   /**
-   * Divide el texto por secciones basándose en encabezados comunes
+   * Splits text into sections based on common headings
    */
   splitIntoSections(text, sectionKeywords) {
     const normalizedText = this.normalizeText(text);
@@ -762,12 +798,12 @@ class CVUtils {
       const lineUpper = line.toUpperCase().trim();
       let foundSection = false;
 &nbsp;
-      // Buscar si la línea es un encabezado de sección
+      // Check if the line is a section heading
       if (line.trim().length &gt; 0) {
-        // Detectar si es una línea de título
-        // Debe ser corta (max 8 palabras) Y cumplir al menos uno de estos criterios:
-        // 1. Todo en mayúsculas
-        // 2. Empieza con mayúscula y no tiene puntos/comas al final
+        // Detect if it is a title line
+        // Must be short (max 8 words) AND meet at least one of these criteria:
+        // 1. All uppercase
+        // 2. Starts with a capital letter and has no periods/commas at the end
         const words = line.trim().split(/\s+/);
         const isShort = words.length &lt;= 8;
         const isUppercase = lineUpper === line.trim();
@@ -776,9 +812,9 @@ class CVUtils {
         const hasColon = line.trim().endsWith(':');
         
         const looksLikeTitle = isShort &amp;&amp; (
-          isUppercase || // Todo en mayúsculas como "EDUCACIÓN"
-          (startsCapital &amp;&amp; noPunctuation &amp;&amp; words.length &lt;= 5) || // Título corto capitalizado
-<span class="branch-5 cbranch-no" title="branch not covered" >          hasColon </span>// Termina con dos puntos como "Habilidades:"
+          isUppercase || // All uppercase like "EDUCATION"
+          (startsCapital &amp;&amp; noPunctuation &amp;&amp; words.length &lt;= 5) || // Short capitalized title
+<span class="branch-5 cbranch-no" title="branch not covered" >          hasColon </span>// Ends with colon like "Skills:"
         );
 &nbsp;
         <span class="missing-if-branch" title="else path not taken" >E</span>if (looksLikeTitle) {
@@ -787,25 +823,25 @@ class CVUtils {
               const keywordLower = keyword.toLowerCase();
               const keywordWords = keywordLower.split(' ');
               
-              // Coincidencia exacta
+              // Exact match
               if (lineLower === keywordLower) return true;
               
-              // Contiene el keyword
+              // Contains the keyword
               <span class="missing-if-branch" title="if path not taken" >I</span>if (lineLower.includes(keywordLower)) <span class="cstat-no" title="statement not covered" >return true;</span>
               
-              // Contiene todas las palabras del keyword
+              // Contains all words of the keyword
               <span class="missing-if-branch" title="if path not taken" >I</span>if (keywordWords.every(word =&gt; lineLower.includes(word))) <span class="cstat-no" title="statement not covered" >return true;</span>
               
               return false;
             });
             
             if (matchesKeyword) {
-              // Guardar sección anterior
+              // Save previous section
               if (currentContent.length &gt; 0) {
                 <span class="missing-if-branch" title="else path not taken" >E</span>if (!sections[currentSection]) sections[currentSection] = [];
                 sections[currentSection].push(currentContent.join('\n'));
               }
-              // Iniciar nueva sección
+              // Start new section
               currentSection = sectionKey;
               currentContent = [];
               foundSection = true;
@@ -815,13 +851,13 @@ class CVUtils {
         }
       }
 &nbsp;
-      // Si no es un encabezado, agregar al contenido actual
+      // If not a heading, add to current content
       if (!foundSection &amp;&amp; line.trim()) {
         currentContent.push(line);
       }
     });
 &nbsp;
-    // Guardar última sección
+    // Save last section
     <span class="missing-if-branch" title="else path not taken" >E</span>if (currentContent.length &gt; 0) {
       <span class="missing-if-branch" title="else path not taken" >E</span>if (!sections[currentSection]) sections[currentSection] = [];
       sections[currentSection].push(currentContent.join('\n'));
@@ -831,20 +867,20 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Limpia caracteres especiales innecesarios
+   * Removes unnecessary special characters
    */
   cleanSpecialCharacters(text) {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (!text) <span class="cstat-no" title="statement not covered" >return '';</span>
     
     return text
       .replace(/[•●○◆◇■□▪▫]/g, '')    // Bullets
-      .replace(/[─┬┼┴├┤┐┘└┌]/g, '')    // Caracteres de tablas
+      .replace(/[─┬┼┴├┤┐┘└┌]/g, '')    // Table characters
       .replace(/\u00A0/g, ' ')          // Non-breaking space
       .trim();
   }
 &nbsp;
   /**
-   * Valida que un campo tenga al menos un valor
+   * Validates that a field has at least one value
    */
   validateField(field) {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (Array.isArray(field)) {
@@ -862,13 +898,13 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Extrae ubicación (ciudad/país) comparando con diccionario
+   * Extracts location (city/country) by comparing with a dictionary
    */
 <span class="fstat-no" title="function not covered" >  ex</span>tractLocation(text, locationDictionary) {
     const textLower = <span class="cstat-no" title="statement not covered" >text.toLowerCase();</span>
     const locations = <span class="cstat-no" title="statement not covered" >[];</span>
 &nbsp;
-    // Buscar ciudades
+    // Search for cities
 <span class="cstat-no" title="statement not covered" >    if (locationDictionary.cities) {</span>
 <span class="cstat-no" title="statement not covered" >      locationDictionary.cities.forEach(<span class="fstat-no" title="function not covered" >ci</span>ty =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        if (textLower.includes(city.toLowerCase())) {</span>
@@ -877,7 +913,7 @@ class CVUtils {
       });
     }
 &nbsp;
-    // Buscar países
+    // Search for countries
 <span class="cstat-no" title="statement not covered" >    if (locationDictionary.countries) {</span>
 <span class="cstat-no" title="statement not covered" >      locationDictionary.countries.forEach(<span class="fstat-no" title="function not covered" >co</span>untry =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >        if (textLower.includes(country.toLowerCase())) {</span>
@@ -890,12 +926,12 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Normaliza nombres de tecnologías
+   * Normalizes technology names
    */
 <span class="fstat-no" title="function not covered" >  no</span>rmalizeTechnology(tech, technologyDictionary) {
     const techLower = <span class="cstat-no" title="statement not covered" >tech.toLowerCase().trim();</span>
     
-    // Buscar en diccionario de normalizaciones
+    // Search in normalization dictionary
 <span class="cstat-no" title="statement not covered" >    if (technologyDictionary &amp;&amp; technologyDictionary[techLower]) {</span>
 <span class="cstat-no" title="statement not covered" >      return technologyDictionary[techLower];</span>
     }
@@ -904,8 +940,8 @@ class CVUtils {
   }
 &nbsp;
   /**
-   * Extrae líneas que probablemente sean descripciones de responsabilidades
-   * (líneas largas o que empiezan con bullets)
+   * Extracts lines that are likely responsibility descriptions
+   * (long lines or lines starting with bullets)
    */
   extractResponsibilities(text) {
     const lines = text.split('\n');
@@ -913,7 +949,7 @@ class CVUtils {
 &nbsp;
     lines.forEach(line =&gt; {
       const cleaned = line.trim();
-      // Líneas largas (más de 30 caracteres) o que empiezan con bullets comunes
+      // Long lines (more than 30 characters) or lines starting with common bullets
       <span class="missing-if-branch" title="if path not taken" >I</span>if (cleaned.length &gt; 30 || /^[-•●○◆▪]/.test(cleaned)) {
 <span class="cstat-no" title="statement not covered" >        responsibilities.push(this.cleanSpecialCharacters(cleaned));</span>
       }
@@ -931,7 +967,7 @@ module.exports = new CVUtils();
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-24T20:22:44.624Z
+                at 2026-08-23T16:35:52.930Z
             </div>
         <script src="../prettify.js"></script>
         <script>

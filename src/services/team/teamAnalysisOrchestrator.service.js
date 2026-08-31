@@ -51,15 +51,15 @@ async function analyzeCurrentTeam(project, organizationId, lang) {
 
   const teamMembers = await Promise.all(
     validCvs.map(async cv => {
-      const score = await teamSelectionService.calculateEmployeeScore(
+      const score = await teamSelectionService.calculateEmployeeScore({
         cv,
-        (project.mainTechnologies || []).map(t =>
+        requiredTechs: (project.mainTechnologies || []).map(t =>
           teamSelectionService.normalizeTechnology(t)
         ),
-        project.requiredExperienceLevel || 'mid',
-        project.weeklyHoursPerMember || 40,
-        phase1Config
-      );
+        experienceLevel: project.requiredExperienceLevel || 'mid',
+        weeklyHours: project.weeklyHoursPerMember || 40,
+        config: phase1Config
+      });
 
       const matchScore = teamSelectionService.calculateMatchScore(score.total, score.details);
 
@@ -246,15 +246,15 @@ async function scoreAvailableEmployees(project, organizationId, suggestionUserId
 
     const availableEmployeesWithScores = await Promise.all(
       validAvailableCvs.map(async cv => {
-        const score = await teamSelectionService.calculateEmployeeScore(
+        const score = await teamSelectionService.calculateEmployeeScore({
           cv,
-          (project.mainTechnologies || []).map(t =>
+          requiredTechs: (project.mainTechnologies || []).map(t =>
             teamSelectionService.normalizeTechnology(t)
           ),
-          project.requiredExperienceLevel || 'mid',
-          project.weeklyHoursPerMember || 40,
-          phase1Config
-        );
+          experienceLevel: project.requiredExperienceLevel || 'mid',
+          weeklyHours: project.weeklyHoursPerMember || 40,
+          config: phase1Config
+        });
 
         const bfi44Profile = bfi44Map.get(cv.userId._id.toString());
 

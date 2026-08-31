@@ -17,6 +17,39 @@ const AppError = require('../../utils/AppError');
  */
 class TeamSelectionService {
   /**
+   * Builds the empty-but-well-formed result of a team selection.
+   *
+   * These paths used to `return []`, while the happy path returned
+   * `{ team, metadata, ... }`. Callers destructure `{ team, metadata }`, so an
+   * organization with no employees (or no accepted curricula) yielded `undefined`
+   * for both and failed further downstream with an unrelated error.
+   *
+   * @param {number} teamSize - Requested team size
+   * @param {number} allEmployeesInOrg - Active employees in the organization
+   * @param {number} employeesWithAcceptedCV - Employees with an accepted curriculum
+   * @returns {Object} Same shape as a successful selection, with an empty team
+   * @private
+   */
+  _emptySelection(teamSize, allEmployeesInOrg = 0, employeesWithAcceptedCV = 0) {
+    return {
+      team: [],
+      metadata: {
+        requestedSize: teamSize,
+        availableEmployees: employeesWithAcceptedCV,
+        selectedSize: 0,
+        isComplete: false,
+        shortage: teamSize,
+        allEmployeesInOrg,
+        employeesWithAcceptedCV,
+        candidatePoolSize: 0,
+        personalityOptimized: false
+      },
+      synergy: null,
+      optimization: null
+    };
+  }
+
+  /**
    * Selects the ideal team for a project
    * Combines technical skill matching (Manhattan distance) with personality optimization
    * NOW USES: Project-specific configuration for weights and parameters
@@ -48,7 +81,7 @@ class TeamSelectionService {
       .map(emp => emp.user);
 
     if (employeeIds.length === 0) {
-      return [];
+      return this._emptySelection(teamSize, 0, 0);
     }
 
     const cvs = await cvRepository.find({
@@ -63,7 +96,7 @@ class TeamSelectionService {
     const validCvs = cvs.filter(cv => cv.userId != null);
 
     if (validCvs.length === 0) {
-      return [];
+      return this._emptySelection(teamSize, employeeIds.length, cvs.length);
     }
 
     const normalizedRequiredTechs = mainTechnologies.map(tech => 
@@ -78,15 +111,15 @@ class TeamSelectionService {
 
     const scoredEmployees = await Promise.all(
       validCvs.map(async cv => {
-        const score = await this.calculateEmployeeScore(
+        const score = await this.calculateEmployeeScore({
           cv,
-          normalizedRequiredTechs,
-          requiredExperienceLevel,
-          weeklyHoursPerMember,
+          requiredTechs: normalizedRequiredTechs,
+          experienceLevel: requiredExperienceLevel,
+          weeklyHours: weeklyHoursPerMember,
           config,
-          allActiveProjects
-        );
-        
+          activeProjects: allActiveProjects
+        });
+
         return {
           userId: cv.userId._id,
           user: cv.userId,
@@ -99,9 +132,13 @@ class TeamSelectionService {
       })
     );
 
+    // Manhattan distance: lower is better. Without this sort the "top candidates"
+    // slice below was just the order MongoDB happened to return the CVs in.
+    scoredEmployees.sort((a, b) => a.score - b.score);
+
     // Use configurable candidate pool multiplier
     const candidatePoolSize = Math.min(
-      teamSize * config.candidatePoolMultiplier, 
+      teamSize * config.candidatePoolMultiplier,
       scoredEmployees.length
     );
     const topCandidates = scoredEmployees.slice(0, candidatePoolSize);
@@ -232,15 +269,15 @@ class TeamSelectionService {
 
     const scoredEmployees = await Promise.all(
       validCvs.map(async cv => {
-        const score = await this.calculateEmployeeScore(
+        const score = await this.calculateEmployeeScore({
           cv,
-          normalizedRequiredTechs,
-          requiredExperienceLevel,
-          weeklyHoursPerMember,
-          phase1Config,
-          allActiveProjects
-        );
-        
+          requiredTechs: normalizedRequiredTechs,
+          experienceLevel: requiredExperienceLevel,
+          weeklyHours: weeklyHoursPerMember,
+          config: phase1Config,
+          activeProjects: allActiveProjects
+        });
+
         return {
           userId: cv.userId._id || cv.userId,
           user: cv.userId,
@@ -336,18 +373,55 @@ class TeamSelectionService {
   }
 
   /**
-   * Calculates employee score using Manhattan distance
-   * NOW USES: Configurable weights from project configuration
-   * 
-   * @param {Object} cv - Employee curriculum
-   * @param {Array} requiredTechs - Normalized required technologies
-   * @param {string} experienceLevel - Required experience level
-   * @param {string} complexity - Project complexity
-   * @param {number} weeklyHours - Required weekly hours
-   * @param {Object} config - Configuration object with weights
+   * Resolves a usable Phase 1 configuration.
+   *
+   * Guards against a caller passing something that is not a Phase 1 config
+   * (which previously produced `undefined` weights and an overall score of NaN,
+   * silently disabling the technical ranking). A malformed config now falls back
+   * to the defaults and says so, instead of poisoning the arithmetic.
+   *
+   * @param {Object} config - Candidate configuration
+   * @returns {Object} A configuration with numeric weights
+   * @private
+   */
+  _resolvePhase1Config(config) {
+    const REQUIRED_WEIGHTS = ['skillsWeight', 'experienceWeight', 'complexityWeight', 'availabilityWeight'];
+    const isUsable = config && REQUIRED_WEIGHTS.every(weight => typeof config[weight] === 'number');
+
+    if (config && !isUsable) {
+      console.warn('[teamSelection] Invalid Phase 1 config received; falling back to defaults');
+    }
+
+    return isUsable ? config : getConfigSection(null, 'phase1');
+  }
+
+  /**
+   * Calculates employee score using Manhattan distance (lower is better).
+   *
+   * Takes a single options object on purpose: the previous positional signature
+   * had seven parameters and every production call site silently omitted one,
+   * shifting every argument after it.
+   *
+   * @param {Object} options
+   * @param {Object} options.cv - Employee curriculum
+   * @param {Array} options.requiredTechs - Normalized required technologies
+   * @param {string} [options.experienceLevel='mid'] - Required experience level
+   * @param {string} [options.complexity='medium'] - Required complexity level.
+   *   No field on the Project model feeds this yet, so callers legitimately omit it.
+   * @param {number} [options.weeklyHours=40] - Required weekly hours
+   * @param {Object} [options.config] - Phase 1 configuration with weights
+   * @param {Array} [options.activeProjects=[]] - Pre-loaded active projects (avoids an N+1 query)
    * @returns {Object} Score and details
    */
-  async calculateEmployeeScore(cv, requiredTechs, experienceLevel, complexity, weeklyHours, config, allActiveProjects = []) {
+  async calculateEmployeeScore({
+    cv,
+    requiredTechs,
+    experienceLevel = 'mid',
+    complexity = 'medium',
+    weeklyHours = 40,
+    config = null,
+    activeProjects = []
+  } = {}) {
     // Validate input
     if (!cv || !cv.userId) {
       console.error('Invalid curriculum or missing userId in calculateEmployeeScore');
@@ -364,8 +438,8 @@ class TeamSelectionService {
     const matchedSkills = [];
     const missingSkills = [];
 
-    // Ensure we always have a valid Phase 1 configuration
-    const phase1Config = config || getConfigSection(null, 'phase1');
+    const phase1Config = this._resolvePhase1Config(config);
+    const allActiveProjects = activeProjects;
 
     const skillsDistance = this.calculateSkillsDistance(
       cv.skills?.technical || [],
@@ -401,6 +475,19 @@ class TeamSelectionService {
     );
     manhattanDistance += availabilityDistance * phase1Config.availabilityWeight;
     details.availabilityDistance = availabilityDistance;
+
+    // A non-finite score would silently break every downstream sort (NaN makes a
+    // comparator return NaN, which leaves the array untouched). Fail loudly-ish:
+    // rank the candidate last rather than corrupting the whole ranking.
+    if (!Number.isFinite(manhattanDistance)) {
+      console.error('[teamSelection] Non-finite score computed', { details });
+      return {
+        total: Infinity,
+        details: { ...details, error: 'Non-finite score' },
+        matchedSkills,
+        missingSkills
+      };
+    }
 
     return {
       total: manhattanDistance,

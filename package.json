@@ -1,7 +1,7 @@
 {
-  "name": "tfg-backend",
+  "name": "saraplatformapi",
   "version": "1.0.0",
-  "description": "Backend para TFG con autenticación JWT",
+  "description": "SARA Platform API",
   "main": "server.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node src/server.js",

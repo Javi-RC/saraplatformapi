@@ -1,4 +1,4 @@
-# Configuración de GitHub Actions para TFG Backend
+# Configuración de GitHub Actions para SARA Platform API
 
 Este documento describe la configuración de CI/CD implementada para el proyecto.
 

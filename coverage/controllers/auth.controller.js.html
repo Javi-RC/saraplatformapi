@@ -25,14 +25,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>35/35</span>
+                <span class='fraction'>38/38</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>5/6</span>
+                <span class='fraction'>4/6</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>35/35</span>
+                <span class='fraction'>38/38</span>
             </div>
         
             
@@ -138,7 +138,16 @@
 <a name='L73'></a><a href='#L73'>73</a>
 <a name='L74'></a><a href='#L74'>74</a>
 <a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -151,6 +160,7 @@
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -169,6 +179,7 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -191,9 +202,8 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -206,6 +216,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -213,9 +225,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const authService = require('../services/auth.service');
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const authService = require('../services/auth/auth.service');
 const validators = require('../utils/validators');
 const responseHandler = require('../utils/responseHandler');
+const { getFrontendUrl } = require('../config/urls');
+const { setTokenCookie } = require('../utils/cookie');
+const AppError = require('../utils/AppError');
 &nbsp;
 exports.register = async (req, res) =&gt; {
   try {
@@ -227,7 +242,8 @@ exports.register = async (req, res) =&gt; {
 &nbsp;
     return responseHandler.success(res, {
       message: result.message,
-      user: result.user
+      user: result.user,
+      ...(result.warning ? <span class="branch-0 cbranch-no" title="branch not covered" >{ warning: result.warning } </span>: {})
     }, 201);
 &nbsp;
   } catch (error) {
@@ -244,7 +260,8 @@ exports.sendConfirmation = async (req, res) =&gt; {
     const result = await authService.resendConfirmationEmail(email, name);
 &nbsp;
     return responseHandler.success(res, {
-      message: result.message
+      message: result.message,
+      ...(result.warning ? <span class="branch-0 cbranch-no" title="branch not covered" >{ warning: result.warning } </span>: {})
     });
 &nbsp;
   } catch (error) {
@@ -257,18 +274,17 @@ exports.confirmAccount = async (req, res) =&gt; {
     const { token } = req.query;
 &nbsp;
     if (!token) {
-      return responseHandler.handleError(new Error('INVALID_OR_EXPIRED_TOKEN'), res);
+      throw AppError.badRequest('INVALID_OR_EXPIRED_TOKEN', 'Missing confirmation token');
     }
 &nbsp;
     await authService.confirmAccount(token);
 &nbsp;
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+    const frontendUrl = getFrontendUrl();
     return responseHandler.redirect(res, `${frontendUrl}/login?confirmed=true`);
 &nbsp;
-  } catch (error) {
-    console.error('Error confirmAccount:', error);
-    const frontendUrl = process.env.FRONTEND_URL || <span class="branch-1 cbranch-no" title="branch not covered" >'http://localhost:3001';</span>
-    return responseHandler.redirect(res, `${frontendUrl}/error?message=Error confirmando cuenta`);
+  } catch (_error) {
+    const frontendUrl = getFrontendUrl();
+    return responseHandler.redirect(res, `${frontendUrl}/login?error=confirmation_failed`);
   }
 };
 &nbsp;
@@ -279,10 +295,12 @@ exports.login = async (req, res) =&gt; {
     validators.validateLoginData(email, password);
     const result = await authService.login({ email, password });
 &nbsp;
+    setTokenCookie(res, result.token);
+&nbsp;
     return responseHandler.success(res, {
-      message: 'Login exitoso',
-      token: result.token,
-      user: result.user
+      message: 'Login successful',
+      user: result.user,
+      token: result.token
     });
 &nbsp;
   } catch (error) {
@@ -295,7 +313,7 @@ exports.login = async (req, res) =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-24T20:22:44.624Z
+                at 2026-08-23T16:35:52.930Z
             </div>
         <script src="../prettify.js"></script>
         <script>

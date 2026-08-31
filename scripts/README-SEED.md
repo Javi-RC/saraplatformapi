@@ -264,7 +264,7 @@ Para limpiar solo los datos de seed sin eliminar todo:
 
 ```javascript
 // En la consola de MongoDB
-use tfg-backend
+use saraplatform
 db.users.deleteMany({ email: /example\.com$/ })
 db.organizations.deleteMany({ name: /Tech Innovators|Global Solutions|Asian Tech Hub/ })
 // etc.

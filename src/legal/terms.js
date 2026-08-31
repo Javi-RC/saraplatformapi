@@ -28,7 +28,7 @@ function getTermsEN() {
 
 **Last updated:** ${TERMS_LAST_UPDATED}
 
-> Notice: this is a text for an academic project (Bachelor's Thesis / TFG) and does not constitute legal advice.
+> Notice: this text is provided for informational purposes and does not constitute legal advice.
 
 ## 1. Identification
 
@@ -146,7 +146,7 @@ function getTermsES() {
 
 **Última actualización:** ${TERMS_LAST_UPDATED}
 
-> Aviso: este es un texto para un proyecto académico (Trabajo de Fin de Grado / TFG) y no constituye asesoramiento legal.
+> Aviso: este texto se proporciona con fines informativos y no constituye asesoramiento legal.
 
 ## 1. Identificación
 
