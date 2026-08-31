@@ -515,7 +515,12 @@ describe('TeamSelectionService - Unit Tests', () => {
       organizationRepository.findById.mockResolvedValue(mockOrg);
 
       const result = await teamSelectionService.selectOptimalTeam({}, 'org-123', 5);
-      expect(result).toEqual([]);
+      expect(result.team).toEqual([]);
+      expect(result.metadata.requestedSize).toBe(5);
+      expect(result.metadata.availableEmployees).toBe(0);
+      expect(result.metadata.selectedSize).toBe(0);
+      expect(result.metadata.shortage).toBe(5);
+      expect(result.metadata.allEmployeesInOrg).toBe(0);
     });
 
     it('should return empty array if no valid curricula', async () => {
@@ -530,7 +535,13 @@ describe('TeamSelectionService - Unit Tests', () => {
       cvRepository.find.mockResolvedValue([]);
 
       const result = await teamSelectionService.selectOptimalTeam({}, 'org-123', 5);
-      expect(result).toEqual([]);
+      expect(result.team).toEqual([]);
+      expect(result.metadata.requestedSize).toBe(5);
+      expect(result.metadata.availableEmployees).toBe(0);
+      expect(result.metadata.selectedSize).toBe(0);
+      expect(result.metadata.shortage).toBe(5);
+      expect(result.metadata.allEmployeesInOrg).toBe(2);
+      expect(result.metadata.employeesWithAcceptedCV).toBe(0);
     });
   });
 
