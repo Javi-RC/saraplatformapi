@@ -956,6 +956,32 @@ describe('Curriculum Controller - Unit Tests', () => {
         }
       );
     });
+
+    it('should normalize contact.phones string before persisting', async () => {
+      req.body = {
+        sessionId: 's1',
+        currentPhase: 'phase-1-basic',
+        responses: { 'contact.phones': '678820014' }
+      };
+      const cv = { _id: 'cv1' };
+      cvRepository.findOne.mockResolvedValue(cv);
+      cvRepository.updateById.mockResolvedValue({ _id: 'cv1' });
+      cvRepository.findById.mockResolvedValue({ _id: 'cv1' });
+
+      const questionnaireService = require('../../../src/services/cv/cvInteractiveQuestionnaire.service');
+      questionnaireService.processResponsesAndGetNext.mockReturnValue({
+        isComplete: true,
+        completenessScore: 100,
+        message: 'done'
+      });
+
+      await cvController.submitPhaseResponses(req, res);
+
+      expect(cvRepository.updateById).toHaveBeenCalledWith(
+        'cv1',
+        { 'contact.phones': [{ number: '678820014', type: 'mobile' }] }
+      );
+    });
   });
 
   describe('submitQuestionnaire (final)', () => {

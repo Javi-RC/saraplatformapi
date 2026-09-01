@@ -379,7 +379,11 @@ function validateResponse(question, response) {
 
       case 'phone':
         const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
-        if (!phoneRegex.test(response)) {
+        const phones = Array.isArray(response)
+          ? response.filter(Boolean).map(p => typeof p === 'string' ? p : p?.number)
+          : [response];
+        const invalidPhone = phones.some(phone => !phoneRegex.test(String(phone).trim()));
+        if (invalidPhone) {
           errors.push({
             en: 'Please provide a valid phone number',
             es: 'Por favor proporciona un número telefónico válido'

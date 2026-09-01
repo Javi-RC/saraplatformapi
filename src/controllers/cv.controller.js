@@ -22,6 +22,24 @@ const CV_UPDATE_FIELDS = [
   'availabilityDetails', 'crossCulturalExperience', 'notes'
 ];
 
+function normalizeContactPhones(responses) {
+  const value = responses?.['contact.phones'];
+  if (value === undefined || value === null || value === '') return responses;
+
+  let phones;
+  if (Array.isArray(value)) {
+    phones = value.map(p =>
+      typeof p === 'string'
+        ? { number: p, type: 'mobile' }
+        : p
+    );
+  } else {
+    phones = [{ number: String(value).trim(), type: 'mobile' }];
+  }
+
+  return { ...responses, 'contact.phones': phones };
+}
+
 /**
  * Curriculum controller
  * Handles HTTP requests related to curricula
@@ -582,7 +600,7 @@ class CVController {
       const beforeCompleteness = validateCVCompleteness(cv);
 
       // Filter to only allowed fields
-      const filteredUpdates = filterAllowedFields(updates, CV_UPDATE_FIELDS);
+      const filteredUpdates = filterAllowedFields(normalizeContactPhones(updates), CV_UPDATE_FIELDS);
 
       if (Object.keys(filteredUpdates).length === 0) {
         return responseHandler.error(res, 'No valid update fields provided', 400);
@@ -728,7 +746,7 @@ class CVController {
       const result = finalizeQuestionnaire(cv, responses);
 
       // Filter to only allowed fields
-      const filteredResponses = filterAllowedFields(responses, CV_UPDATE_FIELDS);
+      const filteredResponses = filterAllowedFields(normalizeContactPhones(responses), CV_UPDATE_FIELDS);
 
       await cvRepository.updateById(cv._id, filteredResponses);
 
@@ -799,7 +817,7 @@ class CVController {
       }
 
       // Update curriculum with responses
-      const filteredResponses = filterAllowedFields(responses, CV_UPDATE_FIELDS);
+      const filteredResponses = filterAllowedFields(normalizeContactPhones(responses), CV_UPDATE_FIELDS);
 
       await cvRepository.updateById(cv._id, filteredResponses);
 
@@ -858,7 +876,7 @@ class CVController {
       const previousCompleteness = validateCVCompleteness(cv);
 
       // Update CV with all final responses
-      const filteredResponses = filterAllowedFields(finalResponses, CV_UPDATE_FIELDS);
+      const filteredResponses = filterAllowedFields(normalizeContactPhones(finalResponses), CV_UPDATE_FIELDS);
 
       await cvRepository.updateById(cv._id, filteredResponses);
 

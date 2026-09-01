@@ -287,6 +287,26 @@ describe('Curriculum Interactive Questionnaire Flow', () => {
   });
 
   describe('Response Validation', () => {
+    test('should validate phone responses as string and array', () => {
+      const phoneQuestion = {
+        field: 'contact.phones',
+        type: 'phone',
+        required: true
+      };
+
+      let validation = validateResponse(phoneQuestion, '6788200145');
+      expect(validation.isValid).toBe(true);
+
+      validation = validateResponse(phoneQuestion, [{ number: '+1234567890' }]);
+      expect(validation.isValid).toBe(true);
+
+      validation = validateResponse(phoneQuestion, [{ number: 'invalid' }]);
+      expect(validation.isValid).toBe(false);
+
+      validation = validateResponse(phoneQuestion, '123');
+      expect(validation.isValid).toBe(false);
+    });
+
     test('should validate email responses', () => {
       const emailQuestion = {
         field: 'contact.email',

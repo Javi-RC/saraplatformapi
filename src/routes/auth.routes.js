@@ -160,7 +160,11 @@ router.put('/complete-profile', async (req, res) => {
       });
     }
 
-    user.role = ROLES.EMPLOYEE;
+    const allowedRoles = [ROLES.EMPLOYEE, ROLES.ORG_ADMIN];
+    const requestedRole = req.body?.role;
+    user.role = (requestedRole && allowedRoles.includes(requestedRole))
+      ? requestedRole
+      : ROLES.EMPLOYEE;
     await user.save();
 
     const newToken = generateToken(user);

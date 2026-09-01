@@ -9,7 +9,7 @@ process.env.FRONTEND_URL = 'http://localhost:3001';
 process.env.EMAIL_SENDER_NAME = 'Test App';
 process.env.EMAIL_SENDER_EMAIL = 'test@example.com';
 process.env.BREVO_API_KEY = 'test-brevo-api-key';
-process.env.MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/saraplatform-test';
+process.env.MONGODB_URI = 'mongodb://localhost:27017/saraplatform-test';
 
 // Mock global de fetch para evitar llamadas reales a Brevo
 global.fetch = jest.fn();
