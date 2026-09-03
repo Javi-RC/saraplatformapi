@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const mongodbHelper = require('../setup/mongodb-helper');
 const app = require('../../src/app');
 const User = require('../../src/models/user.model');
-const { generateToken } = require('../../src/utils/jwt');
+const { generateToken, verifyToken } = require('../../src/utils/jwt');
 
 describe('PUT /auth/complete-profile', () => {
   let testUser;
@@ -44,6 +44,20 @@ describe('PUT /auth/complete-profile', () => {
 
     const updatedUser = await User.findById(testUser._id);
     expect(updatedUser.role).toBe('org_admin');
+  });
+
+  it('debería devolver el token rotado con el rol nuevo', async () => {
+    const response = await request(app)
+      .put('/auth/complete-profile')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ role: 'org_admin' });
+
+    expect(response.status).toBe(200);
+    // Sin esto, un cliente que no puede usar la cookie sigue mandando el token
+    // viejo (role: unassigned) y recibe 403 en todo lo protegido por rol.
+    expect(typeof response.body.token).toBe('string');
+    expect(response.body.token).not.toBe(authToken);
+    expect(verifyToken(response.body.token).role).toBe('org_admin');
   });
 
   it('debería asignar employee cuando el role viene en el body', async () => {

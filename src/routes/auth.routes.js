@@ -79,10 +79,12 @@ router.get(
 
         const token = generateToken(user);
         setTokenCookie(res, token);
-        const redirectPath = user.role === ROLES.UNASSIGNED
-          ? '/complete-profile'
-          : '/auth/callback';
-        return safeRedirect(res, redirectPath, {}, `token=${token}`);
+        // Siempre a /auth/callback: es la única pantalla del front que lee el
+        // token del fragmento y lo guarda para los navegadores que bloquean la
+        // cookie cross-site. Desde ahí decide el destino según el rol, así que
+        // redirigir directo a /complete-profile perdería el token y dejaría al
+        // usuario sin poder asignarse rol.
+        return safeRedirect(res, '/auth/callback', {}, `token=${token}`);
       }
 
       user = new User({
@@ -173,6 +175,11 @@ router.put('/complete-profile', async (req, res) => {
     res.json({
       success: true,
       user: user.toJSON(),
+      // El rol viaja dentro del JWT y la autorización lo lee de ahí, así que el
+      // token anterior sigue diciendo "unassigned". Los clientes que no pueden
+      // usar la cookie necesitan el token rotado para no quedarse con 403 en
+      // todo hasta que caduque.
+      token: newToken,
       message: 'Profile completed successfully'
     });
 
